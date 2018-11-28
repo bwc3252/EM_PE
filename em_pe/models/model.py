@@ -4,10 +4,11 @@ class model_base:
     '''
     Base "template" class for lightcurve models
     '''
-    def __init__(self, name, param_names, bands):
+    def __init__(self, name, param_names, bands, weight=1):
         self.name = name
         self.param_names = param_names
         self.bands = bands
+        self.weight = weight
         self.params = None
 
     def set_params(self, params):
@@ -19,10 +20,8 @@ class model_base:
     ### Functions that should be implemented by child classes.
     ### NOTE: These could be seen as (and maybe should be) abstract methods
 
-    def evaluate(self, t):
+    def evaluate(self, t, band):
         '''
         Method to evaluate model at specific time values using the current parameters.
-
-        Should return a dictionary of data band names mapped to values.
         '''
         pass

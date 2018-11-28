@@ -5,30 +5,32 @@ from .model import model_base
 
 class one_band_test_model(model_base):
 
-    def __init__(self):
+    def __init__(self, weight=1):
         name = 'one_band_test_model'
         param_names = ['a', 'b']
         bands = ['test_bandA']
-        model_base.__init__(self, name, param_names, bands)
+        model_base.__init__(self, name, param_names, bands, weight)
 
-    def evaluate(self, t):
+    def evaluate(self, t, band):
         a = self.params['a']
         b = self.params['b']
-        vals = (1 / np.cosh(a * t)) + b
-        return {'test_bandA':vals}
+        ret = (1 / np.cosh(a * t)) + b
+        return ret #* self.weight
 
 
 class two_band_test_model(model_base):
 
-    def __init__(self):
+    def __init__(self, weight=1):
         name = 'two_band_test_model'
         param_names = ['a', 'b']
         bands = ['test_bandA', 'test_bandB']
-        model_base.__init__(self, name, param_names, bands)
+        model_base.__init__(self, name, param_names, bands, weight)
 
-    def evaluate(self, t):
+    def evaluate(self, t, band):
         a = self.params['a']
         b = self.params['b']
-        A_vals = (1 / np.cosh(a * t)) + b
-        B_vals = (1 / np.cosh(a * t)) - b
-        return {'test_bandA':A_vals, 'test_bandB':B_vals}
+        if band == 'test_bandA':
+            ret = (1 / np.cosh(a * t)) + b
+        else:
+            ret = (1 / np.cosh(a * t)) - b
+        return ret * self.weight
