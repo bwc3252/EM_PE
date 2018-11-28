@@ -12,8 +12,8 @@ def parse_command_line_args():
     parser.add_argument('-v', action='store_true', help='Verbose mode')
     parser.add_argument('--cutoff', default=0, type=float, help='Likelihood cutoff for storing posterior samples')
     parser.add_argument('--f', action='append', help='Name of a data file')
-    parser.add_argument('--min', default=5, type=int, help='Minimum number of integrator iterations')
-    parser.add_argument('--max', default=5, type=int, help='Maximum number of integrator iterations')
+    parser.add_argument('--min', default=20, type=int, help='Minimum number of integrator iterations')
+    parser.add_argument('--max', default=20, type=int, help='Maximum number of integrator iterations')
     parser.add_argument('--out', help='Location to store posterior samples')
     return parser.parse_args()
 
@@ -96,4 +96,5 @@ if __name__ == '__main__':
         print('finished')
     models, ordered_params, bands_used, bounds = initialize_models(m)
     samples = generate_samples(data, models, ordered_params, L_cutoff, bounds, min_iter, max_iter)
-    np.savetxt(args.out, samples)
+    header = 'L p p_s ' + ' '.join(ordered_params)
+    np.savetxt(args.out, samples, header=header)

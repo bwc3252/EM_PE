@@ -17,3 +17,7 @@ data[3] = np.ones(n) * err_lim
 
 filename = 'em_pe/tests/Data/test_bandA.txt'
 np.savetxt(filename, data)
+
+truths = np.array([a, b])
+filename = 'em_pe/tests/Data/test_truths.txt'
+np.savetxt(filename, truths)
