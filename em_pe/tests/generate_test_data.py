@@ -1,8 +1,10 @@
 from __future__ import print_function
 import numpy as np
 
+np.random.seed(1)
+
 a = 1
-b = 1
+b = 0.5
 err_lim = 0.01
 
 tmin = -4

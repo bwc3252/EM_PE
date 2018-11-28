@@ -12,6 +12,7 @@ def parse_command_line_args():
     return parser.parse_args()
 
 def generate_plot(args):
+    color_list=['black', 'red', 'green', 'blue','yellow']
     sample_files = args.posterior_samples
     truth_file = args.truth_file
     if truth_file is not None:
@@ -19,6 +20,7 @@ def generate_plot(args):
     else:
         truths = None
     fig_base = None
+    i = 0
     for file in sample_files:
         samples = np.loadtxt(file, skiprows=1)
         with open(file) as f:
@@ -30,7 +32,12 @@ def generate_plot(args):
         n, m = samples.shape
         x = samples[:,range(3, m)]
         weights = L * p / p_s
-        fig_base = corner.corner(x, weights=weights, fig_base=fig_base, labels=param_names, truths=truths)
+        weights /= np.sum(weights)
+        color = color_list[i % len(color_list)]
+        fig_base = corner.corner(x, weights=weights, fig=fig_base, labels=param_names, truths=truths,
+                                 color=color, plot_datapoints=False, plot_density=False, no_fill_contours=True,
+                                 contours=True,)
+        i += 1
     plt.savefig(args.out)
 
 if __name__ == '__main__':
