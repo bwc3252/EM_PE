@@ -12,6 +12,7 @@ def parse_command_line_args():
     return parser.parse_args()
 
 def generate_plot(args):
+    ### colors to iterate through
     color_list=['black', 'red', 'green', 'blue','yellow']
     sample_files = args.posterior_samples
     truth_file = args.truth_file
@@ -30,6 +31,7 @@ def generate_plot(args):
         p = samples[:,1]
         p_s = samples[:,2]
         n, m = samples.shape
+        ### get columns of array corresponding to actual parameter samples
         x = samples[:,range(3, m)]
         weights = L * p / p_s
         weights /= np.sum(weights)

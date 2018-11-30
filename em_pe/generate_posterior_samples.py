@@ -1,6 +1,7 @@
 from __future__ import print_function
 import numpy as np
 import argparse
+import sys
 
 from models import model_dict, bounds_dict
 from integrator_utils import monte_carlo_integrator
@@ -18,17 +19,24 @@ def parse_command_line_args():
     return parser.parse_args()
 
 def read_data(data_loc, files):
+    if args.v:
+        print('Loading data... ', end='')
     data = {}
     for fname in files:
         band = fname.split('.')[0]
         data[band] = np.loadtxt(data_loc + fname)
+    if args.v:
+        print('finished')
     return data
 
 def initialize_models(m):
-    models = [model_dict[name](weight) for [name, weight] in m]
-    ordered_params = []
-    bands_used = []
-    bounds = []
+    if args.v:
+        print('Initializing models... ', end='')
+    ### initialize model objects
+    models = [model_dict[name](float(weight)) for [name, weight] in m]
+    ordered_params = [] # keep track of all parameters used
+    bands_used = [] # keep track of all data bands used
+    bounds = [] # bounds for each parameter
     for model in models:
         for param in model.param_names:
             if param not in ordered_params:
@@ -37,18 +45,26 @@ def initialize_models(m):
         for band in model.bands:
             if band not in bands_used:
                 bands_used.append(band)
-    return models, ordered_params, bands_used, bounds
+    t_bounds = {} # tmin and tmax for each band
+    for band in bands_used:
+        t = data[band][0]
+        t_bounds[band] = (min(t), max(t))
+    if args.v:
+        print('finished')
+    return models, ordered_params, bands_used, bounds, t_bounds
 
-def evaluate_lnL(params, data, models, bands_used):
-    temp_data = {}
+def evaluate_lnL(params, data, models, bands_used, t_bounds):
+    temp_data = {} # used to hold model data
     for band in bands_used:
         temp_data[band] = 0
+    ### evaluate each model for the params, in the required bands
     for model in models:
-        model.set_params(params)
+        model.set_params(params, t_bounds)
         for band in model.bands:
             t = data[band][0]
             temp_data[band] += model.evaluate(t, band)
     lnL = 0
+    ### calculate lnL
     for band in bands_used:
         x = data[band][2]
         err = data[band][3]
@@ -61,20 +77,25 @@ def integrand(samples):
     n, _ = samples.shape
     ret = []
     for row in samples:
-        params = dict(zip(ordered_params, row))
-        ret.append(np.exp(evaluate_lnL(params, data, models, bands_used)))
+        params = dict(zip(ordered_params, row)) # map each parameter's name to its value
+        ret.append(np.exp(evaluate_lnL(params, data, models, bands_used, t_bounds)))
     ret = np.array(ret).reshape((n, 1))
     return ret
 
 def generate_samples(data, models, ordered_params, L_cutoff, bounds, min_iter, max_iter):
-    # get a tuple of integers as dimensions to make the integrator happy
+    if args.v:
+        print('Generating posterior samples')
+        sys.stdout.flush()
+    ### get a tuple of integers as dimensions to make the integrator happy
     param_ind = tuple(range(len(ordered_params)))
     dim = len(ordered_params) # number of dimensions
     k = 1 # number of gaussian components TODO make this something that can change
     gmm_dict = {param_ind:None}
+    ### initialize and run the integrator
     integrator = monte_carlo_integrator.integrator(dim, bounds, gmm_dict, k,
                     proc_count=None, L_cutoff=L_cutoff)
     integrator.integrate(integrand, min_iter=min_iter, max_iter=max_iter)
+    ### make the array of samples
     samples = integrator.cumulative_values
     samples = np.append(samples, integrator.cumulative_p, axis=1)
     samples = np.append(samples, integrator.cumulative_p_s, axis=1)
@@ -89,12 +110,8 @@ if __name__ == '__main__':
     L_cutoff = args.cutoff
     min_iter = args.min
     max_iter = args.max
-    if args.v:
-        print('Loading data... ', end='')
     data = read_data(data_loc, files)
-    if args.v:
-        print('finished')
-    models, ordered_params, bands_used, bounds = initialize_models(m)
+    models, ordered_params, bands_used, bounds, t_bounds = initialize_models(m)
     samples = generate_samples(data, models, ordered_params, L_cutoff, bounds, min_iter, max_iter)
     header = 'L p p_s ' + ' '.join(ordered_params)
     np.savetxt(args.out, samples, header=header)

@@ -4,6 +4,9 @@ import numpy as np
 from .model import model_base
 
 class one_band_test_model(model_base):
+    '''
+    Simple one-band model for testing
+    '''
 
     def __init__(self, weight=1):
         name = 'one_band_test_model'
@@ -19,6 +22,9 @@ class one_band_test_model(model_base):
 
 
 class two_band_test_model(model_base):
+    '''
+    Simple two-band model for testing
+    '''
 
     def __init__(self, weight=1):
         name = 'two_band_test_model'
