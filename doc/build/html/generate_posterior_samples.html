@@ -41,6 +41,26 @@
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ python generate_posterior_samples.py --dat Data/ --m test_modelA --cutoff 10e-8 --f test_bandA.txt --out posterior_samples.txt
 </pre></div>
 </div>
+<p>To see full command line parameter documentation:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ python generate_posterior_samples.py -h
+usage: generate_posterior_samples.py [-h] [--dat DAT] [--m M M] [-v]
+                                 [--cutoff CUTOFF] [--f F] [--min MIN]
+                                 [--max MAX] [--out OUT]
+
+Generate posterior parameter samples from lightcurve data
+
+optional arguments:
+  -h, --help       show this help message and exit
+  --dat DAT        Path to data directory
+  --m M M          Name of a model to use
+  -v               Verbose mode
+  --cutoff CUTOFF  Likelihood cutoff for storing posterior samples
+  --f F            Name of a data file
+  --min MIN        Minimum number of integrator iterations
+  --max MAX        Maximum number of integrator iterations
+  --out OUT        Location to store posterior samples
+</pre></div>
+</div>
 <dl class="function">
 <dt id="em_pe.generate_posterior_samples.generate_samples">
 <code class="descclassname">em_pe.generate_posterior_samples.</code><code class="descname">generate_samples</code><span class="sig-paren">(</span><em>data</em>, <em>models</em>, <em>ordered_params</em>, <em>L_cutoff</em>, <em>bounds</em>, <em>min_iter</em>, <em>max_iter</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/em_pe/generate_posterior_samples.html#generate_samples"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#em_pe.generate_posterior_samples.generate_samples" title="Permalink to this definition">¶</a></dt>
@@ -86,6 +106,7 @@
 <h3>Navigation</h3>
 <p class="caption"><span class="caption-text">Contents:</span></p>
 <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="usage.html">Examples and Usage</a></li>
 <li class="toctree-l1"><a class="reference internal" href="plot_utils.html">Plot Utils</a></li>
 <li class="toctree-l1"><a class="reference internal" href="integrator_utils.html">Integrator Utils</a></li>
 <li class="toctree-l1"><a class="reference internal" href="models.html">Models</a></li>

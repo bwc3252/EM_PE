@@ -7,6 +7,23 @@ Generates and saves a corner plot from posterior samples.
 Example::
 
     $ python plot_corner.py --posterior_samples samples.txt --truth_file truths.txt --out fig.png --p a --p b
+
+To see full command line parameter documentation::
+
+    $ python plot_corner.py -h
+    usage: plot_corner.py [-h] [--posterior_samples POSTERIOR_SAMPLES]
+                          [--truth_file TRUTH_FILE] [--out OUT] [--p P]
+
+    Generate corner plot from posterior samples
+
+    optional arguments:
+      -h, --help            show this help message and exit
+      --posterior_samples POSTERIOR_SAMPLES
+                            File with posterior samples
+      --truth_file TRUTH_FILE
+                            File with true parameter values
+      --out OUT             File to save plot to
+      --p P                 Parameter name to plot
 '''
 
 from __future__ import print_function

@@ -7,6 +7,26 @@ Generate posterior parameter samples according to the given command line argumen
 Example::
 
     $ python generate_posterior_samples.py --dat Data/ --m test_modelA --cutoff 10e-8 --f test_bandA.txt --out posterior_samples.txt
+
+To see full command line parameter documentation::
+
+    $ python generate_posterior_samples.py -h
+    usage: generate_posterior_samples.py [-h] [--dat DAT] [--m M M] [-v]
+                                     [--cutoff CUTOFF] [--f F] [--min MIN]
+                                     [--max MAX] [--out OUT]
+
+    Generate posterior parameter samples from lightcurve data
+
+    optional arguments:
+      -h, --help       show this help message and exit
+      --dat DAT        Path to data directory
+      --m M M          Name of a model to use
+      -v               Verbose mode
+      --cutoff CUTOFF  Likelihood cutoff for storing posterior samples
+      --f F            Name of a data file
+      --min MIN        Minimum number of integrator iterations
+      --max MAX        Maximum number of integrator iterations
+      --out OUT        Location to store posterior samples
 '''
 from __future__ import print_function
 import numpy as np

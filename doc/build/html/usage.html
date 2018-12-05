@@ -6,7 +6,7 @@
   <head>
     <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>EM PE Documentation &#8212; EM_PE  documentation</title>
+    <title>Examples and Usage &#8212; EM_PE  documentation</title>
     <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
@@ -15,7 +15,8 @@
     <script type="text/javascript" src="_static/doctools.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Examples and Usage" href="usage.html" />
+    <link rel="next" title="Plot Utils" href="plot_utils.html" />
+    <link rel="prev" title="EM_PE" href="index.html" />
    
   <link rel="stylesheet" href="_static/custom.css" type="text/css" />
   
@@ -32,33 +33,33 @@
 
           <div class="body" role="main">
             
-  <div class="section" id="em-pe-documentation">
-<h1>EM PE Documentation<a class="headerlink" href="#em-pe-documentation" title="Permalink to this headline">¶</a></h1>
-<div class="toctree-wrapper compound">
-<p class="caption"><span class="caption-text">Contents:</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="usage.html">Examples and Usage</a></li>
-<li class="toctree-l1"><a class="reference internal" href="plot_utils.html">Plot Utils</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="plot_utils.html#plot-corner">Plot corner</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="integrator_utils.html">Integrator Utils</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="integrator_utils.html#gaussian-mixture-model">Gaussian Mixture Model</a></li>
-<li class="toctree-l2"><a class="reference internal" href="integrator_utils.html#monte-carlo-integrator">Monte Carlo Integrator</a></li>
-<li class="toctree-l2"><a class="reference internal" href="integrator_utils.html#multivariate-truncnorm">Multivariate Truncnorm</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="models.html">Models</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="models.html#model">Model</a></li>
-<li class="toctree-l2"><a class="reference internal" href="models.html#test-models">Test Models</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="generate_posterior_samples.html">Generating Posterior Samples</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="generate_posterior_samples.html#generate-posterior-samples">Generate Posterior Samples</a></li>
-</ul>
-</li>
-</ul>
+  <div class="section" id="examples-and-usage">
+<h1>Examples and Usage<a class="headerlink" href="#examples-and-usage" title="Permalink to this headline">¶</a></h1>
+<p>To run a simple one-band test using a fake model and data, run the included script
+<code class="docutils literal notranslate"><span class="pre">run_tests.sh</span></code>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ sh run_tests.sh
+</pre></div>
 </div>
+<p>This test will generate and save data from an artificial model, generate posterior
+samples, and plot a corner plot of these samples (with truth lines). All data, samples,
+and plots are saved in <code class="docutils literal notranslate"><span class="pre">em_pe/tests/Data/</span></code>. The corner plot produced should look similar
+to:</p>
+<img alt="_images/fig.png" src="_images/fig.png" />
+<p>In general, assuming data is already properly formatted, generate posterior samples:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ python em_pe/generate_posterior_samples.py --dat [data location] --m [model] [weight] --f [data file] --out [posterior sample file] --cutoff [L cutoff value]
+</pre></div>
+</div>
+<p>Multiple models and data files can be provided by adding them as additional arguments.
+To generate a corner plot:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ python em_pe/plot_utils/plot_corner.py --p [param name] --posterior_samples [posterior sample file] --out [filename of plot] --truth_file [truth file]
+</pre></div>
+</div>
+<p>Multiple parameter names can be (and usually are) specified. If multiple posterior
+sample files are specified, plots will be overlaid using a different color. A truth file
+does not have to be provided if truth lines are not desired. For example, here is a
+corner plot using two sets of posterior samples, the first generated from a single-band
+model and the second generated from a two-band model:</p>
+<img alt="_images/fig2.png" src="_images/fig2.png" />
 </div>
 
 
@@ -68,7 +69,7 @@
       </div>
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
-<h1 class="logo"><a href="#">EM_PE</a></h1>
+<h1 class="logo"><a href="index.html">EM_PE</a></h1>
 
 
 
@@ -79,8 +80,8 @@
 
 <h3>Navigation</h3>
 <p class="caption"><span class="caption-text">Contents:</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="usage.html">Examples and Usage</a></li>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Examples and Usage</a></li>
 <li class="toctree-l1"><a class="reference internal" href="plot_utils.html">Plot Utils</a></li>
 <li class="toctree-l1"><a class="reference internal" href="integrator_utils.html">Integrator Utils</a></li>
 <li class="toctree-l1"><a class="reference internal" href="models.html">Models</a></li>
@@ -90,8 +91,9 @@
 <div class="relations">
 <h3>Related Topics</h3>
 <ul>
-  <li><a href="#">Documentation overview</a><ul>
-      <li>Next: <a href="usage.html" title="next chapter">Examples and Usage</a></li>
+  <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="index.html" title="previous chapter">EM_PE</a></li>
+      <li>Next: <a href="plot_utils.html" title="next chapter">Plot Utils</a></li>
   </ul></li>
 </ul>
 </div>
@@ -127,7 +129,7 @@
       &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
       
       |
-      <a href="_sources/index.rst.txt"
+      <a href="_sources/usage.rst.txt"
           rel="nofollow">Page source</a>
     </div>
 

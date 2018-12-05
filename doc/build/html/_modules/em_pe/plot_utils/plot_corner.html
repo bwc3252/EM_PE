@@ -41,6 +41,23 @@
 <span class="sd">Example::</span>
 
 <span class="sd">    $ python plot_corner.py --posterior_samples samples.txt --truth_file truths.txt --out fig.png --p a --p b</span>
+
+<span class="sd">To see full command line parameter documentation::</span>
+
+<span class="sd">    $ python plot_corner.py -h</span>
+<span class="sd">    usage: plot_corner.py [-h] [--posterior_samples POSTERIOR_SAMPLES]</span>
+<span class="sd">                          [--truth_file TRUTH_FILE] [--out OUT] [--p P]</span>
+
+<span class="sd">    Generate corner plot from posterior samples</span>
+
+<span class="sd">    optional arguments:</span>
+<span class="sd">      -h, --help            show this help message and exit</span>
+<span class="sd">      --posterior_samples POSTERIOR_SAMPLES</span>
+<span class="sd">                            File with posterior samples</span>
+<span class="sd">      --truth_file TRUTH_FILE</span>
+<span class="sd">                            File with true parameter values</span>
+<span class="sd">      --out OUT             File to save plot to</span>
+<span class="sd">      --p P                 Parameter name to plot</span>
 <span class="sd">&#39;&#39;&#39;</span>
 
 <span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">print_function</span>
@@ -120,6 +137,7 @@
 <h3>Navigation</h3>
 <p class="caption"><span class="caption-text">Contents:</span></p>
 <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../usage.html">Examples and Usage</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../plot_utils.html">Plot Utils</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../integrator_utils.html">Integrator Utils</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../models.html">Models</a></li>

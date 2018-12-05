@@ -232,7 +232,7 @@ class gmm:
                 i += 1
             distances[index] = dist
             index += 1
-        return orders[np.argmin(distances)] # returns order which gives minimum net Euclidean distance
+        return orders[np.argmin(distances)] # returns order which gives minimum net Mahalanobis distance
 
     def _merge(self, new_model, M):
         '''

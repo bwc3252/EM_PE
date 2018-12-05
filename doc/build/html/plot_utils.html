@@ -16,7 +16,7 @@
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="Integrator Utils" href="integrator_utils.html" />
-    <link rel="prev" title="EM_PE" href="index.html" />
+    <link rel="prev" title="Examples and Usage" href="usage.html" />
    
   <link rel="stylesheet" href="_static/custom.css" type="text/css" />
   
@@ -40,6 +40,23 @@
 <p>Generates and saves a corner plot from posterior samples.</p>
 <p>Example:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ python plot_corner.py --posterior_samples samples.txt --truth_file truths.txt --out fig.png --p a --p b
+</pre></div>
+</div>
+<p>To see full command line parameter documentation:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ python plot_corner.py -h
+usage: plot_corner.py [-h] [--posterior_samples POSTERIOR_SAMPLES]
+                      [--truth_file TRUTH_FILE] [--out OUT] [--p P]
+
+Generate corner plot from posterior samples
+
+optional arguments:
+  -h, --help            show this help message and exit
+  --posterior_samples POSTERIOR_SAMPLES
+                        File with posterior samples
+  --truth_file TRUTH_FILE
+                        File with true parameter values
+  --out OUT             File to save plot to
+  --p P                 Parameter name to plot
 </pre></div>
 </div>
 <dl class="function">
@@ -70,6 +87,7 @@
 <h3>Navigation</h3>
 <p class="caption"><span class="caption-text">Contents:</span></p>
 <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="usage.html">Examples and Usage</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Plot Utils</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#plot-corner">Plot corner</a></li>
 </ul>
@@ -83,7 +101,7 @@
 <h3>Related Topics</h3>
 <ul>
   <li><a href="index.html">Documentation overview</a><ul>
-      <li>Previous: <a href="index.html" title="previous chapter">EM_PE</a></li>
+      <li>Previous: <a href="usage.html" title="previous chapter">Examples and Usage</a></li>
       <li>Next: <a href="integrator_utils.html" title="next chapter">Integrator Utils</a></li>
   </ul></li>
 </ul>
