@@ -1,7 +1,8 @@
 pages:
   script:
-  - apk --no-cache add py2-pip python-dev
-  - apk --no-cache add make
+  - apt-get update
+  - apt install pip
+  - apt install make
   - pip install sphinx
   - pip install numpy
   - pip install scipy
