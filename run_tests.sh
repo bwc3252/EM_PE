@@ -13,4 +13,4 @@ python em_pe/generate_posterior_samples.py --dat em_pe/tests/Data/ -v --m one_ba
 #python em_pe/generate_posterior_samples.py --min 100 --max 100 --dat em_pe/tests/Data/ -v --m two_band_test 1 --f test_bandA.txt --f test_bandB.txt --out em_pe/tests/Data/posterior_samples.txt --cutoff 1e-12
 
 ### Make the corner plots
-python em_pe/plot_utils/plot_corner.py --posterior_samples em_pe/tests/Data/posterior_samples.txt --out em_pe/tests/Data/fig.png --truth_file em_pe/tests/Data/test_truths.txt
+python em_pe/plot_utils/plot_corner.py --p a --p b --posterior_samples em_pe/tests/Data/posterior_samples.txt --out em_pe/tests/Data/fig.png --truth_file em_pe/tests/Data/test_truths.txt

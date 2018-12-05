@@ -9,6 +9,7 @@ def parse_command_line_args():
     parser.add_argument('--posterior_samples', action='append', help='File with posterior samples')
     parser.add_argument('--truth_file', help='File with true parameter values')
     parser.add_argument('--out', help='File to save plot to')
+    parser.add_argument('--p', action='append', help='Parameter name to plot')
     return parser.parse_args()
 
 def generate_plot(args):
@@ -27,12 +28,15 @@ def generate_plot(args):
         with open(file) as f:
             header = f.readline().strip().split(' ')
         param_names = header[4:]
+        index_dict = {}
+        for index in range(4, len(header)):
+            index_dict[header[index]] = index - 1
         L = samples[:,0]
         p = samples[:,1]
         p_s = samples[:,2]
         n, m = samples.shape
         ### get columns of array corresponding to actual parameter samples
-        x = samples[:,range(3, m)]
+        x = samples[:,[index_dict[name] for name in args.p]]
         weights = L * p / p_s
         weights /= np.sum(weights)
         color = color_list[i % len(color_list)]
