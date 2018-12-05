@@ -78,7 +78,7 @@ def integrand(samples):
     ret = []
     for row in samples:
         params = dict(zip(ordered_params, row)) # map each parameter's name to its value
-        ret.append(np.exp(evaluate_lnL(params, data, models, bands_used, t_bounds)))
+        ret.append(evaluate_lnL(params, data, models, bands_used, t_bounds))
     ret = np.array(ret).reshape((n, 1))
     return ret
 
@@ -93,13 +93,15 @@ def generate_samples(data, models, ordered_params, L_cutoff, bounds, min_iter, m
     gmm_dict = {param_ind:None}
     ### initialize and run the integrator
     integrator = monte_carlo_integrator.integrator(dim, bounds, gmm_dict, k,
-                    proc_count=None, L_cutoff=L_cutoff)
+                    proc_count=None, L_cutoff=L_cutoff, use_lnL=True)
     integrator.integrate(integrand, min_iter=min_iter, max_iter=max_iter)
     ### make the array of samples
     samples = integrator.cumulative_values
     samples = np.append(samples, integrator.cumulative_p, axis=1)
     samples = np.append(samples, integrator.cumulative_p_s, axis=1)
     samples = np.append(samples, integrator.cumulative_samples, axis=1)
+    if args.v:
+        print('Integral result:', integrator.integral)
     return samples
 
 if __name__ == '__main__':

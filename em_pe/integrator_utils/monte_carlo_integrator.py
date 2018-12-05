@@ -43,7 +43,8 @@ class integrator:
     '''
 
     def __init__(self, d, bounds, gmm_dict, n_comp, n=None, prior=None,
-                reflect=False, user_func=None, proc_count=None, L_cutoff=None):
+                reflect=False, user_func=None, proc_count=None, L_cutoff=None,
+                use_lnL=False):
         # user-specified parameters
         self.d = d
         self.bounds = bounds
@@ -53,6 +54,7 @@ class integrator:
         self.user_func=user_func
         self.prior = prior
         self.proc_count = proc_count
+        self.use_lnL = use_lnL
         # constants
         self.t = 0.02 # percent estimated error threshold
         if n is None:
@@ -124,9 +126,12 @@ class integrator:
             sample_array, value_array, p_array, new_n_comp = self.reflect_over_bounds()
             new_n, _ = sample_array.shape
         else:
-            sample_array, value_array, p_array = self.sample_array, self.value_array, self.p_array
+            sample_array, value_array, p_array = np.copy(self.sample_array), np.copy(self.value_array), np.copy(self.p_array)
             new_n_comp = self.n_comp
             new_n = self.n
+        if self.use_lnL:
+            value_array += abs(np.max(value_array))
+            value_array = np.exp(value_array)
         weights = abs((value_array * self.prior_array) / p_array) # training weights for samples
         for dim_group in self.gmm_dict: # iterate over grouped dimensions
             # create a matrix of the left and right limits for this set of dimensions
@@ -198,14 +203,18 @@ class integrator:
 
     def calculate_results(self):
         # cumulative samples
-        mask = self.value_array >= self.L_cutoff
+        if self.use_lnL:
+            value_array = np.exp(self.value_array)
+        else:
+            value_array = np.copy(self.value_array)
+        mask = value_array >= self.L_cutoff
         mask = mask.flatten()
         self.cumulative_samples = np.append(self.cumulative_samples, self.sample_array[mask], axis=0)
-        self.cumulative_values = np.append(self.cumulative_values, self.value_array[mask], axis=0)
+        self.cumulative_values = np.append(self.cumulative_values, value_array[mask], axis=0)
         self.cumulative_p = np.append(self.cumulative_p, self.prior_array[mask], axis=0)
         self.cumulative_p_s = np.append(self.cumulative_p_s, self.p_array[mask], axis=0)
         # make local copies
-        value_array = np.copy(self.value_array) * self.prior_array
+        value_array = np.copy(value_array) * self.prior_array
         p_array = np.copy(self.p_array)
         value_array /= p_array
         # calculate variance
