@@ -1,6 +1,6 @@
 *.pyc
 
-*Data
+Data
 
 *.png
 
@@ -10,3 +10,12 @@
 *.log
 *.pdf
 *.gz
+
+doctrees/
+latex/
+source/
+Makefile
+*.js
+*.inv
+*.buildinfo
+_*
