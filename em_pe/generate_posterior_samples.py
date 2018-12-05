@@ -1,3 +1,13 @@
+# -*- coding: utf-8 -*-
+'''
+Generate Posterior Samples
+--------------------------
+Generate posterior parameter samples according to the given command line arguments
+
+Example::
+
+    $ python generate_posterior_samples.py --dat Data/ --m test_modelA --cutoff 10e-8 --f test_bandA.txt --out posterior_samples.txt
+'''
 from __future__ import print_function
 import numpy as np
 import argparse
@@ -6,7 +16,10 @@ import sys
 from models import model_dict, bounds_dict
 from integrator_utils import monte_carlo_integrator
 
-def parse_command_line_args():
+def _parse_command_line_args():
+    '''
+    Parses and returns the command line arguments.
+    '''
     parser = argparse.ArgumentParser(description='Generate posterior parameter samples from lightcurve data')
     parser.add_argument('--dat', help='Path to data directory')
     parser.add_argument('--m', action='append', nargs=2, help='Name of a model to use')
@@ -18,7 +31,7 @@ def parse_command_line_args():
     parser.add_argument('--out', help='Location to store posterior samples')
     return parser.parse_args()
 
-def read_data(data_loc, files):
+def _read_data(data_loc, files):
     if args.v:
         print('Loading data... ', end='')
     data = {}
@@ -29,7 +42,7 @@ def read_data(data_loc, files):
         print('finished')
     return data
 
-def initialize_models(m):
+def _initialize_models(m):
     if args.v:
         print('Initializing models... ', end='')
     ### initialize model objects
@@ -53,7 +66,7 @@ def initialize_models(m):
         print('finished')
     return models, ordered_params, bands_used, bounds, t_bounds
 
-def evaluate_lnL(params, data, models, bands_used, t_bounds):
+def _evaluate_lnL(params, data, models, bands_used, t_bounds):
     temp_data = {} # used to hold model data
     for band in bands_used:
         temp_data[band] = 0
@@ -73,16 +86,36 @@ def evaluate_lnL(params, data, models, bands_used, t_bounds):
         lnL += np.sum(diff**2 / err**2)
     return -0.5 * lnL
 
-def integrand(samples):
+def _integrand(samples):
     n, _ = samples.shape
     ret = []
     for row in samples:
         params = dict(zip(ordered_params, row)) # map each parameter's name to its value
-        ret.append(evaluate_lnL(params, data, models, bands_used, t_bounds))
+        ret.append(_evaluate_lnL(params, data, models, bands_used, t_bounds))
     ret = np.array(ret).reshape((n, 1))
     return ret
 
 def generate_samples(data, models, ordered_params, L_cutoff, bounds, min_iter, max_iter):
+    '''
+    Generate posterior samples
+
+    Parameters
+    ----------
+    data : dict
+        Dictionary mapping bands to data
+    models : dict
+        Dictionary mapping model names to objects
+    ordered_params : list
+        List of parameter names
+    L_cutoff : float
+        Likelihood cutoff for storing samples
+    bounds : np.ndarray
+        Limits of integration
+    min_iter : int
+        Minimum number of integrator iterations
+    max_iter : int
+        Maximum number of integrator iterations
+    '''
     if args.v:
         print('Generating posterior samples')
         sys.stdout.flush()
@@ -94,7 +127,7 @@ def generate_samples(data, models, ordered_params, L_cutoff, bounds, min_iter, m
     ### initialize and run the integrator
     integrator = monte_carlo_integrator.integrator(dim, bounds, gmm_dict, k,
                     proc_count=None, L_cutoff=L_cutoff, use_lnL=True)
-    integrator.integrate(integrand, min_iter=min_iter, max_iter=max_iter)
+    integrator.integrate(_integrand, min_iter=min_iter, max_iter=max_iter)
     ### make the array of samples
     samples = integrator.cumulative_values
     samples = np.append(samples, integrator.cumulative_p, axis=1)
@@ -105,15 +138,15 @@ def generate_samples(data, models, ordered_params, L_cutoff, bounds, min_iter, m
     return samples
 
 if __name__ == '__main__':
-    args = parse_command_line_args()
+    args = _parse_command_line_args()
     m = args.m
     data_loc = args.dat
     files = args.f
     L_cutoff = args.cutoff
     min_iter = args.min
     max_iter = args.max
-    data = read_data(data_loc, files)
-    models, ordered_params, bands_used, bounds, t_bounds = initialize_models(m)
+    data = _read_data(data_loc, files)
+    models, ordered_params, bands_used, bounds, t_bounds = _initialize_models(m)
     samples = generate_samples(data, models, ordered_params, L_cutoff, bounds, min_iter, max_iter)
     header = 'L p p_s ' + ' '.join(ordered_params)
     np.savetxt(args.out, samples, header=header)

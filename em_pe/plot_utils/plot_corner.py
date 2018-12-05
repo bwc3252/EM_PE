@@ -1,10 +1,24 @@
+# -*- coding: utf-8 -*-
+'''
+Plot corner
+-----------
+Generates and saves a corner plot from posterior samples.
+
+Example::
+
+    $ python plot_corner.py --posterior_samples samples.txt --truth_file truths.txt --out fig.png --p a --p b
+'''
+
 from __future__ import print_function
 import numpy as np
 import matplotlib.pyplot as plt
 import corner
 import argparse
 
-def parse_command_line_args():
+def _parse_command_line_args():
+    '''
+    Parses and returns the command line arguments.
+    '''
     parser = argparse.ArgumentParser(description='Generate corner plot from posterior samples')
     parser.add_argument('--posterior_samples', action='append', help='File with posterior samples')
     parser.add_argument('--truth_file', help='File with true parameter values')
@@ -12,7 +26,11 @@ def parse_command_line_args():
     parser.add_argument('--p', action='append', help='Parameter name to plot')
     return parser.parse_args()
 
-def generate_plot(args):
+def generate_plot():
+    '''
+    Generates a corner plot for the specified posterior samples and parameters.
+    '''
+    args = _parse_command_line_args()
     ### colors to iterate through
     color_list=['black', 'red', 'green', 'blue','yellow']
     sample_files = args.posterior_samples
@@ -47,5 +65,4 @@ def generate_plot(args):
     plt.savefig(args.out)
 
 if __name__ == '__main__':
-    args = parse_command_line_args()
-    generate_plot(args)
+    generate_plot()

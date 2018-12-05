@@ -1,3 +1,10 @@
+# -*- coding: utf-8 -*-
+'''
+Gaussian Mixture Model
+----------------------
+Fit a Gaussian Mixture Model (GMM) to data and draw samples from it. Uses the
+Expectation-Maximization algorithm.
+'''
 from __future__ import print_function
 import numpy as np
 from scipy.stats import multivariate_normal
@@ -5,14 +12,22 @@ from scipy.misc import logsumexp
 import multivariate_truncnorm as truncnorm
 import itertools
 
-'''
-Equation references are from Numerical Recipes for general GMM and https://www.cs.nmsu.edu/~joemsong/publications/Song-SPIE2005-updated.pdf
-for online updating features
-'''
+
+# Equation references are from Numerical Recipes for general GMM and
+# https://www.cs.nmsu.edu/~joemsong/publications/Song-SPIE2005-updated.pdf for
+# online updating features
+
 
 class estimator:
     '''
-    base estimator class for GMM, contains only basic EM algorithm
+    Base estimator class for GMM
+
+    Parameters
+    ----------
+    k : int
+        Number of Gaussian components
+    max_iters : int
+        Maximum number of Expectation-Maximization iterations
     '''
 
     def __init__(self, k, max_iters=100):
@@ -27,14 +42,17 @@ class estimator:
         self.log_prob = None
         self.cov_avg_ratio = 0.1
 
-    def initialize(self, n, sample_array, sample_weights=None):
+    def _initialize(self, n, sample_array, sample_weights=None):
         p_weights = (sample_weights / np.sum(sample_weights)).flatten()
         self.means = sample_array[np.random.choice(n, self.k, p=p_weights.astype(sample_array.dtype)), :]
         self.covariances = [np.identity(self.d)] * self.k
         self.prev_covariances = self.covariances
         self.weights = np.array([1.0 / self.k] * self.k)
 
-    def e_step(self, n, sample_array, sample_weights):
+    def _e_step(self, n, sample_array, sample_weights):
+        '''
+        Expectation step
+        '''
         if sample_weights is None:
             log_sample_weights = np.zeros((n, 1))
         else:
@@ -54,7 +72,10 @@ class estimator:
         self.p_nk += log_sample_weights
         self.log_prob = np.sum(p_xn + log_sample_weights) # (16.1.2)
 
-    def m_step(self, n, sample_array):
+    def _m_step(self, n, sample_array):
+        '''
+        Maximization step
+        '''
         p_nk = np.exp(self.p_nk)
         weights = np.sum(p_nk, axis=0)
         for index in range(self.k):
@@ -68,7 +89,7 @@ class estimator:
             diff = sample_array - mean
             cov = np.dot((p_k * diff).T, diff) / w
             # attempt to fix non-positive-semidefinite covariances
-            if self.is_pos_def(cov):
+            if self._is_pos_def(cov):
                 self.covariances[index] = (cov + (self.cov_avg_ratio * self.prev_covariances[index])) / (1 + self.cov_avg_ratio)
             else:
                 self.covariances[index] = np.identity(self.d)
@@ -79,17 +100,17 @@ class estimator:
         self.weights = weights
 
 
-    def tol(self, n):
+    def _tol(self, n):
         '''
-        scale tolerance with number of dimensions, number of components, and
+        Scale tolerance with number of dimensions, number of components, and
         number of samples
         '''
         return (self.d * self.k * n) * 10e-4
 
 
-    def is_pos_def(self, M):
+    def _is_pos_def(self, M):
         '''
-        idea from here:
+        Idea from here:
         https://stackoverflow.com/questions/43238173/python-convert-matrix-to-positive-semi-definite
         '''
         try:
@@ -101,23 +122,30 @@ class estimator:
 
     def fit(self, sample_array, sample_weights):
         '''
-        basic fit() function to fit model to data
+        Fit the model to data
+
+        Parameters
+        ----------
+        sample_array : np.ndarray
+            Array of samples to fit
+        sample_weights : np.ndarray
+            Weights for samples
         '''
         n, self.d = sample_array.shape
-        self.initialize(n, sample_array, sample_weights)
+        self._initialize(n, sample_array, sample_weights)
         prev_log_prob = 0
         self.log_prob = float('inf')
         count = 0
-        while abs(self.log_prob - prev_log_prob) > self.tol(n) and count < self.max_iters:
+        while abs(self.log_prob - prev_log_prob) > self._tol(n) and count < self.max_iters:
             prev_log_prob = self.log_prob
-            self.e_step(n, sample_array, sample_weights)
-            self.m_step(n, sample_array)
+            self._e_step(n, sample_array, sample_weights)
+            self._m_step(n, sample_array)
             count += 1
 
 
     def print_params(self):
         '''
-        a nice way to print the parameters of the model
+        Prints the model's parameters in an easily-readable format
         '''
         for i in range(self.k):
             mean = self.means[i]
@@ -135,7 +163,17 @@ class estimator:
 
 class gmm:
     '''
-    more sophisticated implementation built on top of estimator
+    More sophisticated implementation built on top of estimator class
+
+    Includes functionality to update with new data rather than re-fit, as well
+    as sampling and scoring of samples.
+
+    Parameters
+    ----------
+    k : int
+        Number of Gaussian components
+    max_iters : int
+        Maximum number of Expectation-Maximization iterations
     '''
 
     def __init__(self, k, max_iters=1000):
@@ -152,7 +190,14 @@ class gmm:
 
     def fit(self, sample_array, sample_weights=None):
         '''
-        fit a new model to data with optional weights
+        Fit the model to data
+
+        Parameters
+        ----------
+        sample_array : np.ndarray
+            Array of samples to fit
+        sample_weights : np.ndarray
+            Weights for samples
         '''
         self.N, self.d = sample_array.shape
         if sample_weights is None:
@@ -166,9 +211,9 @@ class gmm:
         self.p_nk = model.p_nk
         self.log_prob = model.log_prob
 
-    def match_components(self, new_model):
+    def _match_components(self, new_model):
         '''
-        match components in new model to those in current model by minimizing the
+        Match components in new model to those in current model by minimizing the
         net Mahalanobis between all pairs of components
         '''
         orders = list(itertools.permutations(range(self.k), self.k))
@@ -189,15 +234,15 @@ class gmm:
             index += 1
         return orders[np.argmin(distances)] # returns order which gives minimum net Euclidean distance
 
-    def merge(self, new_model, M):
+    def _merge(self, new_model, M):
         '''
-        merge corresponding components of new model and old model
+        Merge corresponding components of new model and old model
 
-        refer to paper linked at the top of this file
+        Refer to paper linked at the top of this file
 
         M is the number of samples that the new model was fit using
         '''
-        order = self.match_components(new_model)
+        order = self._match_components(new_model)
         for i in range(self.k):
             j = order[i] # get corresponding component
             old_mean = self.means[i]
@@ -217,7 +262,7 @@ class gmm:
             cov2 /= denominator
             cov = cov1 + cov2 - mean * mean.T
             # check for positive-semidefinite
-            if not self.is_pos_def(cov):
+            if not self._is_pos_def(cov):
                 print('Non-positive-semidefinite covariance in component', i, ', reinitializing...')
                 cov = np.identity(self.d)
             # start equation (8)
@@ -229,19 +274,32 @@ class gmm:
 
     def update(self, sample_array, sample_weights=None):
         '''
-        updates the current model with new data WITHOUT doing a full re-training
+        Updates the model with new data without doing a full retraining.
+
+        Parameters
+        ----------
+        sample_array : np.ndarray
+            Array of samples to fit
+        sample_weights : np.ndarray
+            Weights for samples
         '''
         new_model = estimator(self.k, self.max_iters)
         new_model.fit(sample_array, sample_weights)
         M, _ = sample_array.shape
-        self.merge(new_model, M)
+        self._merge(new_model, M)
         self.N += M
 
     def score(self, sample_array, bounds=None):
         '''
-        scores samples under the current model. If bounds are given, they are used
-        to renormalize the scores. This should generally be pretty fast, but it does
-        require sampling another n points from a full, not-truncated distribution
+        Score samples (i.e. calculate likelihood of each sample) under the current
+        model.
+
+        Parameters
+        ----------
+        sample_array : np.ndarray
+            Array of samples to fit
+        bounds : np.ndarray
+            Bounds for samples, used for renormalizing scores
         '''
         n, _ = sample_array.shape
         scores = np.zeros((len(sample_array), 1))
@@ -269,8 +327,14 @@ class gmm:
 
     def sample(self, n, bounds=None):
         '''
-        samples from the current model, either over a full domain or within the
-        specified rectangular bounds
+        Draw samples from the current model, either with or without bounds
+
+        Parameters
+        ----------
+        n : int
+            Number of samples to draw
+        bounds : np.ndarray
+            Bounds for samples
         '''
         sample_array = np.empty((n, self.d))
         start = 0
@@ -296,7 +360,7 @@ class gmm:
 
 
 
-    def is_pos_def(self, M):
+    def _is_pos_def(self, M):
         '''
         idea from here:
         https://stackoverflow.com/questions/43238173/python-convert-matrix-to-positive-semi-definite
@@ -310,7 +374,7 @@ class gmm:
 
     def print_params(self):
         '''
-        a nice way to print the parameters of the model
+        Prints the model's parameters in an easily-readable format
         '''
         for i in range(self.k):
             mean = self.means[i]

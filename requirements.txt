@@ -1,0 +1,5 @@
+numpy==1.15.3
+corner==2.0.1
+scipy==1.1.0
+matplotlib==2.2.3
+multiprocess==0.70.6.1

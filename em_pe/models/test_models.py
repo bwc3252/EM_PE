@@ -1,3 +1,9 @@
+# -*- coding: utf-8 -*-
+'''
+Test Models
+-----------
+Simple model classes used for testing.
+'''
 from __future__ import print_function
 import numpy as np
 
@@ -6,6 +12,11 @@ from .model import model_base
 class one_band_test_model(model_base):
     '''
     Simple one-band model for testing
+
+    Parameters
+    ----------
+    weight : float
+        Weight of the model
     '''
 
     def __init__(self, weight=1):
@@ -15,6 +26,16 @@ class one_band_test_model(model_base):
         model_base.__init__(self, name, param_names, bands, weight)
 
     def evaluate(self, t, band):
+        '''
+        Evaluate model at specific time values using the current parameters.
+
+        Parameters
+        ----------
+        t : np.ndarray
+            Time values
+        band : string
+            Band to evaluate
+        '''
         a = self.params['a']
         b = self.params['b']
         ret = (1 / np.cosh(a * t)) + b
@@ -24,6 +45,11 @@ class one_band_test_model(model_base):
 class two_band_test_model(model_base):
     '''
     Simple two-band model for testing
+
+    Parameters
+    ----------
+    weight : float
+        Weight of the model
     '''
 
     def __init__(self, weight=1):
@@ -33,6 +59,16 @@ class two_band_test_model(model_base):
         model_base.__init__(self, name, param_names, bands, weight)
 
     def evaluate(self, t, band):
+        '''
+        Evaluate model at specific time values using the current parameters.
+
+        Parameters
+        ----------
+        t : np.ndarray
+            Time values
+        band : string
+            Band to evaluate
+        '''
         a = self.params['a']
         b = self.params['b']
         if band == 'test_bandA':

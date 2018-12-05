@@ -1,19 +1,20 @@
+# -*- coding: utf-8 -*-
+'''
+Multivariate Truncnorm
+----------------------
+Draw samples from a truncated multivariate Gaussian distribution.
+'''
 from __future__ import print_function
 import itertools
 import numpy as np
 from scipy.stats import truncnorm
 from time import time
 
-'''
-Code adapted from http://www.aishack.in/tutorials/generating-multivariate-gaussian-random/
+# Code adapted from http://www.aishack.in/tutorials/generating-multivariate-gaussian-random/
 
-Generates multivariate Gaussian samples inside a specified rectangular region
-'''
-
-
-def get_corner_coords(bounds):
+def _get_corner_coords(bounds):
     '''
-    gets coordinates of corner points given bounds for each dimension
+    Gets coordinates of corner points given bounds for each dimension
     '''
     d = len(bounds)
     points = np.empty((2**d, d))
@@ -27,14 +28,14 @@ def get_corner_coords(bounds):
     return points
 
 
-def get_new_bounds(bounds, q):
+def _get_new_bounds(bounds, q):
     '''
-    finds smallest rectangular region that, when transformed, will contain the
+    Finds smallest rectangular region that, when transformed, will contain the
     desired rectangular sampling region
     '''
     r = q.I # inverse of transformation
     d = len(bounds)
-    old_points = get_corner_coords(bounds)
+    old_points = _get_corner_coords(bounds)
     new_points = np.empty((2**d, d))
     index = 0
     for point in old_points:
@@ -48,9 +49,9 @@ def get_new_bounds(bounds, q):
     return new_bounds
 
 
-def get_multipliers(cov):
+def _get_multipliers(cov):
     '''
-    gets the linear transformation to shift samples
+    Gets the linear transformation to shift samples
     '''
     [lam, sigma] = np.linalg.eig(cov)
     lam = np.matrix(np.diag(np.sqrt(lam)))
@@ -60,12 +61,28 @@ def get_multipliers(cov):
 
 def sample(mean, cov, bounds, n):
     '''
-    generates n samples with correct mean and covariance inside of the specified bounds
+    Generate samples
+
+    Parameters
+    ----------
+    mean : np.ndarray
+        Mean of the distribution
+    cov : np.ndarray
+        Covariance matrix of the distribution
+    bounds : np.ndarray
+        Bounds for samples
+    n : int
+        Number of samples to draw
+
+    Returns
+    -------
+    np.ndarray
+        Array of samples
     '''
     mean = np.matrix(mean)
     d = len(bounds)
-    q = get_multipliers(cov)
-    new_bounds = get_new_bounds(bounds - np.rot90(mean, -1), q)
+    q = _get_multipliers(cov)
+    new_bounds = _get_new_bounds(bounds - np.rot90(mean, -1), q)
     llim_new = new_bounds[:,[0]]
     rlim_new = new_bounds[:,[1]]
     ret = np.empty((0, d))

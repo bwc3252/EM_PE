@@ -1,3 +1,9 @@
+# -*- coding: utf-8 -*-
+'''
+Monte Carlo Integrator
+----------------------
+Perform an adaptive monte carlo integral.
+'''
 from __future__ import print_function
 import numpy as np
 import gaussian_mixture_model as GMM
@@ -16,41 +22,47 @@ class integrator:
     Class to iteratively perform an adaptive Monte Carlo integral where the integrand
     is a combination of one or more Gaussian curves, in one or more dimensions.
 
-    Parameters:
+    Parameters
+    ----------
+    d : int
+        Total number of dimensions.
 
-    d (int): Total number of dimensions.
+    bounds : np.ndarray
+        Limits of integration, where each row represents [left_lim, right_lim]
+        for its corresponding dimension.
 
-    bounds (2 x d numpy array): Limits of integration, where each row represents
-    [left_lim, right_lim] for its corresponding dimension.
+    gmm_dict : dict
+        Dictionary where each key is a tuple of one or more dimensions
+        that are to be modeled together. If the integrand has strong correlations between
+        two or more dimensions, they should be grouped. Each value is by default initialized
+        to None, and is replaced with the GMM object for its dimension(s).
 
-    gmm_dict (dict): Dictionary where each key is a tuple of one or more dimensions
-    that are to be modeled together. If the integrand has strong correlations between
-    two or more dimensions, they should be grouped. Each value is by default initialized
-    to None, and is replaced with the GMM object for its dimension(s).
+    n_comp : int
+        The number of Gaussian components per group of dimensions.
 
-    n_comp (int): The number of Gaussian components per group of dimensions.
+    n : int
+        Number of samples per iteration
 
-    reflect (bool or 2 x d numpy array): Option to reflect all samples across limits of
-    integration to help handle boundaries. If not False, must be a numpy array of the
-    same shape as the bounds parameter, where each entry is a bool indicating whether
-    or not to reflect over that boundary.
+    prior : function
+        Function to evaluate prior for samples
 
-    prior_samples (d x n numpy array): User-provided samples for intial evaluation
-    and training. If None, a uniform prior is used. Note that if non-uniform prior
-    is used, the prior_pdf must also be provided.
+    user_func : function
+        Function to run each iteration
 
-    prior_pdf (1 x n numpy array): User-provided responsibilities for prior samples
+    L_cutoff : float
+        Likelihood cutoff for samples to store
+
+    use_lnL : bool
+        Whether or not lnL or L will be returned by the integrand
     '''
 
     def __init__(self, d, bounds, gmm_dict, n_comp, n=None, prior=None,
-                reflect=False, user_func=None, proc_count=None, L_cutoff=None,
-                use_lnL=False):
+                user_func=None, proc_count=None, L_cutoff=None, use_lnL=False):
         # user-specified parameters
         self.d = d
         self.bounds = bounds
         self.gmm_dict = gmm_dict
         self.n_comp = n_comp
-        self.reflect = reflect
         self.user_func=user_func
         self.prior = prior
         self.proc_count = proc_count
@@ -84,13 +96,13 @@ class integrator:
         else:
             self.L_cutoff = L_cutoff
 
-    def calculate_prior(self):
+    def _calculate_prior(self):
         if self.prior is None:
             self.prior_array = np.ones((self.n, 1))
         else:
             self.prior_array = self.prior(self.sample_array)
 
-    def sample(self):
+    def _sample(self):
         self.p_array = np.ones((self.n, 1))
         self.sample_array = np.empty((self.n, self.d))
         for dim_group in self.gmm_dict: # iterate over grouped dimensions
@@ -120,15 +132,8 @@ class integrator:
                 self.sample_array[:,[dim]] = temp_samples[:,[index]]
                 index += 1
 
-    def train(self):
-        if self.reflect:
-            # we need to reflect each dimension over the left and right limits
-            sample_array, value_array, p_array, new_n_comp = self.reflect_over_bounds()
-            new_n, _ = sample_array.shape
-        else:
-            sample_array, value_array, p_array = np.copy(self.sample_array), np.copy(self.value_array), np.copy(self.p_array)
-            new_n_comp = self.n_comp
-            new_n = self.n
+    def _train(self):
+        sample_array, value_array, p_array = np.copy(self.sample_array), np.copy(self.value_array), np.copy(self.p_array)
         if self.use_lnL:
             value_array += abs(np.max(value_array))
             value_array = np.exp(value_array)
@@ -141,7 +146,7 @@ class integrator:
                 new_bounds[index] = self.bounds[dim]
                 index += 1
             model = self.gmm_dict[dim_group] # get model for this set of dimensions
-            temp_samples = np.empty((new_n, len(dim_group)))
+            temp_samples = np.empty((self.n, len(dim_group)))
             index = 0
             for dim in dim_group:
                 # get samples corresponding to the current model
@@ -149,59 +154,14 @@ class integrator:
                 index += 1
             if model is None:
                 # model doesn't exist yet
-                model = GMM.gmm(new_n_comp)
+                model = GMM.gmm(self.n_comp)
                 model.fit(temp_samples, sample_weights=weights)
             else:
                 model.update(temp_samples, sample_weights=weights)
             self.gmm_dict[dim_group] = model
 
 
-    def reflect_over_bounds(self):
-        # make local copies of points, function values, and responsibilities
-        sample_array = self.sample_array
-        value_array = self.value_array
-        p_array = self.p_array
-        samples_to_append = np.empty((0, self.d))
-        values_to_append = np.empty((0, 1))
-        p_to_append = np.empty((0, 1))
-        # get rotated arrays of function values and responsibilities
-        rotated_values = np.flipud(value_array)
-        rotated_p = np.flipud(p_array)
-        new_n_comp = self.n_comp
-        for dim in range(self.d): # each dimension will have two reflections
-            if self.reflect[dim][1]: # right side needs reflected
-                # get a copy of samples
-                right = np.copy(sample_array)
-                # reflect
-                right[:,[dim]] *= -1
-                # shift
-                rlim = self.bounds[dim][0]
-                right[:,[dim]] += 2 * rlim
-                # append things
-                samples_to_append = np.append(samples_to_append, right, axis=0)
-                values_to_append = np.append(values_to_append, value_array, axis=0)
-                p_to_append = np.append(p_to_append, p_array, axis=0)
-                new_n_comp += self.n_comp
-            if self.reflect[dim][0]: # left side needs reflected
-                # get a copy of samples
-                left = np.copy(sample_array)
-                # reflect
-                left[:,[dim]] *= -1
-                # shift
-                llim = self.bounds[dim][0]
-                left[:,[dim]] += 2 * llim
-                # append things
-                samples_to_append = np.append(samples_to_append, left, axis=0)
-                values_to_append = np.append(values_to_append, rotated_values, axis=0)
-                p_to_append = np.append(p_to_append, rotated_p, axis=0)
-                new_n_comp += self.n_comp
-            # append things
-            sample_array = np.append(sample_array, samples_to_append, axis=0)
-            value_array = np.append(value_array, values_to_append, axis=0)
-            p_array = np.append(p_array, p_to_append, axis=0)
-        return sample_array, value_array, p_array, new_n_comp
-
-    def calculate_results(self):
+    def _calculate_results(self):
         # cumulative samples
         if self.use_lnL:
             value_array = np.exp(self.value_array)
@@ -232,6 +192,26 @@ class integrator:
         self.var = ((self.var * self.iterations) + curr_var) / (self.iterations + 1)
 
     def integrate(self, func, min_iter=10, max_iter=20, var_thresh=0.0, max_err=10, neff=float('inf'), nmax=None):
+        '''
+        Evaluate the integral
+
+        Parameters
+        ----------
+        func : function
+            Integrand function
+        min_iter : int
+            Minimum number of integrator iterations
+        max_iter : int
+            Maximum number of integrator iterations
+        var_thresh : float
+            Variance threshold for terminating integration
+        max_err : int
+            Maximum number of errors to catch before terminating integration
+        neff : float
+            Effective samples threshold for terminating integration
+        nmax : int
+            Maximum number of samples to draw
+        '''
         err_count = 0
         cumulative_eval_time = 0
         if nmax is None:
@@ -241,7 +221,7 @@ class integrator:
                 print('Exiting due to errors...')
                 break
             try:
-                self.sample()
+                self._sample()
             except KeyboardInterrupt:
                 print('KeyboardInterrupt, exiting...')
                 exit()
@@ -260,15 +240,15 @@ class integrator:
                 self.value_array = np.concatenate(p.map(func, split_samples), axis=0)
                 p.close()
             cumulative_eval_time += time.time() - t1
-            self.calculate_prior()
-            self.calculate_results()
+            self._calculate_prior()
+            self._calculate_results()
             #print(self.integral, '+/-', np.sqrt(self.var), 'with eff_samp', self.eff_samp)
             self.iterations += 1
             self.ntotal += self.n
             if self.iterations >= min_iter and self.var < var_thresh:
                 break
             try:
-                self.train()
+                self._train()
             except KeyboardInterrupt:
                 print('KeyboardInterrupt, exiting...')
                 exit()

@@ -1,16 +1,25 @@
+# -*- coding: utf-8 -*-
+'''
+Model
+-----
+Base class for lightcurve models
+'''
 from __future__ import print_function
 
 class model_base:
     '''
     Base "template" class for lightcurve models
 
-    name: string name of model
-
-    param_names: [string] names of parameters
-
-    bands: [string] names of data bands
-
-    weight: float weight of model (defaults to 1, used as weight for multi-component likelihoods)
+    Parameters
+    ----------
+    name : string
+        Name of the model
+    param_names : list
+        Names of parameters
+    bands : list
+        Names of data bands
+    weight : float
+        Weight of model used in likelihood calculations
     '''
     def __init__(self, name, param_names, bands, weight=1):
         self.name = name
@@ -22,8 +31,16 @@ class model_base:
 
     def set_params(self, params, t_bounds):
         '''
-        Method to set the parameters. Would be overridden for more complex models,
-        because this is where the differential equations would be solved.
+        Method to set the parameters. This would be overridden for more complex
+        models, because this is where the differential equations would be solved.
+
+        Parameters
+        ----------
+        params : dict
+            Dictionary mapping parameter names to their values
+        t_bounds : dict
+            Dictionary mapping bands to [upper_bound, lower_bound] pairs for the
+            time values observed in those bands
         '''
         self.params = params
         self.t_bounds = t_bounds
@@ -35,5 +52,12 @@ class model_base:
         '''
         Method to evaluate model at specific time values using the current parameters.
         Must be implemented by all child classes.
+
+        Parameters
+        ----------
+        t : np.ndarray
+            Time values
+        band : string
+            Band to evaluate
         '''
         pass
