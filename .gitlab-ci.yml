@@ -1,0 +1,17 @@
+pages:
+  script:
+  - apk --no-cache add py2-pip python-dev
+  - apk --no-cache add make
+  - pip install sphinx
+  - pip install numpy
+  - pip install scipy
+  - pip install matplotlib
+  - pip install corner
+  - cd doc/
+  - make html
+  - mv build/html/ public/
+  artifacts:
+    paths:
+    - public
+  only:
+  - master
