@@ -165,12 +165,14 @@ class integrator:
         # cumulative samples
         if self.use_lnL:
             value_array = np.exp(self.value_array)
+            lnL = self.value_array
         else:
             value_array = np.copy(self.value_array)
+            lnL = self.value_array
         mask = value_array >= self.L_cutoff
         mask = mask.flatten()
         self.cumulative_samples = np.append(self.cumulative_samples, self.sample_array[mask], axis=0)
-        self.cumulative_values = np.append(self.cumulative_values, value_array[mask], axis=0)
+        self.cumulative_values = np.append(self.cumulative_values, lnL[mask], axis=0)
         self.cumulative_p = np.append(self.cumulative_p, self.prior_array[mask], axis=0)
         self.cumulative_p_s = np.append(self.cumulative_p_s, self.p_array[mask], axis=0)
         # make local copies

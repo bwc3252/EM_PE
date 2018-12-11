@@ -100,12 +100,14 @@
         <span class="n">index_dict</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="k">for</span> <span class="n">index</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">header</span><span class="p">)):</span>
             <span class="n">index_dict</span><span class="p">[</span><span class="n">header</span><span class="p">[</span><span class="n">index</span><span class="p">]]</span> <span class="o">=</span> <span class="n">index</span> <span class="o">-</span> <span class="mi">1</span>
-        <span class="n">L</span> <span class="o">=</span> <span class="n">samples</span><span class="p">[:,</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">lnL</span> <span class="o">=</span> <span class="n">samples</span><span class="p">[:,</span><span class="mi">0</span><span class="p">]</span>
         <span class="n">p</span> <span class="o">=</span> <span class="n">samples</span><span class="p">[:,</span><span class="mi">1</span><span class="p">]</span>
         <span class="n">p_s</span> <span class="o">=</span> <span class="n">samples</span><span class="p">[:,</span><span class="mi">2</span><span class="p">]</span>
         <span class="n">n</span><span class="p">,</span> <span class="n">m</span> <span class="o">=</span> <span class="n">samples</span><span class="o">.</span><span class="n">shape</span>
         <span class="c1">### get columns of array corresponding to actual parameter samples</span>
         <span class="n">x</span> <span class="o">=</span> <span class="n">samples</span><span class="p">[:,[</span><span class="n">index_dict</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">args</span><span class="o">.</span><span class="n">p</span><span class="p">]]</span>
+        <span class="n">lnL</span> <span class="o">+=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">lnL</span><span class="p">))</span>
+        <span class="n">L</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="n">lnL</span><span class="p">)</span>
         <span class="n">weights</span> <span class="o">=</span> <span class="n">L</span> <span class="o">*</span> <span class="n">p</span> <span class="o">/</span> <span class="n">p_s</span>
         <span class="n">weights</span> <span class="o">/=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">weights</span><span class="p">)</span>
         <span class="n">color</span> <span class="o">=</span> <span class="n">color_list</span><span class="p">[</span><span class="n">i</span> <span class="o">%</span> <span class="nb">len</span><span class="p">(</span><span class="n">color_list</span><span class="p">)]</span>
@@ -142,6 +144,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../integrator_utils.html">Integrator Utils</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../models.html">Models</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../generate_posterior_samples.html">Generating Posterior Samples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../parser.html">Parser</a></li>
 </ul>
 
 <div class="relations">

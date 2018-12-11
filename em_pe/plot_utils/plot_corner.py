@@ -66,12 +66,14 @@ def generate_plot():
         index_dict = {}
         for index in range(4, len(header)):
             index_dict[header[index]] = index - 1
-        L = samples[:,0]
+        lnL = samples[:,0]
         p = samples[:,1]
         p_s = samples[:,2]
         n, m = samples.shape
         ### get columns of array corresponding to actual parameter samples
         x = samples[:,[index_dict[name] for name in args.p]]
+        lnL += abs(np.max(lnL))
+        L = np.exp(lnL)
         weights = L * p / p_s
         weights /= np.sum(weights)
         color = color_list[i % len(color_list)]

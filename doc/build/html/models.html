@@ -166,6 +166,114 @@ time values observed in those bands</li>
 </dd></dl>
 
 </div>
+<span class="target" id="module-em_pe.models.gwemlightcurve_models"></span><div class="section" id="gwemlightcurves-models">
+<h2>Gwemlightcurves Models<a class="headerlink" href="#gwemlightcurves-models" title="Permalink to this headline">¶</a></h2>
+<p>Models adapted from code found in <a class="reference external" href="https://github.com/mcoughlin/gwemlightcurves/tree/master/gwemlightcurves/KNModels/io">gwemlightcurves</a></p>
+<dl class="class">
+<dt id="em_pe.models.gwemlightcurve_models.me2017">
+<em class="property">class </em><code class="descclassname">em_pe.models.gwemlightcurve_models.</code><code class="descname">me2017</code><span class="sig-paren">(</span><em>weight=1</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/em_pe/models/gwemlightcurve_models.html#me2017"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#em_pe.models.gwemlightcurve_models.me2017" title="Permalink to this definition">¶</a></dt>
+<dd><p>Implementation of Metzger model</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>weight</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a>) – Weight of the model</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="em_pe.models.gwemlightcurve_models.me2017.set_params">
+<code class="descname">set_params</code><span class="sig-paren">(</span><em>params</em>, <em>t_bounds</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/em_pe/models/gwemlightcurve_models.html#me2017.set_params"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#em_pe.models.gwemlightcurve_models.me2017.set_params" title="Permalink to this definition">¶</a></dt>
+<dd><p>Method to set the parameters and run differential equation for lightcurve
+model.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>params</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)"><em>dict</em></a>) – Dictionary mapping parameter names to their values</li>
+<li><strong>t_bounds</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)"><em>dict</em></a>) – Dictionary mapping bands to [upper_bound, lower_bound] pairs for the
+time values observed in those bands</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="em_pe.models.gwemlightcurve_models.woko2017">
+<em class="property">class </em><code class="descclassname">em_pe.models.gwemlightcurve_models.</code><code class="descname">woko2017</code><span class="sig-paren">(</span><em>weight=1</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/em_pe/models/gwemlightcurve_models.html#woko2017"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#em_pe.models.gwemlightcurve_models.woko2017" title="Permalink to this definition">¶</a></dt>
+<dd><p>Implementation of lightcurve model found <a class="reference external" href="https://arxiv.org/abs/1705.07084">here</a></p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>weight</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a>) – Weight of the model</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="em_pe.models.gwemlightcurve_models.woko2017.set_params">
+<code class="descname">set_params</code><span class="sig-paren">(</span><em>params</em>, <em>t_bounds</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/em_pe/models/gwemlightcurve_models.html#woko2017.set_params"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#em_pe.models.gwemlightcurve_models.woko2017.set_params" title="Permalink to this definition">¶</a></dt>
+<dd><p>Method to set the parameters and run differential equation for lightcurve
+model.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>params</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)"><em>dict</em></a>) – Dictionary mapping parameter names to their values</li>
+<li><strong>t_bounds</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)"><em>dict</em></a>) – Dictionary mapping bands to [upper_bound, lower_bound] pairs for the
+time values observed in those bands</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<span class="target" id="module-em_pe.models.linear_model"></span><div class="section" id="linear-model">
+<h2>Linear Model<a class="headerlink" href="#linear-model" title="Permalink to this headline">¶</a></h2>
+<p>Simple model used for tests on actual data.</p>
+<dl class="class">
+<dt id="em_pe.models.linear_model.linear_model">
+<em class="property">class </em><code class="descclassname">em_pe.models.linear_model.</code><code class="descname">linear_model</code><span class="sig-paren">(</span><em>weight=1</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/em_pe/models/linear_model.html#linear_model"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#em_pe.models.linear_model.linear_model" title="Permalink to this definition">¶</a></dt>
+<dd><p>Simple model for tests on actual data</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>weight</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.7)"><em>float</em></a>) – Weight of the model</td>
+</tr>
+</tbody>
+</table>
+<dl class="method">
+<dt id="em_pe.models.linear_model.linear_model.evaluate">
+<code class="descname">evaluate</code><span class="sig-paren">(</span><em>t</em>, <em>band</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/em_pe/models/linear_model.html#linear_model.evaluate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#em_pe.models.linear_model.linear_model.evaluate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Evaluate the model at specific time values using the current parameters.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>t</strong> (<em>np.ndarray</em>) – Time values</li>
+<li><strong>band</strong> (<em>string</em>) – Band to evaluate</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+</div>
 </div>
 
 
@@ -187,14 +295,18 @@ time values observed in those bands</li>
 <h3>Navigation</h3>
 <p class="caption"><span class="caption-text">Contents:</span></p>
 <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="usage.html">Examples and Usage</a></li>
 <li class="toctree-l1"><a class="reference internal" href="plot_utils.html">Plot Utils</a></li>
 <li class="toctree-l1"><a class="reference internal" href="integrator_utils.html">Integrator Utils</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Models</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#model">Model</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#test-models">Test Models</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#gwemlightcurves-models">Gwemlightcurves Models</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#linear-model">Linear Model</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="generate_posterior_samples.html">Generating Posterior Samples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="parser.html">Parser</a></li>
 </ul>
 
 <div class="relations">

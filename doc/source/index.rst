@@ -15,3 +15,4 @@ EM PE Documentation
    integrator_utils
    models
    generate_posterior_samples
+   parser

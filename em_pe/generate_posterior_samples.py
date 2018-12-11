@@ -168,5 +168,5 @@ if __name__ == '__main__':
     data = _read_data(data_loc, files)
     models, ordered_params, bands_used, bounds, t_bounds = _initialize_models(m)
     samples = generate_samples(data, models, ordered_params, L_cutoff, bounds, min_iter, max_iter)
-    header = 'L p p_s ' + ' '.join(ordered_params)
+    header = 'lnL p p_s ' + ' '.join(ordered_params)
     np.savetxt(args.out, samples, header=header)

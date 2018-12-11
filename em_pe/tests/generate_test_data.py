@@ -19,7 +19,7 @@ data[0] = t
 data[2] = (1 / np.cosh(a * t)) + b + np.random.uniform(-1 * err_lim, err_lim, n)
 data[3] = np.ones(n) * err_lim
 
-filename = 'em_pe/tests/Data/test_bandA.txt'
+filename = 'em_pe/tests/temp/test_bandA.txt'
 np.savetxt(filename, data)
 
 ### generate and save band B data
@@ -29,11 +29,11 @@ data[0] = t
 data[2] = (1 / np.cosh(a * t)) - b + np.random.uniform(-1 * err_lim, err_lim, n)
 data[3] = np.ones(n) * err_lim
 
-filename = 'em_pe/tests/Data/test_bandB.txt'
+filename = 'em_pe/tests/temp/test_bandB.txt'
 np.savetxt(filename, data)
 
 ### save true values
 
 truths = np.array([a, b])
-filename = 'em_pe/tests/Data/test_truths.txt'
+filename = 'em_pe/tests/temp/test_truths.txt'
 np.savetxt(filename, truths)
