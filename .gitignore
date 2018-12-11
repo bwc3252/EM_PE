@@ -1,8 +1,8 @@
 *.pyc
 
-Data
+temp/
 
-*.png
+fig.png
 
 *.aux
 *.fdb_latexmk
@@ -15,7 +15,5 @@ doctrees/
 latex/
 source/
 Makefile
-*.js
-*.inv
-*.buildinfo
-_*
+.buildinfo
+_sources
