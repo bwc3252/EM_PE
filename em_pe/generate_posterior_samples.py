@@ -78,32 +78,36 @@ def _initialize_models(m):
         for band in model.bands:
             if band not in bands_used:
                 bands_used.append(band)
-    t_bounds = {} # tmin and tmax for each band
+    t_bounds = [-1 * np.inf, np.inf] # tmin and tmax for each band
     for band in bands_used:
         t = data[band][0]
-        t_bounds[band] = (min(t), max(t))
+        t_bounds[0] = min(min(t), t_bounds[0])
+        t_bounds[1] = max(max(t), t_bounds[1])
     if args.v:
         print('finished')
     return models, ordered_params, bands_used, bounds, t_bounds
 
 def _evaluate_lnL(params, data, models, bands_used, t_bounds):
-    temp_data = {} # used to hold model data
+    temp_data = {} # used to hold model data and squared model error
     for band in bands_used:
-        temp_data[band] = 0
+        temp_data[band] = [0, 0]
     ### evaluate each model for the params, in the required bands
     for model in models:
         model.set_params(params, t_bounds)
         for band in model.bands:
             t = data[band][0]
-            temp_data[band] += model.evaluate(t, band)
+            m, m_err = model.evaluate(t, band)
+            temp_data[band][0] += m * model.weight
+            temp_data[band][1] += m_err**2
     lnL = 0
     ### calculate lnL
     for band in bands_used:
         x = data[band][2]
         err = data[band][3]
-        m = temp_data[band]
+        m = temp_data[band][0]
+        m_err_squared = temp_data[band][1]
         diff = x - m
-        lnL += np.sum(diff**2 / err**2)
+        lnL += np.sum(diff**2 / (err**2 + m_err_squared))
     return -0.5 * lnL
 
 def _integrand(samples):

@@ -40,6 +40,7 @@
 <span class="sd">&#39;&#39;&#39;</span>
 
 <span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">print_function</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">from</span> <span class="nn">.model</span> <span class="k">import</span> <span class="n">model_base</span>
 
 <div class="viewcode-block" id="linear_model"><a class="viewcode-back" href="../../../models.html#em_pe.models.linear_model.linear_model">[docs]</a><span class="k">class</span> <span class="nc">linear_model</span><span class="p">(</span><span class="n">model_base</span><span class="p">):</span>
@@ -71,7 +72,8 @@
 <span class="sd">        &#39;&#39;&#39;</span>
         <span class="n">m</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s1">&#39;m&#39;</span><span class="p">]</span>
         <span class="n">y0</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s1">&#39;y0&#39;</span><span class="p">]</span>
-        <span class="k">return</span> <span class="p">(</span><span class="n">m</span> <span class="o">*</span> <span class="n">t</span><span class="p">)</span> <span class="o">+</span> <span class="n">y0</span></div></div>
+        <span class="c1"># return lightcurve, model error</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">m</span> <span class="o">*</span> <span class="n">t</span><span class="p">)</span> <span class="o">+</span> <span class="n">y0</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">t</span><span class="p">))</span></div></div>
 </pre></div>
 
           </div>

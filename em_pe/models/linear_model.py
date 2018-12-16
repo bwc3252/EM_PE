@@ -6,6 +6,7 @@ Simple model used for tests on actual data.
 '''
 
 from __future__ import print_function
+import numpy as np
 from .model import model_base
 
 class linear_model(model_base):
@@ -37,4 +38,5 @@ class linear_model(model_base):
         '''
         m = self.params['m']
         y0 = self.params['y0']
-        return (m * t) + y0
+        # return lightcurve, model error
+        return (m * t) + y0, np.zeros(len(t))

@@ -39,7 +39,8 @@ class one_band_test_model(model_base):
         a = self.params['a']
         b = self.params['b']
         ret = (1 / np.cosh(a * t)) + b
-        return ret #* self.weight
+        # return model values, model errors
+        return ret, np.zeros(len(t))
 
 
 class two_band_test_model(model_base):
@@ -75,4 +76,5 @@ class two_band_test_model(model_base):
             ret = (1 / np.cosh(a * t)) + b
         else:
             ret = (1 / np.cosh(a * t)) - b
-        return ret * self.weight
+        # return lightcurve, model error
+        return ret, np.zeros(len(t))

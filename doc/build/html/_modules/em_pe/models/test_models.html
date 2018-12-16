@@ -73,7 +73,8 @@
         <span class="n">a</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s1">&#39;a&#39;</span><span class="p">]</span>
         <span class="n">b</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="s1">&#39;b&#39;</span><span class="p">]</span>
         <span class="n">ret</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">cosh</span><span class="p">(</span><span class="n">a</span> <span class="o">*</span> <span class="n">t</span><span class="p">))</span> <span class="o">+</span> <span class="n">b</span>
-        <span class="k">return</span> <span class="n">ret</span> <span class="c1">#* self.weight</span></div></div>
+        <span class="c1"># return model values, model errors</span>
+        <span class="k">return</span> <span class="n">ret</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">t</span><span class="p">))</span></div></div>
 
 
 <div class="viewcode-block" id="two_band_test_model"><a class="viewcode-back" href="../../../models.html#em_pe.models.test_models.two_band_test_model">[docs]</a><span class="k">class</span> <span class="nc">two_band_test_model</span><span class="p">(</span><span class="n">model_base</span><span class="p">):</span>
@@ -109,7 +110,8 @@
             <span class="n">ret</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">cosh</span><span class="p">(</span><span class="n">a</span> <span class="o">*</span> <span class="n">t</span><span class="p">))</span> <span class="o">+</span> <span class="n">b</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">ret</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">cosh</span><span class="p">(</span><span class="n">a</span> <span class="o">*</span> <span class="n">t</span><span class="p">))</span> <span class="o">-</span> <span class="n">b</span>
-        <span class="k">return</span> <span class="n">ret</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">weight</span></div></div>
+        <span class="c1"># return lightcurve, model error</span>
+        <span class="k">return</span> <span class="n">ret</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">t</span><span class="p">))</span></div></div>
 </pre></div>
 
           </div>

@@ -38,9 +38,8 @@ class model_base:
         ----------
         params : dict
             Dictionary mapping parameter names to their values
-        t_bounds : dict
-            Dictionary mapping bands to [upper_bound, lower_bound] pairs for the
-            time values observed in those bands
+        t_bounds : list
+            [upper bound, lower bound] pair for time values
         '''
         self.params = params
         self.t_bounds = t_bounds
