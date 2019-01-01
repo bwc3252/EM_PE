@@ -24,8 +24,7 @@ class woko2017(model_base):
     def __init__(self, weight=1):
         name = 'woko2017'
         param_names = ['mej', 'vej']
-        #bands = ['4775.6', '6129.5', '7484.6', '8657.8', '9603.1', '12350', '16620', '21590']
-        bands = ['A']
+        bands = ['4775.6', '6129.5', '7484.6', '8657.8', '9603.1', '12350', '16620', '21590']
         model_base.__init__(self, name, param_names, bands, weight)
         modelfile = 'Data/DZ2_mags_2017-03-20.dat'
         self.data_out = np.loadtxt(modelfile)

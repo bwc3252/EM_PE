@@ -56,7 +56,7 @@ def _read_data(data_loc, files):
         print('Loading data... ', end='')
     data = {}
     for fname in files:
-        band = fname.split('.')[0]
+        band = fname.split('.txt')[0]
         data[band] = np.loadtxt(data_loc + fname)
     if args.v:
         print('finished')
