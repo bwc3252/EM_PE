@@ -16,5 +16,5 @@ python em_pe/generate_posterior_samples.py --dat em_pe/tests/temp/ -v --m woko20
                                            --f 21590.txt
 
 ### Make the corner plots
-python em_pe/plot_utils/plot_corner.py --p mej --p vej --posterior_samples em_pe/tests/temp/posterior_samples.txt \
+python em_pe/plot_utils/plot_corner.py --p mej --p vej --p dist --posterior_samples em_pe/tests/temp/posterior_samples.txt \
                                        --out em_pe/tests/temp/fig.png --truth_file em_pe/tests/temp/test_truths.txt

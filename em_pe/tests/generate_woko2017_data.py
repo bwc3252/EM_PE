@@ -13,6 +13,7 @@ tdays = np.linspace(tini, tmax, n)
 err_lim = 0.05
 beta = 3.0
 kappa_r = 1.0
+dist = 40.0
 
 m1 = 1.4
 mb1 = 1.5
@@ -24,7 +25,7 @@ c2 = 0.2
 mej = calc_meje(m1, mb1, c1, m2, mb2, c2)
 vej = calc_vej(m1, c1, m2, c2)
 
-params = {'mej':mej, 'vej':vej}
+params = {'mej':mej, 'vej':vej, 'dist':dist}
 t_bounds = [tini, tmax]
 
 ### initialize the model and set parameters
@@ -45,6 +46,6 @@ for band in model.bands:
 
 ### save true values
 
-truths = np.array([mej, vej])
+truths = np.array([mej, vej, dist])
 filename = 'em_pe/tests/temp/test_truths.txt'
 np.savetxt(filename, truths)
