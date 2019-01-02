@@ -10,7 +10,7 @@ tini = 0.1
 tmax = 10
 n = 10
 tdays = np.linspace(tini, tmax, n)
-err_lim = 0.3
+err_lim = 0.05
 beta = 3.0
 kappa_r = 1.0
 

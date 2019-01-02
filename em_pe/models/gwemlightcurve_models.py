@@ -28,6 +28,8 @@ class woko2017(model_base):
         model_base.__init__(self, name, param_names, bands, weight)
         modelfile = 'Data/DZ2_mags_2017-03-20.dat'
         self.data_out = np.loadtxt(modelfile)
+        self.new_params = True
+        self.prev_result = None
 
 
     def set_params(self, params, t_bounds):
@@ -43,6 +45,7 @@ class woko2017(model_base):
             [upper bound, lower bound] pair for time values
         '''
         self.params = params
+        self.new_params = True
 
     def evaluate(self, t, band):
         '''
@@ -55,6 +58,13 @@ class woko2017(model_base):
         band : string
             Band to evaluate
         '''
+        if not self.new_params:
+            # if the parameters have not been reset, just use the old results
+            mAB_new = self.prev_result
+            band_ind = dict(zip(self.bands, range(len(self.bands)))) # map bands to indices
+            index = band_ind[band]
+            return mAB_new.T[index], 0
+
         ### define constants
         mej0 = 0.013+0.005
         vej0 = 0.132+0.08
@@ -137,6 +147,8 @@ class woko2017(model_base):
 
         band_ind = dict(zip(self.bands, range(len(self.bands)))) # map bands to indices
         index = band_ind[band]
+        self.new_params = False
+        self.prev_result = mAB_new
         return mAB_new.T[index], 0
 
 class me2017(model_base):

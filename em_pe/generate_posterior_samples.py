@@ -55,29 +55,27 @@ def _read_data(data_loc, files):
     if args.v:
         print('Loading data... ', end='')
     data = {}
+    bands_used = []
     for fname in files:
         band = fname.split('.txt')[0]
         data[band] = np.loadtxt(data_loc + fname)
+        bands_used.append(band)
     if args.v:
         print('finished')
-    return data
+    return data, bands_used
 
-def _initialize_models(m):
+def _initialize_models(m, bands_used):
     if args.v:
         print('Initializing models... ', end='')
     ### initialize model objects
     models = [model_dict[name](float(weight)) for [name, weight] in m]
     ordered_params = [] # keep track of all parameters used
-    bands_used = [] # keep track of all data bands used
     bounds = [] # bounds for each parameter
     for model in models:
         for param in model.param_names:
             if param not in ordered_params:
                 ordered_params.append(param)
                 bounds.append(bounds_dict[param])
-        for band in model.bands:
-            if band not in bands_used:
-                bands_used.append(band)
     t_bounds = [-1 * np.inf, np.inf] # tmin and tmax for each band
     for band in bands_used:
         t = data[band][0]
@@ -85,7 +83,7 @@ def _initialize_models(m):
         t_bounds[1] = max(max(t), t_bounds[1])
     if args.v:
         print('finished')
-    return models, ordered_params, bands_used, bounds, t_bounds
+    return models, ordered_params, bounds, t_bounds
 
 def _evaluate_lnL(params, data, models, bands_used, t_bounds):
     temp_data = {} # used to hold model data and squared model error
@@ -95,10 +93,11 @@ def _evaluate_lnL(params, data, models, bands_used, t_bounds):
     for model in models:
         model.set_params(params, t_bounds)
         for band in model.bands:
-            t = data[band][0]
-            m, m_err = model.evaluate(t, band)
-            temp_data[band][0] += m * model.weight
-            temp_data[band][1] += m_err**2
+            if band in bands_used:
+                t = data[band][0]
+                m, m_err = model.evaluate(t, band)
+                temp_data[band][0] += m * model.weight
+                temp_data[band][1] += m_err**2
     lnL = 0
     ### calculate lnL
     for band in bands_used:
@@ -169,8 +168,8 @@ if __name__ == '__main__':
     L_cutoff = args.cutoff
     min_iter = args.min
     max_iter = args.max
-    data = _read_data(data_loc, files)
-    models, ordered_params, bands_used, bounds, t_bounds = _initialize_models(m)
+    data, bands_used = _read_data(data_loc, files)
+    models, ordered_params, bounds, t_bounds = _initialize_models(m, bands_used)
     samples = generate_samples(data, models, ordered_params, L_cutoff, bounds, min_iter, max_iter)
     header = 'lnL p p_s ' + ' '.join(ordered_params)
     np.savetxt(args.out, samples, header=header)
