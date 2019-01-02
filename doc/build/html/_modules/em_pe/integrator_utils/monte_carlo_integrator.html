@@ -253,6 +253,7 @@
         <span class="k">if</span> <span class="n">nmax</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">nmax</span> <span class="o">=</span> <span class="n">max_iter</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">n</span>
         <span class="k">while</span> <span class="bp">self</span><span class="o">.</span><span class="n">iterations</span> <span class="o">&lt;</span> <span class="n">max_iter</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">ntotal</span> <span class="o">&lt;</span> <span class="n">nmax</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">eff_samp</span> <span class="o">&lt;</span> <span class="n">neff</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Iteration:&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">iterations</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">err_count</span> <span class="o">&gt;=</span> <span class="n">max_err</span><span class="p">:</span>
                 <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Exiting due to errors...&#39;</span><span class="p">)</span>
                 <span class="k">break</span>

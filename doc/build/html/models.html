@@ -191,8 +191,7 @@ model.</p>
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
 <li><strong>params</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)"><em>dict</em></a>) – Dictionary mapping parameter names to their values</li>
-<li><strong>t_bounds</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)"><em>dict</em></a>) – Dictionary mapping bands to [upper_bound, lower_bound] pairs for the
-time values observed in those bands</li>
+<li><strong>t_bounds</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)"><em>list</em></a>) – [upper bound, lower bound] pair for time values</li>
 </ul>
 </td>
 </tr>
@@ -215,9 +214,27 @@ time values observed in those bands</li>
 </tbody>
 </table>
 <dl class="method">
+<dt id="em_pe.models.gwemlightcurve_models.woko2017.evaluate">
+<code class="descname">evaluate</code><span class="sig-paren">(</span><em>t</em>, <em>band</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/em_pe/models/gwemlightcurve_models.html#woko2017.evaluate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#em_pe.models.gwemlightcurve_models.woko2017.evaluate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Evaluate model at specific time values using the current parameters.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>t</strong> (<em>np.ndarray</em>) – Time values</li>
+<li><strong>band</strong> (<em>string</em>) – Band to evaluate</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
 <dt id="em_pe.models.gwemlightcurve_models.woko2017.set_params">
 <code class="descname">set_params</code><span class="sig-paren">(</span><em>params</em>, <em>t_bounds</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/em_pe/models/gwemlightcurve_models.html#woko2017.set_params"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#em_pe.models.gwemlightcurve_models.woko2017.set_params" title="Permalink to this definition">¶</a></dt>
-<dd><p>Method to set the parameters and run differential equation for lightcurve
+<dd><p>Method to set the parameters for lightcurve
 model.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -225,8 +242,7 @@ model.</p>
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
 <li><strong>params</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)"><em>dict</em></a>) – Dictionary mapping parameter names to their values</li>
-<li><strong>t_bounds</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.7)"><em>dict</em></a>) – Dictionary mapping bands to [upper_bound, lower_bound] pairs for the
-time values observed in those bands</li>
+<li><strong>t_bounds</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.7)"><em>list</em></a>) – [upper bound, lower bound] pair for time values</li>
 </ul>
 </td>
 </tr>

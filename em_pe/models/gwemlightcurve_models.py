@@ -34,7 +34,7 @@ class woko2017(model_base):
 
     def set_params(self, params, t_bounds):
         '''
-        Method to set the parameters and run differential equation for lightcurve
+        Method to set the parameters for lightcurve
         model.
 
         Parameters
