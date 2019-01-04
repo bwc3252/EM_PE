@@ -5,7 +5,7 @@ python em_pe/tests/generate_woko2017_data.py
 
 ### Do a normal test in one band with a single model
 python em_pe/generate_posterior_samples.py --dat em_pe/tests/temp/ -v --m woko2017 1 \
-                                           --out em_pe/tests/temp/posterior_samples.txt --cutoff 1e-8 \
+                                           --out em_pe/tests/temp/posterior_samples.txt --cutoff 1e-15 \
                                            --f 4775.6.txt \
                                            --f 6129.5.txt \
                                            --f 7484.6.txt \

@@ -27,10 +27,12 @@ class woko2017(model_base):
         bands = ['4775.6', '6129.5', '7484.6', '8657.8', '9603.1', '12350', '16620', '21590']
         model_base.__init__(self, name, param_names, bands, weight)
         modelfile = 'Data/DZ2_mags_2017-03-20.dat'
+        #modelfile = 'Data/gamA2_mags_2017-03-20.dat'
         self.data_out = np.loadtxt(modelfile)
         self.new_params = True
         self.prev_result = None
-
+        self.tvec_days_prev = None
+        self.band_ind = dict(zip(self.bands, range(len(self.bands)))) # map bands to indices
 
     def set_params(self, params, t_bounds):
         '''
@@ -47,7 +49,7 @@ class woko2017(model_base):
         self.params = params
         self.new_params = True
 
-    def evaluate(self, t, band):
+    def evaluate(self, tvec_days, band):
         '''
         Evaluate model at specific time values using the current parameters.
 
@@ -58,12 +60,14 @@ class woko2017(model_base):
         band : string
             Band to evaluate
         '''
-        if not self.new_params:
-            # if the parameters have not been reset, just use the old results
+        if (not self.new_params) and np.array_equal(tvec_days, self.tvec_days_prev):
+            # if the parameters have not been reset and the times are the same,
+            # just use the old results
             mAB_new = self.prev_result
-            band_ind = dict(zip(self.bands, range(len(self.bands)))) # map bands to indices
-            index = band_ind[band]
+            index = self.band_ind[band]
             return mAB_new.T[index], 0
+        else:
+            self.tvec_days_prev = tvec_days
 
         ### define constants
         mej0 = 0.013+0.005
@@ -83,7 +87,6 @@ class woko2017(model_base):
         ndata, nslices = data_out.shape
         ints = np.arange(0,ndata,ndata/9)
 
-        tvec_days = t
         mAB = np.zeros((len(tvec_days),8))
 
         for ii in xrange(len(ints)):
@@ -92,9 +95,7 @@ class woko2017(model_base):
 
             t = data_out_slice[:,1]
             data = data_out_slice[:,2:]
-            #idx = np.where((t >= 0) & (t <= 7))[0]
-            #t = t[idx]
-            #data = data[idx,:]
+
             nt, nbins = data.shape
 
             a_i = (360/(2*np.pi))*np.arccos(1 - np.arange(nbins)*2/float(nbins))
@@ -148,7 +149,7 @@ class woko2017(model_base):
         mAB_new += 5*(np.log10(dist*1e6) - 1)
 
         band_ind = dict(zip(self.bands, range(len(self.bands)))) # map bands to indices
-        index = band_ind[band]
+        index = self.band_ind[band]
         self.new_params = False
         self.prev_result = mAB_new
         return mAB_new.T[index], 0
