@@ -24,7 +24,7 @@ class woko2017(model_base):
     def __init__(self, weight=1):
         name = 'woko2017'
         param_names = ['mej', 'vej', 'dist']
-        bands = ['4775.6', '6129.5', '7484.6', '8657.8', '9603.1', '12350', '16620', '21590']
+        bands = ['g', 'r', 'i', 'z', 'y', 'J', 'H', 'K']
         model_base.__init__(self, name, param_names, bands, weight)
         modelfile = 'Data/DZ2_mags_2017-03-20.dat'
         #modelfile = 'Data/gamA2_mags_2017-03-20.dat'
@@ -136,7 +136,8 @@ class woko2017(model_base):
 
         tvec_days = tvec_days*tmax/tvec_days[np.argmax(lbol)]
         lbol = lbol*Lmax/np.max(lbol)
-
+        ### u      g       r       i       z       y       J       H       K
+        ### 354.3, 477.56, 612.95, 748.46, 865.78, 960.31, 1235.0, 1662.0, 2159.0
         wavelengths = [4775.6, 6129.5, 7484.6, 8657.8, 9603.1, 12350, 16620, 21590]
         wavelength_interp = 3543
 

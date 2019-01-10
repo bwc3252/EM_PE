@@ -14,7 +14,7 @@ To see full command line parameter documentation::
     usage: parse_json.py [-h] [--t0 T0] [--f F] [--b B] [--out OUT]
 
     Parse Open Astronomy Catalog (OAC) JSON files
-    
+
     optional arguments:
       -h, --help  show this help message and exit
       --t0 T0     Initial time (t=0 for event)
@@ -53,13 +53,15 @@ def _read_data(args):
     for band in args.b:
         data_dict[band] = np.empty((4, 0))
     for entry in data:
-        band = entry['band']
-        ### check that it's a band we want and that it's not an "upper limit" 
-        if band in args.b and ('upperlimit' not in entry or not entry['upperlimit']):
-            ### [time, time error, magnitude, magnitude error]
-            to_append = np.array([[entry['time']], [0], [entry['magnitude']], [entry['e_magnitude']]]).astype(np.float)
-            to_append[0] -= args.t0
-            data_dict[band] = np.append(data_dict[band], to_append, axis=1)
+        if 'band' in entry:
+            band = entry['band']
+            ### check that it's a band we want and that it has an error magnitude
+            #if band in args.b and ('upperlimit' not in entry or not entry['upperlimit']):
+            if band in args.b and 'e_magnitude' in entry:
+                ### [time, time error, magnitude, magnitude error]
+                to_append = np.array([[entry['time']], [0], [entry['magnitude']], [entry['e_magnitude']]]).astype(np.float)
+                to_append[0] -= args.t0
+                data_dict[band] = np.append(data_dict[band], to_append, axis=1)
     return data_dict
 
 def _save_data(args, data_dict):
