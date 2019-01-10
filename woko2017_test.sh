@@ -5,8 +5,8 @@ mkdir em_pe/tests/temp/
 
 ### parse JSON data
 python em_pe/parser/parse_json.py --f Data/GW170817.json --out em_pe/tests/temp/ --t0 57982.5285231481 \
-                                --b y \
                                 --b g \
+                                --b y \
                                 --b r \
                                 --b z \
                                 --b K \
@@ -18,8 +18,8 @@ python em_pe/parser/parse_json.py --f Data/GW170817.json --out em_pe/tests/temp/
 ### Do a normal test in one band with a single model
 python em_pe/generate_posterior_samples.py --min 5 --max 5 --dat em_pe/tests/temp/ -v --m woko2017 1 \
                                            --out em_pe/tests/temp/posterior_samples.txt --cutoff 1e-400 \
-                                           --f y.txt \
                                            --f g.txt \
+                                           --f y.txt \
                                            --f r.txt \
                                            --f z.txt \
                                            --f K.txt \

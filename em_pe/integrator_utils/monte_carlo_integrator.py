@@ -187,6 +187,8 @@ class integrator:
             self.max_value = max_value
         self.total_value += np.sum(value_array)
         self.eff_samp = self.total_value / self.max_value
+        if np.isnan(self.eff_samp):
+            self.eff_samp = 0
         # calculate integral
         curr_integral = (1.0 / self.n) * np.sum(value_array)
         # update results
