@@ -16,8 +16,8 @@ python em_pe/parser/parse_json.py --f Data/GW170817.json --out em_pe/tests/temp/
 
 
 ### Do a normal test in one band with a single model
-python em_pe/generate_posterior_samples.py --min 5 --max 5 --dat em_pe/tests/temp/ -v --m woko2017 1 \
-                                           --out em_pe/tests/temp/posterior_samples.txt --cutoff 1e-400 \
+python em_pe/generate_posterior_samples.py --dat em_pe/tests/temp/ -v --m woko2017 1 \
+                                           --out em_pe/tests/temp/posterior_samples.txt --cutoff 1e-1000 \
                                            --f g.txt \
                                            --f y.txt \
                                            --f r.txt \
