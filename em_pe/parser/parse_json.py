@@ -39,6 +39,8 @@ def _parse_command_line_args():
     parser.add_argument('--f', help='Filename for JSON file')
     parser.add_argument('--b', action='append', help='Data bands to store')
     parser.add_argument('--out', help='Directory to save data to')
+    parser.add_argument('--maxpts', type=float, default=np.inf, help='Maximum number of points to keep for each band')
+    parser.add_argument('--tmax', type=float, default=np.inf, help='Upper bound for time points to keep')
     return parser.parse_args()
 
 def _read_data(args):
@@ -56,12 +58,23 @@ def _read_data(args):
         if 'band' in entry:
             band = entry['band']
             ### check that it's a band we want and that it has an error magnitude
-            #if band in args.b and ('upperlimit' not in entry or not entry['upperlimit']):
             if band in args.b and 'e_magnitude' in entry:
                 ### [time, time error, magnitude, magnitude error]
                 to_append = np.array([[entry['time']], [0], [entry['magnitude']], [entry['e_magnitude']]]).astype(np.float)
                 to_append[0] -= args.t0
                 data_dict[band] = np.append(data_dict[band], to_append, axis=1)
+    for band in data_dict:
+        data = data_dict[band]
+        ### check if we have too much data
+        if data.shape[1] > args.maxpts:
+            ### basically, generate random indices, take the columns (data points)
+            ### specified by those columns, and then sort them based on times
+            ### (sorting is not strictly necessary but it seems like a good idea
+            ### to keep data ordered)
+            cols = np.random.randint(0, data.shape[1], int(args.maxpts))
+            data = data[:,cols]
+            data = data[:,data[0].argsort()]
+            data_dict[band] = data
     return data_dict
 
 def _save_data(args, data_dict):

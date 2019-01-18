@@ -76,7 +76,7 @@ def _initialize_models(m, bands_used):
             if param not in ordered_params:
                 ordered_params.append(param)
                 bounds.append(bounds_dict[param])
-    t_bounds = [-1 * np.inf, np.inf] # tmin and tmax for each band
+    t_bounds = [np.inf, -1 * np.inf] # tmin and tmax for each band
     for band in bands_used:
         t = data[band][0]
         t_bounds[0] = min(min(t), t_bounds[0])

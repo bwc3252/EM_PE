@@ -25,6 +25,8 @@ c2 = 0.2
 mej = calc_meje(m1, mb1, c1, m2, mb2, c2)
 vej = calc_vej(m1, c1, m2, c2)
 
+print('mej:', mej, 'vej:', vej)
+
 params = {'mej':mej, 'vej':vej, 'dist':dist}
 t_bounds = [tini, tmax]
 
