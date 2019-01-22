@@ -1,4 +1,5 @@
 *.pyc
+__pycache__/
 
 temp/
 
@@ -11,9 +12,11 @@ fig.png
 *.pdf
 *.gz
 
+*.profile
+
 doctrees/
 latex/
-source/
+build/
 Makefile
 .buildinfo
 _sources
