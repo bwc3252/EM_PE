@@ -1,3 +1,5 @@
 # EM PE
 
-[Documentation](https://benjamin.champion.docs.ligo.org/em_pe/)
+Joint GW/EM parameter estimation.
+
+[Documentation](https://em-pe.readthedocs.io/en/latest/)
