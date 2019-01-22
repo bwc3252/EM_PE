@@ -1,5 +1,6 @@
-numpy==1.15.3
-corner==2.0.1
-scipy==1.1.0
+scipy==1.2.0
 matplotlib==2.2.3
 multiprocess==0.70.6.1
+corner==2.0.1
+numpy==1.16.0
+sphinxcontrib-napoleon=0.7
