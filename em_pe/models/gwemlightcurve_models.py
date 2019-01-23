@@ -7,7 +7,7 @@ Models adapted from code found in `gwemlightcurves <https://github.com/mcoughlin
 from __future__ import print_function
 import numpy as np
 import scipy.interpolate
-from scipy.interpolate import interpolate as interp
+from scipy.interpolate import interp1d
 
 from .model import model_base
 
@@ -191,13 +191,15 @@ class me2017(model_base):
         #dist = params['dist']
         dist = 40
         dt = 0.05
-        self.tdays, self.mAB = self._calc_lc(t_bounds[0], t_bounds[1], dt, mej, vej, dist)
+        self.tdays, self.mAB = self._calc_lc(0.5, t_bounds[1], dt, mej, vej, dist)
 
     def evaluate(self, t, band):
         band_ind = dict(zip(self.bands, range(len(self.bands)))) # map bands to indices
         index = band_ind[band]
         lc = self.mAB[index]
-        return np.interp(t, self.tdays, lc), 0
+        mask = np.isfinite(lc)
+        f = interp1d(self.tdays[mask], lc[mask], fill_value='extrapolate')
+        return f(t), 0
 
     def _calc_lc(self, tini, tmax, dt, mej, vej, dist):
 
@@ -469,5 +471,7 @@ class me2017(model_base):
         mAB = -2.5*np.log10(F) - 48.6
 
         mAB += 5*(np.log10(dist*1e6) - 1)
+
+        mask = np.isfinite(mAB)
 
         return tdays, mAB

@@ -41,6 +41,7 @@ def _parse_command_line_args():
     parser.add_argument('--truth_file', help='File with true parameter values')
     parser.add_argument('--out', help='File to save plot to')
     parser.add_argument('--p', action='append', help='Parameter name to plot')
+    parser.add_argument('--c', type=float, default=0, help='Minimum likelihood for points to keep')
     return parser.parse_args()
 
 def generate_plot():
@@ -52,6 +53,10 @@ def generate_plot():
     color_list=['black', 'red', 'green', 'blue','yellow']
     sample_files = args.posterior_samples
     truth_file = args.truth_file
+    if args.c <= 0:
+        min_lnL = -1 * np.inf
+    else:
+        min_lnL = np.log(args.c)
     if truth_file is not None:
         truths = np.loadtxt(truth_file)
     else:
@@ -67,9 +72,12 @@ def generate_plot():
         for index in range(4, len(header)):
             index_dict[header[index]] = index - 1
         lnL = samples[:,0]
+        mask = lnL > min_lnL
         p = samples[:,1]
         p_s = samples[:,2]
-        n, m = samples.shape
+        lnL = lnL[mask]
+        p = p[mask]
+        p_s = p_s[mask]
         ### get columns of array corresponding to actual parameter samples
         x = samples[:,[index_dict[name] for name in args.p]]
         lnL += abs(np.max(lnL))
@@ -77,7 +85,7 @@ def generate_plot():
         weights = L * p / p_s
         weights /= np.sum(weights)
         color = color_list[i % len(color_list)]
-        fig_base = corner.corner(x, weights=weights, fig=fig_base, labels=param_names, truths=truths,
+        fig_base = corner.corner(x[mask], weights=weights, fig=fig_base, labels=param_names, truths=truths,
                                  color=color, plot_datapoints=False, plot_density=False, no_fill_contours=True,
                                  contours=True,)
         i += 1

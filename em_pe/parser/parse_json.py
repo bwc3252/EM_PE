@@ -40,7 +40,8 @@ def _parse_command_line_args():
     parser.add_argument('--b', action='append', help='Data bands to store')
     parser.add_argument('--out', help='Directory to save data to')
     parser.add_argument('--maxpts', type=float, default=np.inf, help='Maximum number of points to keep for each band')
-    parser.add_argument('--tmax', type=float, default=np.inf, help='Upper bound for time points to keep')
+#    parser.add_argument('--tmax', type=float, default=np.inf, help='Upper bound for time points to keep')
+#    parser.add_argument('--tmin', type=float, default=0, help='Lower bound for time points to keep')
     return parser.parse_args()
 
 def _read_data(args):
