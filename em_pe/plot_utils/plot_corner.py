@@ -12,7 +12,7 @@ To see full command line parameter documentation::
 
     $ python plot_corner.py -h
     usage: plot_corner.py [-h] [--posterior_samples POSTERIOR_SAMPLES]
-                          [--truth_file TRUTH_FILE] [--out OUT] [--p P]
+                          [--truth_file TRUTH_FILE] [--out OUT] [--p P] [--c C]
 
     Generate corner plot from posterior samples
 
@@ -24,6 +24,7 @@ To see full command line parameter documentation::
                             File with true parameter values
       --out OUT             File to save plot to
       --p P                 Parameter name to plot
+      --c C                 Minimum likelihood for points to keep
 '''
 
 from __future__ import print_function

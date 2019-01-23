@@ -55,7 +55,7 @@ class woko2017(model_base):
 
         Parameters
         ----------
-        t : np.ndarray
+        tvec_days : np.ndarray
             Time values
         band : string
             Band to evaluate
@@ -167,8 +167,8 @@ class me2017(model_base):
 
     def __init__(self, weight=1):
         name = 'me2017'
-        #param_names = ['mej', 'vej', 'dist']
-        param_names = ['mej', 'vej']
+        param_names = ['mej', 'vej', 'dist']
+        #param_names = ['mej', 'vej']
         bands = ['u', 'g', 'r', 'i', 'z', 'y', 'J', 'H', 'K']
         model_base.__init__(self, name, param_names, bands, weight)
         self.mAB = None
@@ -177,7 +177,8 @@ class me2017(model_base):
     def set_params(self, params, t_bounds):
         '''
         Method to set the parameters and run differential equation for lightcurve
-        model.
+        model. Currently uses questionable fixed time step method to integrate
+        from tmin to tmax, then saves the lightcurve values for interpolation.
 
         Parameters
         ----------
@@ -188,12 +189,23 @@ class me2017(model_base):
         '''
         mej = params['mej']
         vej = params['vej']
-        #dist = params['dist']
-        dist = 40
+        dist = params['dist']
+        #dist = 40
         dt = 0.05
         self.tdays, self.mAB = self._calc_lc(0.5, t_bounds[1], dt, mej, vej, dist)
 
     def evaluate(self, t, band):
+        '''
+        Evaluate model at specific time values using the current parameters by
+        interpolating the lightcurve calculated in the set_params() method.
+
+        Parameters
+        ----------
+        tvec_days : np.ndarray
+            Time values
+        band : string
+            Band to evaluate
+        '''
         band_ind = dict(zip(self.bands, range(len(self.bands)))) # map bands to indices
         index = band_ind[band]
         lc = self.mAB[index]

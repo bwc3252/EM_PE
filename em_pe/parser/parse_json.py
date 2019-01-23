@@ -12,16 +12,17 @@ To see full command line parameter documentation::
 
     $ python parse_json.py -h
     usage: parse_json.py [-h] [--t0 T0] [--f F] [--b B] [--out OUT]
+                         [--maxpts MAXPTS]
 
     Parse Open Astronomy Catalog (OAC) JSON files
 
     optional arguments:
-      -h, --help  show this help message and exit
-      --t0 T0     Initial time (t=0 for event)
-      --f F       Filename for JSON file
-      --b B       Data bands to store
-      --out OUT   Directory to save data to
-
+      -h, --help       show this help message and exit
+      --t0 T0          Initial time (t=0 for event)
+      --f F            Filename for JSON file
+      --b B            Data bands to store
+      --out OUT        Directory to save data to
+      --maxpts MAXPTS  Maximum number of points to keep for each band
 '''
 
 from __future__ import print_function

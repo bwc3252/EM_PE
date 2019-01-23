@@ -12,8 +12,8 @@ To see full command line parameter documentation::
 
     $ python generate_posterior_samples.py -h
     usage: generate_posterior_samples.py [-h] [--dat DAT] [--m M M] [-v]
-                                     [--cutoff CUTOFF] [--f F] [--min MIN]
-                                     [--max MAX] [--out OUT]
+                                         [--cutoff CUTOFF] [--f F] [--min MIN]
+                                         [--max MAX] [--out OUT]
 
     Generate posterior parameter samples from lightcurve data
 
@@ -28,6 +28,7 @@ To see full command line parameter documentation::
       --max MAX        Maximum number of integrator iterations
       --out OUT        Location to store posterior samples
 '''
+
 from __future__ import print_function
 import numpy as np
 import argparse
@@ -35,6 +36,14 @@ import sys
 
 from models import model_dict, bounds_dict
 from integrator_utils import monte_carlo_integrator
+
+try:
+    import progressbar
+    progress = True
+except:
+    print('No progressbar')
+    progress = False
+
 
 def _parse_command_line_args():
     '''
@@ -106,16 +115,27 @@ def _evaluate_lnL(params, data, models, bands_used, t_bounds):
         m = temp_data[band][0]
         m_err_squared = temp_data[band][1]
         diff = x - m
+        #print(diff)
         lnL += np.sum(diff**2 / (err**2 + m_err_squared))
     return -0.5 * lnL
 
 def _integrand(samples):
     n, _ = samples.shape
     ret = []
+    if args.v and progress:
+        bar = progressbar.ProgressBar(maxval=n,
+            widgets=[progressbar.Bar('=', '[', ']'), ' ', progressbar.Percentage()])
+        bar.start()
+    i = 0
     for row in samples:
+        if progress and args.v and (i % 10 == 0):
+            bar.update(i)
+        i += 1
         params = dict(zip(ordered_params, row)) # map each parameter's name to its value
         lnL = _evaluate_lnL(params, data, models, bands_used, t_bounds)
         ret.append(lnL)
+    if args.v:
+        print()
     ret = np.array(ret).reshape((n, 1))
     ret[np.isnan(ret)] = -1 * np.inf
     return ret
@@ -151,7 +171,7 @@ def generate_samples(data, models, ordered_params, L_cutoff, bounds, min_iter, m
     gmm_dict = {param_ind:None}
     ### initialize and run the integrator
     integrator = monte_carlo_integrator.integrator(dim, bounds, gmm_dict, k,
-                    proc_count=None, L_cutoff=L_cutoff, use_lnL=True, n=1000)
+                    proc_count=None, L_cutoff=L_cutoff, use_lnL=True)
     integrator.integrate(_integrand, min_iter=min_iter, max_iter=max_iter)
     ### make the array of samples
     samples = integrator.cumulative_values
