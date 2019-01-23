@@ -15,10 +15,10 @@ python em_pe/parser/parse_json.py --f Data/GW170817.json --out em_pe/tests/temp/
                                 --b K
 
 ### Generate the posterior samples
-python em_pe/generate_posterior_samples.py --min 10 --max 10 --dat em_pe/tests/temp/ \
-                                           -v --m woko2017 1 --out em_pe/tests/temp/posterior_samples.txt \
+python em_pe/generate_posterior_samples.py --min 5 --max 5 --dat em_pe/tests/temp/ \
+                                           -v --m me2017 1 --out em_pe/tests/temp/posterior_samples.txt \
                                            --cutoff 1e-500 \
-                                           --f r.txt
+                                           --f g.txt
 
                                            #--f g.txt \
                                            #--f r.txt \
@@ -30,5 +30,5 @@ python em_pe/generate_posterior_samples.py --min 10 --max 10 --dat em_pe/tests/t
                                            #--f K.txt
 
 ### Make the corner plots
-python em_pe/plot_utils/plot_corner.py --p mej --p vej --p dist --posterior_samples em_pe/tests/temp/posterior_samples.txt \
+python em_pe/plot_utils/plot_corner.py --p mej --p vej --posterior_samples em_pe/tests/temp/posterior_samples.txt \
                                        --out em_pe/tests/temp/fig.png #--truth_file em_pe/tests/temp/test_truths.txt

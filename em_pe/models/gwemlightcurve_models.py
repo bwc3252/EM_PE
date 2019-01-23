@@ -167,7 +167,8 @@ class me2017(model_base):
 
     def __init__(self, weight=1):
         name = 'me2017'
-        param_names = ['mej', 'vej', 'dist']
+        #param_names = ['mej', 'vej', 'dist']
+        param_names = ['mej', 'vej']
         bands = ['u', 'g', 'r', 'i', 'z', 'y', 'J', 'H', 'K']
         model_base.__init__(self, name, param_names, bands, weight)
         self.mAB = None
@@ -187,7 +188,8 @@ class me2017(model_base):
         '''
         mej = params['mej']
         vej = params['vej']
-        dist = params['dist']
+        #dist = params['dist']
+        dist = 40
         dt = 0.05
         self.tdays, self.mAB = self._calc_lc(t_bounds[0], t_bounds[1], dt, mej, vej, dist)
 
