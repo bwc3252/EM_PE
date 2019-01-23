@@ -422,11 +422,12 @@ class me2017(model_base):
             R[j+1] = v[j+1]*(dt[j]) + R[j]
             taues[j+1] = (M0)*0.4/(4.0*R[j+1]**(2.0))
 
-            templayer = (3.0*ene[:-1,j]*dm*Msun/(arad*4.0*np.pi*(t[j]*vm[:-1])**(3.0)))**(0.25)
-            kappa_correction = np.ones(templayer.shape)
-            kappa_correction[templayer > 4000.] = 1.0
-            kappa_correction[templayer < 4000.] = 1.0*(templayer[templayer < 4000.]/4000.)**(5.5)
-            kappa_correction[:] = 1.0
+            #templayer = (3.0*ene[:-1,j]*dm*Msun/(arad*4.0*np.pi*(t[j]*vm[:-1])**(3.0)))**(0.25)
+            #kappa_correction = np.ones(templayer.shape)
+            #kappa_correction[templayer > 4000.] = 1.0
+            #kappa_correction[templayer < 4000.] = 1.0*(templayer[templayer < 4000.]/4000.)**(5.5)
+            #kappa_correction[:] = 1.0
+            kappa_correction = 1.0
 
             tdiff[:-1,j] = 0.08*kappa[:-1,j]*m[:-1]*Msun*3*kappa_correction/(vm[:-1]*c*t[j]*beta)
             tau[:-1,j] = m[:-1]*Msun*kappa[:-1,j]/(4.0*np.pi*(t[j]*vm[:-1])**(2.0))
