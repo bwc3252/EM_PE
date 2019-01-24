@@ -178,7 +178,7 @@ class me2017(model_base):
         '''
         Method to set the parameters and run differential equation for lightcurve
         model. Currently uses questionable fixed time step method to integrate
-        from tmin to tmax, then saves the lightcurve values for interpolation.
+        from tmin to tmax, then stores the lightcurve values for interpolation.
 
         Parameters
         ----------
