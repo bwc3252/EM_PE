@@ -6,8 +6,6 @@ Models adapted from code found in `gwemlightcurves <https://github.com/mcoughlin
 '''
 from __future__ import print_function
 import numpy as np
-#import scipy.interpolate
-#from scipy.interpolate import interp1d
 from scipy.interpolate import splrep, splev
 
 from .model import model_base

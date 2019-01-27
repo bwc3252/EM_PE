@@ -8,7 +8,7 @@ Models adapted from code found in `gwemlightcurves <https://github.com/mcoughlin
 from __future__ import print_function
 import numpy as np
 import scipy.interpolate
-from scipy.interpolate import interp1d
+from scipy.interpolate import splrep, splev
 
 from .model import model_base
 
@@ -67,8 +67,8 @@ class me2017(model_base):
         index = band_ind[band]
         lc = self.mAB[index]
         mask = np.isfinite(lc)
-        f = interp1d(self.tdays[mask], lc[mask], fill_value='extrapolate')
-        return f(t), 0
+        f = splrep(self.tdays[mask], lc[mask])
+        return splev(t, f), 0
 
     def _calc_lc(self, tini, tmax, dt, mej, vej, dist):
 

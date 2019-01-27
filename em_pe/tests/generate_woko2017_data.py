@@ -1,7 +1,7 @@
 from __future__ import print_function
 import numpy as np
 
-from em_pe.models import gwemlightcurve_models as models
+from em_pe.models import woko2017
 from em_pe.models.lightcurve_utils import calc_meje, calc_vej
 
 np.random.seed(1)
@@ -32,7 +32,7 @@ t_bounds = [tini, tmax]
 
 ### initialize the model and set parameters
 
-model = models.woko2017()
+model = woko2017()
 model.set_params(params, t_bounds)
 
 ### generate and save the data
