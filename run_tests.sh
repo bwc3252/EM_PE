@@ -1,6 +1,3 @@
-python em_pe/tests/imports_test.py
-python em_pe/tests/models_test.py
-
 ### Set up test data and results directory
 rm -rf em_pe/tests/temp/
 mkdir em_pe/tests/temp/

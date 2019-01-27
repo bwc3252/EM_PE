@@ -7,7 +7,10 @@ Models
 .. automodule:: em_pe.models.test_models
     :members:
 
-.. automodule:: em_pe.models.gwemlightcurve_models
+.. automodule:: em_pe.models.me2017
+    :members:
+
+.. automodule:: em_pe.models.woko2017
     :members:
 
 .. automodule:: em_pe.models.linear_model
