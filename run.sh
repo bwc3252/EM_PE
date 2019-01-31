@@ -4,7 +4,7 @@ mkdir em_pe/tests/temp/
 
 ### parse JSON data
 python em_pe/parser/parse_json.py --f Data/GW170817.json --out em_pe/tests/temp/ \
-                                  --t0 57982.5285231481 --maxpts 20 \
+                                  --t0 57982.5285231481 --maxpts 500 \
                                 --b g \
                                 --b r \
                                 --b i \
@@ -15,11 +15,10 @@ python em_pe/parser/parse_json.py --f Data/GW170817.json --out em_pe/tests/temp/
                                 --b K
 
 ### Generate the posterior samples
-python em_pe/generate_posterior_samples.py --min 20 --max 20 --dat em_pe/tests/temp/ \
+python em_pe/generate_posterior_samples.py --min 30 --max 30 --dat em_pe/tests/temp/ \
                                            -v --m me2017 1 --out em_pe/tests/temp/posterior_samples.txt \
                                            --cutoff 0 \
-                                           --f K.txt \
-                                           --f H.txt
+                                           --f z.txt
 
                                            #--f g.txt \
                                            #--f r.txt \

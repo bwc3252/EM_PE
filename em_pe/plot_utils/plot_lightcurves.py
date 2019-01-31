@@ -46,16 +46,19 @@ def _parse_command_line_args():
     parser.add_argument('--tmin', type=float, help='Minimum time (for models only)')
     parser.add_argument('--tmax', type=float, help='Maximum time (for models only)')
     parser.add_argument('--out', help='Filename to save plot')
+    parser.add_argument('--title', help='Custom title, overrides automatically-generated title')
     return parser.parse_args()
 
 def plot_lightcurves():
     args = _parse_command_line_args()
-    color_list=['black', 'red', 'green', 'blue','yellow']
+    color_list=['black', 'red', 'orange', 'yellow', 'green', 'cyan', 'blue',
+                'purple', 'gray']
     nbands = len(args.b)
     color_list = color_list[:nbands]
     color_dict = dict(zip(args.b, color_list))
     model_data = {}
     actual_data = {}
+    plt.figure(figsize=(10,10))
     if args.m is not None:
         t_bounds = [args.tmin, args.tmax]
         t = np.linspace(args.tmin, args.tmax, 100)
@@ -87,7 +90,9 @@ def plot_lightcurves():
         title_text = ''
         for param_name in params:
             title_text += param_name + '='+ str(round(params[param_name], 4)) + ' '
-        plt.title(title_text)
+    if args.title is not None:
+        title_text = args.title
+    plt.title(title_text)
     plt.savefig(args.out)
 
 if __name__ == '__main__':

@@ -32,19 +32,7 @@ class woko2017(model_base):
         self.f_list = []
         self.params = None
 
-    def set_params(self, params, t_bounds):
-        '''
-        Method to set the parameters for lightcurve
-        model.
-
-        Parameters
-        ----------
-        params : dict
-            Dictionary mapping parameter names to their values
-        t_bounds : list
-            [upper bound, lower bound] pair for time values
-        '''
-        self.params = params
+        ### Do the major interpolations
         ### define constants
         mej0 = 0.013+0.005
         vej0 = 0.132+0.08
@@ -52,10 +40,6 @@ class woko2017(model_base):
         mejconst = [-1.13,-1.01,-0.94,-0.94,-0.93,-0.93,-0.95,-0.99]
         vejconst = [-1.28,-1.60,-1.52,-1.56,-1.61,-1.61,-1.55,-1.33]
         kappaconst = [2.65,2.27,2.02,1.87,1.76,1.56,1.33,1.13]
-        ### get parameters
-        mej = params['mej']
-        vej = params['vej']
-        dist = 40.0
         ### temporarily hardcode these
         kappa_r = 1.0
         theta_r = 0.0
@@ -98,6 +82,20 @@ class woko2017(model_base):
                 f2 = splrep(t,data[:,idx2])
 
             self.f_list.append((f1, f2, weight1, weight2))
+
+    def set_params(self, params, t_bounds):
+        '''
+        Method to set the parameters for lightcurve
+        model.
+
+        Parameters
+        ----------
+        params : dict
+            Dictionary mapping parameter names to their values
+        t_bounds : list
+            [upper bound, lower bound] pair for time values
+        '''
+        self.params = params
 
 
     def evaluate(self, tvec_days, band):
