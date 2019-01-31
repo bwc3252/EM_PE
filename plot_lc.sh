@@ -21,7 +21,7 @@ touch em_pe/tests/temp/params.txt
 echo "0.01" >> em_pe/tests/temp/params.txt # mej
 echo "0.1" >> em_pe/tests/temp/params.txt # vej
 
-python em_pe/plot_utils/plot_lightcurves.py --m me2017 --p em_pe/tests/temp/params.txt \
+python em_pe/plot_utils/plot_lightcurves.py --m woko2017 --p em_pe/tests/temp/params.txt \
                                             --tmin 0.5 --tmax 15 --out em_pe/tests/temp/lc.png \
                                             --dat em_pe/tests/temp \
                                             --b z \

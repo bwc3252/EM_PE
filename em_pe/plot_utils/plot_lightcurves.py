@@ -46,6 +46,7 @@ def _parse_command_line_args():
     parser.add_argument('--tmin', type=float, help='Minimum time (for models only)')
     parser.add_argument('--tmax', type=float, help='Maximum time (for models only)')
     parser.add_argument('--out', help='Filename to save plot')
+    parser.add_argument('--div', action='store_true', help='Create plot of data/model')
     parser.add_argument('--title', help='Custom title, overrides automatically-generated title')
     return parser.parse_args()
 
@@ -59,7 +60,7 @@ def plot_lightcurves():
     model_data = {}
     actual_data = {}
     plt.figure(figsize=(10,10))
-    if args.m is not None:
+    if args.m is not None and not args.div:
         t_bounds = [args.tmin, args.tmax]
         t = np.linspace(args.tmin, args.tmax, 100)
         model = model_dict[args.m]()
@@ -72,22 +73,43 @@ def plot_lightcurves():
     if args.dat is not None:
         for band in args.b:
             actual_data[band] = np.loadtxt(args.dat + '/' + band + '.txt')
-    if args.m is not None:
-        for band in model_data:
-            dat = model_data[band]
-            plt.plot(dat[0], dat[1], label=(band + ' [' + args.m + ']'), color=color_dict[band])
-    if args.dat is not None:
-        for band in actual_data:
-            dat = actual_data[band]
-            plt.scatter(dat[0], dat[2], label=band, color=color_dict[band])
+    if args.div:
+        t_bounds = [np.inf, -1 * np.inf]
+        for band in args.b:
+            real_dat = actual_data[band]
+            t = real_dat[0]
+            t_bounds[0] = min(t_bounds[0], min(t))
+            t_bounds[1] = max(t_bounds[1], max(t))
+        model = model_dict[args.m]()
+        params = np.loadtxt(args.p)
+        params = dict(zip(model.param_names, params))
+        model.set_params(params, t_bounds)
+        for band in args.b:
+            t = actual_data[band][0]
+            m_dat, _ = model.evaluate(t, band)
+            real_dat = actual_data[band]
+            plt.scatter(t, real_dat[2] / m_dat, label=band, color=color_dict[band])
+    else:
+        if args.m is not None:
+            for band in model_data:
+                dat = model_data[band]
+                plt.plot(dat[0], dat[1], label=(band + ' [' + args.m + ']'), color=color_dict[band])
+        if args.dat is not None:
+            for band in actual_data:
+                dat = actual_data[band]
+                plt.scatter(dat[0], dat[2], label=band, color=color_dict[band])
     ax = plt.gca()
-    ax.invert_yaxis()
+    if not args.div:
+        ax.invert_yaxis()
     ax.set_xscale('log')
     plt.legend()
     plt.xlabel('Time (days)')
-    plt.ylabel('AB Magnitude')
+    if args.div:
+        plt.ylabel('Data / Model')
+    else:
+        plt.ylabel('AB Magnitude')
     if args.m is not None:
-        title_text = ''
+        title_text = args.m + ', '
         for param_name in params:
             title_text += param_name + '='+ str(round(params[param_name], 4)) + ' '
     if args.title is not None:
