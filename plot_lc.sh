@@ -25,4 +25,7 @@ python em_pe/plot_utils/plot_lightcurves.py --m me2017 --p em_pe/tests/temp/para
                                             --tmin 0.5 --tmax 15 --out em_pe/tests/temp/lc.png \
                                             --dat em_pe/tests/temp \
                                             --b z \
-                                            --title "GW170817 Photometry in Selected Bands"
+                                            --b y \
+                                            --b J \
+                                            --b H \
+                                            --b K
