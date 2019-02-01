@@ -27,7 +27,7 @@ vej = calc_vej(m1, c1, m2, c2)
 
 print('mej:', mej, 'vej:', vej)
 
-params = {'mej':mej, 'vej':vej, 'dist':dist}
+params = {'mej':mej, 'vej':vej, 'dist':dist, 'delta_t':0}
 t_bounds = [tini, tmax]
 
 ### initialize the model and set parameters

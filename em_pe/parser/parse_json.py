@@ -41,7 +41,7 @@ def _parse_command_line_args():
     parser.add_argument('--b', action='append', help='Data bands to store')
     parser.add_argument('--out', help='Directory to save data to')
     parser.add_argument('--maxpts', type=float, default=np.inf, help='Maximum number of points to keep for each band')
-#    parser.add_argument('--tmax', type=float, default=np.inf, help='Upper bound for time points to keep')
+    parser.add_argument('--tmax', type=float, default=np.inf, help='Upper bound for time points to keep')
 #    parser.add_argument('--tmin', type=float, default=0, help='Lower bound for time points to keep')
     return parser.parse_args()
 
@@ -64,7 +64,8 @@ def _read_data(args):
                 ### [time, time error, magnitude, magnitude error]
                 to_append = np.array([[entry['time']], [0], [entry['magnitude']], [entry['e_magnitude']]]).astype(np.float)
                 to_append[0] -= args.t0
-                data_dict[band] = np.append(data_dict[band], to_append, axis=1)
+                if to_append[0] < args.tmax:
+                    data_dict[band] = np.append(data_dict[band], to_append, axis=1)
     for band in data_dict:
         data = data_dict[band]
         ### check if we have too much data

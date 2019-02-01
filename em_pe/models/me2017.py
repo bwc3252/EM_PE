@@ -49,7 +49,7 @@ class me2017(model_base):
         vej = params['vej']
         self.delta_t = params['delta_t']
         #dist = params['dist']
-        dist = 40
+        dist = 40.0
         dt = 0.05
         self.tdays, self.mAB = self._calc_lc(0.5, t_bounds[1], dt, mej, vej, dist,)
 
