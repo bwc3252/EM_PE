@@ -25,11 +25,12 @@ class me2017(model_base):
     def __init__(self, weight=1):
         name = 'me2017'
         #param_names = ['mej', 'vej', 'dist']
-        param_names = ['mej', 'vej']
+        param_names = ['mej', 'vej', 'delta_t']
         bands = ['u', 'g', 'r', 'i', 'z', 'y', 'J', 'H', 'K']
         model_base.__init__(self, name, param_names, bands, weight)
         self.mAB = None
         self.tdays = None
+        self.delta_t = 0
 
     def set_params(self, params, t_bounds):
         '''
@@ -46,10 +47,11 @@ class me2017(model_base):
         '''
         mej = params['mej']
         vej = params['vej']
+        self.delta_t = params['delta_t']
         #dist = params['dist']
         dist = 40
         dt = 0.05
-        self.tdays, self.mAB = self._calc_lc(0.5, t_bounds[1], dt, mej, vej, dist)
+        self.tdays, self.mAB = self._calc_lc(0.5, t_bounds[1], dt, mej, vej, dist,)
 
     def evaluate(self, t, band):
         '''
@@ -68,6 +70,7 @@ class me2017(model_base):
         lc = self.mAB[index]
         mask = np.isfinite(lc)
         f = splrep(self.tdays[mask], lc[mask])
+        t += self.delta_t
         return splev(t, f), 0
 
     def _calc_lc(self, tini, tmax, dt, mej, vej, dist):
