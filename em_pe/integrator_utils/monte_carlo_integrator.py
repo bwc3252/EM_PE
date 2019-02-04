@@ -92,7 +92,7 @@ class integrator:
         self.cumulative_p = np.empty((0, 1))
         self.cumulative_p_s = np.empty((0, 1))
         if L_cutoff is None:
-            self.L_cutoff = 0
+            self.L_cutoff = -1
         else:
             self.L_cutoff = L_cutoff
 
@@ -169,7 +169,8 @@ class integrator:
         else:
             value_array = np.copy(self.value_array)
             lnL = self.value_array
-        mask = value_array >= self.L_cutoff
+        #mask = value_array >= self.L_cutoff
+        mask = value_array > self.L_cutoff
         mask = mask.flatten()
         self.cumulative_samples = np.append(self.cumulative_samples, self.sample_array[mask], axis=0)
         self.cumulative_values = np.append(self.cumulative_values, lnL[mask], axis=0)

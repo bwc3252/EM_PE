@@ -22,7 +22,7 @@ class woko2017(model_base):
 
     def __init__(self, weight=1):
         name = 'woko2017'
-        param_names = ['mej', 'vej', 'delta_t']
+        param_names = ['mej', 'vej']
         bands = ['g', 'r', 'i', 'z', 'y', 'J', 'H', 'K']
         model_base.__init__(self, name, param_names, bands, weight)
         modelfile = 'Data/DZ2_mags_2017-03-20.dat'
@@ -124,7 +124,8 @@ class woko2017(model_base):
 
         mej = self.params['mej']
         vej = self.params['vej']
-        delta_t = self.params['delta_t']
+        #delta_t = self.params['delta_t']
+        delta_t = 0
 
         dist = 40.0
 
