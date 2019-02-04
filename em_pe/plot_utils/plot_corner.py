@@ -42,7 +42,8 @@ def _parse_command_line_args():
     parser.add_argument('--truth_file', help='File with true parameter values')
     parser.add_argument('--out', help='File to save plot to')
     parser.add_argument('--p', action='append', help='Parameter name to plot')
-    parser.add_argument('--c', type=float, default=0, help='Minimum likelihood for points to keep')
+    parser.add_argument('--c', type=float, default=0, help='Minimum likelihood for points to keep. Takes precedence over --frac')
+    parser.add_argument('--frac', type=float, default=1.0, help='Fraction of points to keep')
     return parser.parse_args()
 
 def generate_plot():
@@ -73,9 +74,16 @@ def generate_plot():
         for index in range(4, len(header)):
             index_dict[header[index]] = index - 1
         lnL = samples[:,0]
-        mask = lnL > min_lnL
         p = samples[:,1]
         p_s = samples[:,2]
+        if args.c != 0:
+            mask = lnL > min_lnL
+        elif args.frac != 1.0:
+            ind = np.argsort(lnL)
+            n = int(len(lnL) * args.frac)
+            mask = ind[len(lnL) - n:]
+        else:
+            mask = [True] * len(lnL)
         lnL = lnL[mask]
         p = p[mask]
         p_s = p_s[mask]
@@ -85,8 +93,13 @@ def generate_plot():
         L = np.exp(lnL)
         weights = L * p / p_s
         weights /= np.sum(weights)
+        mask2 = weights > 0
+        print(np.sum(mask2), 'samples with weight > 0')
+        weights = weights[mask2]
+        x = x[mask]
+        x = x[mask2]
         color = color_list[i % len(color_list)]
-        fig_base = corner.corner(x[mask], weights=weights, fig=fig_base, labels=param_names, truths=truths,
+        fig_base = corner.corner(x, weights=weights, fig=fig_base, labels=param_names, truths=truths,
                                  color=color, plot_datapoints=False, plot_density=False, no_fill_contours=True,
                                  contours=True,)
         i += 1
