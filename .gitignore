@@ -2,6 +2,7 @@
 __pycache__/
 
 temp/
+results/
 
 fig.png
 

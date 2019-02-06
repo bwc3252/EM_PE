@@ -1,6 +1,11 @@
+### Basic script to plot lightcurves from data or model or both.
+# Usage: sh plot_lc.sh [test name]
+
 ### Set up test data and results directory
 rm -rf em_pe/tests/temp/
 mkdir em_pe/tests/temp/
+
+mkdir results/$1/
 
 ### parse JSON data
 python em_pe/parser/parse_json.py --f Data/GW170817.json --out em_pe/tests/temp/ \
@@ -20,9 +25,13 @@ touch em_pe/tests/temp/params.txt
 #echo "0.095" >> em_pe/tests/temp/params.txt
 echo "0.01" >> em_pe/tests/temp/params.txt # mej
 echo "0.1" >> em_pe/tests/temp/params.txt # vej
-echo "0.0" >> em_pe/tests/temp/params.txt # delta_t
+#echo "0.0" >> em_pe/tests/temp/params.txt # delta_t
 
 python em_pe/plot_utils/plot_lightcurves.py --m woko2017 --p em_pe/tests/temp/params.txt \
-                                            --tmin 0.5 --tmax 8 --out em_pe/tests/temp/lc.png \
+                                            --tmin 0.5 --tmax 8 --out results/$1/lc.png \
                                             --dat em_pe/tests/temp \
-                                            --b H
+                                            --b z \
+                                            --b y \
+                                            --b J \
+                                            --b H \
+                                            --b K
