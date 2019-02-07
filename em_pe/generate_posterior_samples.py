@@ -58,6 +58,7 @@ def _parse_command_line_args():
     parser.add_argument('--min', default=20, type=int, help='Minimum number of integrator iterations')
     parser.add_argument('--max', default=20, type=int, help='Maximum number of integrator iterations')
     parser.add_argument('--out', help='Location to store posterior samples')
+    parser.add_argument('--ncomp', type=int, default=1, help='Number of Gaussian components for integrator')
     return parser.parse_args()
 
 def _read_data(data_loc, files):
@@ -170,7 +171,7 @@ def generate_samples(data, models, ordered_params, L_cutoff, bounds, min_iter, m
     k = 1 # number of gaussian components TODO make this something that can change
     gmm_dict = {param_ind:None}
     ### initialize and run the integrator
-    integrator = monte_carlo_integrator.integrator(dim, bounds, gmm_dict, k,
+    integrator = monte_carlo_integrator.integrator(dim, bounds, gmm_dict, args.ncomp,
                     proc_count=None, L_cutoff=L_cutoff, use_lnL=True,
                     user_func=sys.stdout.flush())
     integrator.integrate(_integrand, min_iter=min_iter, max_iter=max_iter)

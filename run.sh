@@ -20,12 +20,9 @@ python em_pe/parser/parse_json.py --f Data/GW170817.json --out em_pe/tests/temp/
                                 --b K
 
 ### Generate the posterior samples
-python em_pe/generate_posterior_samples.py --min 250 --max 250 --dat em_pe/tests/temp/ \
+python em_pe/generate_posterior_samples.py --min 5 --max 5 --dat em_pe/tests/temp/ \
                                            -v --m woko2017 1 --out results/$1/posterior_samples.txt \
                                            --cutoff 0 \
-                                           --f z.txt \
-                                           --f y.txt \
-                                           --f J.txt \
                                            --f H.txt \
                                            --f K.txt
 
