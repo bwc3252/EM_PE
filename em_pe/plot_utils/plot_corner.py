@@ -100,14 +100,16 @@ def generate_plot():
         x = x[mask]
         x = x[mask2]
         color = color_list[i % len(color_list)]
-        #range = None
-        levels = [0.1, 0.5]
+        #levels = None
+        levels = [0.5, 0.9]
         fig_base = corner.corner(x, weights=weights, levels=levels, fig=fig_base, labels=param_names, truths=truths,
                                  color=color, plot_datapoints=False, plot_density=False, no_fill_contours=True,
-                                 contours=True,)
+                                 contours=True)
         i += 1
     if args.legend != []:
-        plt.legend(args.legend)
+        xcoord = 0.4 * len(args.p)
+        ycoord = len(args.p)
+        plt.legend(args.legend, bbox_to_anchor=(xcoord, ycoord))
     plt.savefig(args.out)
 
 if __name__ == '__main__':
