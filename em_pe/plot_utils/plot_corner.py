@@ -44,6 +44,7 @@ def _parse_command_line_args():
     parser.add_argument('--p', action='append', help='Parameter name to plot')
     parser.add_argument('--c', type=float, default=0, help='Minimum likelihood for points to keep. Takes precedence over --frac')
     parser.add_argument('--frac', type=float, default=1.0, help='Fraction of points to keep')
+    parser.add_argument('--legend', action='append', help='Name of posterior sample set for plot legend. Assumed to be in the same order as the posterior sample files')
     return parser.parse_args()
 
 def generate_plot():
@@ -99,10 +100,14 @@ def generate_plot():
         x = x[mask]
         x = x[mask2]
         color = color_list[i % len(color_list)]
-        fig_base = corner.corner(x, weights=weights, fig=fig_base, labels=param_names, truths=truths,
+        #range = None
+        range_list = [0.1, 0.5]
+        fig_base = corner.corner(x, weights=weights, range=range_list, fig=fig_base, labels=param_names, truths=truths,
                                  color=color, plot_datapoints=False, plot_density=False, no_fill_contours=True,
                                  contours=True,)
         i += 1
+    if args.legend != []:
+        plt.legend(args.legend)
     plt.savefig(args.out)
 
 if __name__ == '__main__':
