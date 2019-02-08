@@ -101,8 +101,8 @@ def generate_plot():
         x = x[mask2]
         color = color_list[i % len(color_list)]
         #range = None
-        range_list = [0.1, 0.5]
-        fig_base = corner.corner(x, weights=weights, range=range_list, fig=fig_base, labels=param_names, truths=truths,
+        levels = [0.1, 0.5]
+        fig_base = corner.corner(x, weights=weights, levels=levels, fig=fig_base, labels=param_names, truths=truths,
                                  color=color, plot_datapoints=False, plot_density=False, no_fill_contours=True,
                                  contours=True,)
         i += 1

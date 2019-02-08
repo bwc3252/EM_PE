@@ -12,6 +12,7 @@ fig.png
 *.log
 *.pdf
 *.gz
+*.blg
 
 *.profile
 
