@@ -107,10 +107,10 @@ def generate_plot():
                                  contours=True)
         i += 1
     if args.legend != []:
-        xcoord = 0.4 * len(args.p)
+        xcoord = len(args.p)
         ycoord = len(args.p)
-        plt.legend(args.legend, bbox_to_anchor=(xcoord, ycoord))
-    plt.savefig(args.out)
+        lgd = plt.legend(args.legend, bbox_to_anchor=(xcoord, ycoord), loc="center right")
+    plt.savefig(args.out, bbox_extra_artists=(lgd,), bbox_inches='tight')
 
 if __name__ == '__main__':
     generate_plot()
