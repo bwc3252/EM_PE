@@ -12,19 +12,22 @@ To see full command line parameter documentation::
 
     $ python plot_corner.py -h
     usage: plot_lightcurves.py [-h] [--dat DAT] [--b B] [--m M] [--p P]
-                               [--tmin TMIN] [--tmax TMAX] [--out OUT]
+                               [--tmin TMIN] [--tmax TMAX] [--out OUT] [--div]
+                               [--title TITLE]
 
     Generate lightcurve plot from data or models
 
     optional arguments:
-      -h, --help   show this help message and exit
-      --dat DAT    Data directory location
-      --b B        Data band
-      --m M        Model
-      --p P        Location of parameter file
-      --tmin TMIN  Minimum time (for models only)
-      --tmax TMAX  Maximum time (for models only)
-      --out OUT    Filename to save plot
+      -h, --help     show this help message and exit
+      --dat DAT      Data directory location
+      --b B          Data band
+      --m M          Model
+      --p P          Location of parameter file
+      --tmin TMIN    Minimum time (for models only)
+      --tmax TMAX    Maximum time (for models only)
+      --out OUT      Filename to save plot
+      --div          Create plot of data/model
+      --title TITLE  Custom title, overrides automatically-generated title
 '''
 
 from __future__ import print_function
