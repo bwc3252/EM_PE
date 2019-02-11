@@ -53,7 +53,8 @@ def generate_plot():
     '''
     args = _parse_command_line_args()
     ### colors to iterate through
-    color_list=['black', 'red', 'green', 'blue','yellow']
+    color_list=['black', 'red', 'orange', 'yellow', 'green', 'cyan', 'blue',
+                'purple', 'gray']
     sample_files = args.posterior_samples
     truth_file = args.truth_file
     if args.c <= 0:
@@ -106,11 +107,13 @@ def generate_plot():
                                  color=color, plot_datapoints=False, plot_density=False, no_fill_contours=True,
                                  contours=True)
         i += 1
-    if args.legend != []:
+    if args.legend is not None:
         xcoord = len(args.p)
         ycoord = len(args.p)
         lgd = plt.legend(args.legend, bbox_to_anchor=(xcoord, ycoord), loc="center right")
-    plt.savefig(args.out, bbox_extra_artists=(lgd,), bbox_inches='tight')
+        plt.savefig(args.out, bbox_extra_artists=(lgd,), bbox_inches='tight')
+    else:
+        plt.savefig(args.out)
 
 if __name__ == '__main__':
     generate_plot()
