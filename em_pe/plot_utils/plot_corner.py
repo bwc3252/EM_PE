@@ -111,6 +111,8 @@ def generate_plot():
         xcoord = len(args.p)
         ycoord = len(args.p)
         lgd = plt.legend(args.legend, bbox_to_anchor=(xcoord, ycoord), loc="center right")
+        for i in range(len(sample_files)):
+            lgd.legendHandles[i].set_color(color_list[i])
         plt.savefig(args.out, bbox_extra_artists=(lgd,), bbox_inches='tight')
     else:
         plt.savefig(args.out)
