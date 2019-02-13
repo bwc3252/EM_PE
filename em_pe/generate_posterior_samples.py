@@ -27,6 +27,7 @@ To see full command line parameter documentation::
       --min MIN        Minimum number of integrator iterations
       --max MAX        Maximum number of integrator iterations
       --out OUT        Location to store posterior samples
+      --ncomp NCOMP    Number of Gaussian components for integrator
 '''
 
 from __future__ import print_function

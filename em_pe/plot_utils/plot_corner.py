@@ -13,6 +13,7 @@ To see full command line parameter documentation::
     $ python plot_corner.py -h
     usage: plot_corner.py [-h] [--posterior_samples POSTERIOR_SAMPLES]
                           [--truth_file TRUTH_FILE] [--out OUT] [--p P] [--c C]
+                          [--frac FRAC] [--legend LEGEND]
 
     Generate corner plot from posterior samples
 
@@ -24,7 +25,11 @@ To see full command line parameter documentation::
                             File with true parameter values
       --out OUT             File to save plot to
       --p P                 Parameter name to plot
-      --c C                 Minimum likelihood for points to keep
+      --c C                 Minimum likelihood for points to keep. Takes
+                            precedence over --frac
+      --frac FRAC           Fraction of points to keep
+      --legend LEGEND       Name of posterior sample set for plot legend. Assumed
+                            to be in the same order as the posterior sample files
 '''
 
 from __future__ import print_function
