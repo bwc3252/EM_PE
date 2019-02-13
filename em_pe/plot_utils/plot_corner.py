@@ -75,31 +75,38 @@ def generate_plot():
     for file in sample_files:
         samples = np.loadtxt(file, skiprows=1)
         with open(file) as f:
+            ### the "header" contains the column names
             header = f.readline().strip().split(' ')
+        ### the parameter samples are in columns 4 and up, so to get their
+        ### names look at the corresponding words in the header
         param_names = header[4:]
         index_dict = {}
+        ### generate a dictionary that matches parameter names to column indices
         for index in range(4, len(header)):
             index_dict[header[index]] = index - 1
         lnL = samples[:,0]
         p = samples[:,1]
         p_s = samples[:,2]
-        if args.c != 0:
+        if args.c != 0: # cutoff specified, so get the boolean mask
             mask = lnL > min_lnL
-        elif args.frac != 1.0:
+        elif args.frac != 1.0: # fraction specified but cutoff not, so get the appropriate mask
             ind = np.argsort(lnL)
             n = int(len(lnL) * args.frac)
             mask = ind[len(lnL) - n:]
-        else:
+        else: # no mask
             mask = [True] * len(lnL)
         lnL = lnL[mask]
         p = p[mask]
         p_s = p_s[mask]
         ### get columns of array corresponding to actual parameter samples
         x = samples[:,[index_dict[name] for name in args.p]]
+        ### shift all the lnL values up so that we don't have rounding issues
         lnL += abs(np.max(lnL))
         L = np.exp(lnL)
+        ### calculate weights
         weights = L * p / p_s
         weights /= np.sum(weights)
+        ### throw out points with weight 0
         mask2 = weights > 0
         print(np.sum(mask2), 'samples with weight > 0')
         weights = weights[mask2]
@@ -108,16 +115,22 @@ def generate_plot():
         color = color_list[i % len(color_list)]
         #levels = None
         levels = [0.5, 0.9]
+        ### make the corner plot
         fig_base = corner.corner(x, weights=weights, levels=levels, fig=fig_base, labels=param_names, truths=truths,
                                  color=color, plot_datapoints=False, plot_density=False, no_fill_contours=True,
                                  contours=True)
         i += 1
     if args.legend is not None:
+        ### figure out where to put the legend so it doesn't cover anything
         xcoord = len(args.p)
         ycoord = len(args.p)
+        ### generate the legend
         lgd = plt.legend(args.legend, bbox_to_anchor=(xcoord, ycoord), loc="center right")
+        ### fix the colors in the legend -- for some reason, if truth values are provided,
+        ### every entry in the legend will have the same color
         for i in range(len(sample_files)):
             lgd.legendHandles[i].set_color(color_list[i])
+        ### the extra arguments in savefig() make sure that the legend is not cut off
         plt.savefig(args.out, bbox_extra_artists=(lgd,), bbox_inches='tight')
     else:
         plt.savefig(args.out)

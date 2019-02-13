@@ -54,6 +54,9 @@ def _parse_command_line_args():
     return parser.parse_args()
 
 def plot_lightcurves():
+    '''
+    Plots lightcurves using data, a model, or both.
+    '''
     args = _parse_command_line_args()
     color_list=['black', 'red', 'orange', 'yellow', 'green', 'cyan', 'blue',
                 'purple', 'gray']
@@ -64,19 +67,29 @@ def plot_lightcurves():
     actual_data = {}
     plt.figure(figsize=(10,10))
     if args.m is not None and not args.div:
+        ### we are using a model, but are NOT plotting data divided by model
         t_bounds = [args.tmin, args.tmax]
         t = np.linspace(args.tmin, args.tmax, 100)
+        ### initialize model
         model = model_dict[args.m]()
+        ### load the parameters
         params = np.loadtxt(args.p)
+        ### match parameters to names and set them in the model
         params = dict(zip(model.param_names, params))
         model.set_params(params, t_bounds)
         for band in args.b:
+            ### calculate model values in every band specified
             dat, _ = model.evaluate(t, band)
             model_data[band] = [t, dat]
     if args.dat is not None:
+        ### load the data
         for band in args.b:
             actual_data[band] = np.loadtxt(args.dat + '/' + band + '.txt')
     if args.div:
+        ### we are plotting data divided by model
+        ### basically go through the same steps as above to initialize the model
+        ### and calculate model values, but only doing so for time values that
+        ### exist in the data
         t_bounds = [np.inf, -1 * np.inf]
         for band in args.b:
             real_dat = actual_data[band]
@@ -93,16 +106,20 @@ def plot_lightcurves():
             real_dat = actual_data[band]
             plt.scatter(t, real_dat[2] / m_dat, label=band, color=color_dict[band])
     else:
+        ### not dividing
         if args.m is not None:
+            ### plot the model
             for band in model_data:
                 dat = model_data[band]
                 plt.plot(dat[0], dat[1], label=(band + ' [' + args.m + ']'), color=color_dict[band])
         if args.dat is not None:
+            ### plot the data
             for band in actual_data:
                 dat = actual_data[band]
                 plt.scatter(dat[0], dat[2], label=band, color=color_dict[band])
     ax = plt.gca()
     if not args.div:
+        ### regular lightcurve plots have their y axis inverted
         ax.invert_yaxis()
     ax.set_xscale('log')
     plt.legend()
@@ -111,6 +128,7 @@ def plot_lightcurves():
         plt.ylabel('Data / Model')
     else:
         plt.ylabel('AB Magnitude')
+    ### generate title if not provided
     if args.m is not None:
         title_text = args.m + ', '
         for param_name in params:
