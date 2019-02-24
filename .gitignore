@@ -4,6 +4,8 @@ __pycache__/
 temp/
 results/
 
+test.py
+
 fig.png
 
 *.aux
@@ -13,6 +15,7 @@ fig.png
 *.pdf
 *.gz
 *.blg
+*.bbl
 
 *.profile
 
