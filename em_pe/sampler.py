@@ -8,12 +8,12 @@ another python script)
 
 CLI example::
 
-    $ python generate_posterior_samples.py --dat Data/ --m test_modelA --cutoff 10e-8 --f test_bandA.txt --out posterior_samples.txt
+    $ python sampler.py --dat Data/ --m test_modelA --cutoff 10e-8 --f test_bandA.txt --out posterior_samples.txt
 
 To see full command line parameter documentation::
 
-    $ python generate_posterior_samples.py -h
-    usage: generate_posterior_samples.py [-h] [--dat DAT] [--m M M] [-v]
+    $ python sampler.py -h
+    usage: sampler.py [-h] [--dat DAT] [--m M M] [-v]
                                          [--cutoff CUTOFF] [--f F] [--min MIN]
                                          [--max MAX] [--out OUT]
 
