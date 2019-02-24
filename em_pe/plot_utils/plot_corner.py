@@ -52,21 +52,36 @@ def _parse_command_line_args():
     parser.add_argument('--legend', action='append', help='Name of posterior sample set for plot legend. Assumed to be in the same order as the posterior sample files')
     return parser.parse_args()
 
-def generate_plot():
+def generate_plot(sample_files, out, params, truths=None, cutoff=0, frac=1.0, leg=None):
     '''
     Generates a corner plot for the specified posterior samples and parameters.
+
+    Parameters
+    ----------
+    sample_files : list
+        List of posterior sample files
+    out : string
+        File to save plot to
+    params : list
+        List of parameter names
+    truths : string
+        File with true parameter values
+    cutoff : float
+        Minimum likelihood for points to keep. Takes precedence over frac
+    frac : float
+        Fraction of points to keep
+    leg : list
+        List of names of posterior sample set for plot legend. Assumed to be in
+        the same order as the posterior sample files
     '''
-    args = _parse_command_line_args()
     ### colors to iterate through
     color_list=['black', 'red', 'orange', 'yellow', 'green', 'cyan', 'blue',
                 'purple', 'gray']
-    sample_files = args.posterior_samples
-    truth_file = args.truth_file
-    if args.c <= 0:
+    if cutoff <= 0:
         min_lnL = -1 * np.inf
     else:
-        min_lnL = np.log(args.c)
-    if truth_file is not None:
+        min_lnL = np.log(cutoff)
+    if truths is not None:
         truths = np.loadtxt(truth_file)
     else:
         truths = None
@@ -87,11 +102,11 @@ def generate_plot():
         lnL = samples[:,0]
         p = samples[:,1]
         p_s = samples[:,2]
-        if args.c != 0: # cutoff specified, so get the boolean mask
+        if cutoff != 0: # cutoff specified, so get the boolean mask
             mask = lnL > min_lnL
-        elif args.frac != 1.0: # fraction specified but cutoff not, so get the appropriate mask
+        elif frac != 1.0: # fraction specified but cutoff not, so get the appropriate mask
             ind = np.argsort(lnL)
-            n = int(len(lnL) * args.frac)
+            n = int(len(lnL) * frac)
             mask = ind[len(lnL) - n:]
         else: # no mask
             mask = [True] * len(lnL)
@@ -99,7 +114,7 @@ def generate_plot():
         p = p[mask]
         p_s = p_s[mask]
         ### get columns of array corresponding to actual parameter samples
-        x = samples[:,[index_dict[name] for name in args.p]]
+        x = samples[:,[index_dict[name] for name in params]]
         ### shift all the lnL values up so that we don't have rounding issues
         lnL += abs(np.max(lnL))
         L = np.exp(lnL)
@@ -120,20 +135,28 @@ def generate_plot():
                                  color=color, plot_datapoints=False, plot_density=False, no_fill_contours=True,
                                  contours=True)
         i += 1
-    if args.legend is not None:
+    if leg is not None:
         ### figure out where to put the legend so it doesn't cover anything
-        xcoord = len(args.p)
-        ycoord = len(args.p)
+        xcoord = len(params)
+        ycoord = len(params)
         ### generate the legend
-        lgd = plt.legend(args.legend, bbox_to_anchor=(xcoord, ycoord), loc="center right")
+        lgd = plt.legend(leg, bbox_to_anchor=(xcoord, ycoord), loc="center right")
         ### fix the colors in the legend -- for some reason, if truth values are provided,
         ### every entry in the legend will have the same color
         for i in range(len(sample_files)):
             lgd.legendHandles[i].set_color(color_list[i])
         ### the extra arguments in savefig() make sure that the legend is not cut off
-        plt.savefig(args.out, bbox_extra_artists=(lgd,), bbox_inches='tight')
+        plt.savefig(out, bbox_extra_artists=(lgd,), bbox_inches='tight')
     else:
-        plt.savefig(args.out)
+        plt.savefig(out)
 
 if __name__ == '__main__':
-    generate_plot()
+    args = _parse_command_line_args()
+    sample_files = args.posterior_samples
+    out = args.out
+    params = args.p
+    truths = args.truth_file
+    cutoff = args.c
+    frac = args.frac
+    leg = args.legend
+    generate_plot(sample_files, out, params, truths, cutoff, frac, leg)
