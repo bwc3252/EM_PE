@@ -14,5 +14,5 @@ EM PE Documentation
    plot_utils
    integrator_utils
    models
-   generate_posterior_samples
+   sampler
    parser
