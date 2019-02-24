@@ -7,7 +7,7 @@ parse_json.parse_json(57982.5285231481, "Data/GW170817.json", ["H", "K"],
                       "em_pe/tests/temp/", maxpts=50, tmax=8)
 
 ### Initialize sampler
-s = sampler.sampler("em_pe/tests/temp/", [["woko2017", 1]], ["H.txt", "K.txt"],
+s = sampler.sampler("em_pe/tests/temp/", "woko2017", ["H.txt", "K.txt"],
                     "results/woko2017/posterior_samples.txt", min_iter=5, max_iter=5)
 
 ### Generate samples
