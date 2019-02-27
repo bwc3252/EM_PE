@@ -8,12 +8,13 @@ from em_pe.plot_utils import plot_corner
 
 ### Initialize sampler
 s = sampler.sampler("em_pe/tests/temp/", "two_comp", ["H.txt"],
-                    "results/two_comp/posterior_samples.txt", min_iter=100, max_iter=100)
+                    "results/two_comp/posterior_samples.txt", min_iter=200,
+                    max_iter=200, fixed_params=[["frac", 0.5]])
 
 ### Generate samples
 s.generate_samples()
 
 ### Make a corner plot
 plot_corner.generate_plot(["results/two_comp/posterior_samples.txt"],
-                           "results/two_comp/corner.png", ["mej1", "vej1", "mej2", "vej2", "frac"],
-                           leg=["test"])
+                           "results/two_comp/corner.png", ["mej1", "vej1", "mej2", "vej2"],
+                           leg=["test (frac=0.5)"])

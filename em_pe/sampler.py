@@ -62,6 +62,7 @@ def _parse_command_line_args():
     parser.add_argument('--max', default=20, type=int, help='Maximum number of integrator iterations')
     parser.add_argument('--out', help='Location to store posterior samples')
     parser.add_argument('--ncomp', type=int, default=1, help='Number of Gaussian components for integrator')
+    parser.add_argument('--fixed_param', action='append', nargs=2, help='Parameters with fixed values')
     return parser.parse_args()
 
 class sampler:
@@ -88,7 +89,7 @@ class sampler:
         Number of Gaussian components to use for integrator
     '''
     def __init__(self, data_loc, m, files, out, v=True, L_cutoff=0, min_iter=20,
-                 max_iter=20, ncomp=1):
+                 max_iter=20, ncomp=1, fixed_params=None):
         ### parameters passed in from user or main()
         self.data_loc = data_loc
         self.m = m
@@ -99,6 +100,12 @@ class sampler:
         self.min_iter = min_iter
         self.max_iter = max_iter
         self.ncomp = ncomp
+        self.fixed_params = {}
+
+        ### convert types for fixed params, make it a dict
+        if fixed_params is not None:
+            for [name, value]  in fixed_params:
+                self.fixed_params[name] = float(value)
 
         ###variables to store
         self.data = None
@@ -130,7 +137,7 @@ class sampler:
         ordered_params = [] # keep track of all parameters used
         bounds = [] # bounds for each parameter
         for param in model.param_names:
-            if param not in ordered_params:
+            if param not in ordered_params and param not in self.fixed_params:
                 ordered_params.append(param)
                 bounds.append(bounds_dict[param])
         t_bounds = [np.inf, -1 * np.inf] # tmin and tmax for each band
@@ -182,6 +189,9 @@ class sampler:
                 bar.update(i)
             i += 1
             params = dict(zip(self.ordered_params, row)) # map each parameter's name to its value
+            ### take care of fixed parameters
+            for p in self.fixed_params:
+                params[p] = self.fixed_params[p]
             lnL = self._evaluate_lnL(params)
             ret.append(lnL)
         if self.v:
@@ -233,7 +243,8 @@ def main():
     max_iter = args.max
     out = args.out
     ncomp = args.ncomp
-    s = sampler(data_loc, m, files, out, v, L_cutoff, min_iter, max_iter, ncomp)
+    fixed_params = args.fixed_param
+    s = sampler(data_loc, m, files, out, v, L_cutoff, min_iter, max_iter, ncomp, fixed_params)
     s.generate_samples()
 
 if __name__ == '__main__':
