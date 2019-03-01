@@ -115,6 +115,10 @@ class sampler:
         self.bounds = None
         self.t_bounds = None
 
+        ### initialization things
+        self._read_data()
+        self._initialize_model()
+
     def _read_data(self):
         if self.v:
             print('Loading data... ', end='')
@@ -226,11 +230,50 @@ class sampler:
         '''
         Generate posterior samples.
         '''
-        self._read_data()
-        self._initialize_model()
         samples = self._generate_samples()
         header = 'lnL p p_s ' + ' '.join(self.ordered_params)
         np.savetxt(self.out, samples, header=header)
+
+    def log_likelihood(self, samples, vect=False):
+        '''
+        Function to calculate log-likelihoods of parameter samples
+
+        Parameters
+        ----------
+        samples : dict
+            Dictionary mapping parameter names to values. The values can either
+            be single floats or arrays. If arrays, the vect parameter should be
+            True
+
+        vect : bool
+            Set to True if passing arrays of parameter samples
+
+        Returns
+        -------
+        np.ndarray
+            Array of log-likelihoods
+        '''
+        ### get samples into common format
+        for param in samples:
+            if vect:
+                samples[param] = samples[param].flatten()
+                n = samples[param].size
+            else:
+                samples[param] = np.array(samples[param])
+                n = 1
+        ### concatenate everything into a single array (so we can take slices of it)
+        sample_array = np.empty((n, len(self.ordered_params)))
+        for col in range(len(self.ordered_params)):
+            sample_array[:,col] = samples[self.ordered_params[col]]
+        lnL = np.empty(n)
+        row = 0
+        while row < n:
+            params = dict(zip(self.ordered_params, sample_array[row]))
+            for p in self.fixed_params:
+                params[p] = self.fixed_params[p]
+            lnL[row] = self._evaluate_lnL(params)
+            row += 1
+        return lnL
 
 def main():
     args = _parse_command_line_args()
