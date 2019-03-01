@@ -100,8 +100,8 @@ plot_corner.generate_plot(...)
 
 I think there are three primary options for doing this:
 
-1. Copy-paste this code into GW PE code
-2. Implement or import GW likelihood in this sampling code
+1. ~~Copy-paste this code into GW PE code~~
+2. ~~Implement or import GW likelihood in this sampling code~~
 3. Import this code as a package and use Python API for EM likelihood
 
 Options 2 and 3 make the most sense to me. If there is a straightforward way to
@@ -121,11 +121,27 @@ This seems like the cleanest way to organize everything.
 Otherwise, it would be possible to implement a Python API for the EM likelihood,
 and something similar to the above code could be added to the GW likelihood.
 
+### Update
+
+The package can now be installed using the setup.py script (see README.md for
+details). I have also implemented function to just return log-likelihoods for
+parameter samples. This code can now be imported from anywhere else, as long
+as it has been installed. It should then be as simple as:
+
+```python
+from em_pe import sampler
+
+s = sampler.sampler(...)
+params = {...}
+
+lnL = s.log_likelihood(params)
+```
+
 ## Questions
 
-1. How hard would it be to import and use the GW likelihood?
+1. ~~How hard would it be to import and use the GW likelihood?~~
 2. Do we want to use my corner plot code, JSON parsing and associated internal
 data format, and so on?
 3. How important is it to support user-defined models? Currently, the user is
-only able to choose between models that are already implemented. Are we assuming
-that we will implement any models that someone might want to use?
+only able to choose between models that are already implemented. Are we
+assuming that we will implement any models that someone might want to use?
