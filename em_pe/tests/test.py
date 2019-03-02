@@ -3,8 +3,8 @@ from em_pe.parser import parse_json
 from em_pe.plot_utils import plot_corner
 
 ### Parse JSON data and convert to necessary format
-#parse_json.parse_json(57982.5285231481, "Data/GW170817.json", ["H"],
-#                      "em_pe/tests/temp/", maxpts=50, tmax=8)
+parse_json.parse_json(1187008882.43, "Data/GW170817.json", ["H"],
+                      "em_pe/tests/temp/", maxpts=50, tmax=8, gps_time=True)
 
 ### Initialize sampler
 s = sampler.sampler("em_pe/tests/temp/", "two_comp", ["H.txt"],

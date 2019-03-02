@@ -31,6 +31,7 @@ import numpy as np
 import argparse
 import sys
 import json
+from astropy.time import Time
 
 def _parse_command_line_args():
     '''
@@ -43,6 +44,7 @@ def _parse_command_line_args():
     parser.add_argument('--out', help='Directory to save data to')
     parser.add_argument('--maxpts', type=float, default=np.inf, help='Maximum number of points to keep for each band')
     parser.add_argument('--tmax', type=float, default=np.inf, help='Upper bound for time points to keep')
+    parser.add_argument('--time_format', type=str, default='gps', help='Time format (MJD or GPS)')
     return parser.parse_args()
 
 def _read_data(t0, file, bands, out, maxpts, tmax):
@@ -84,7 +86,11 @@ def _save_data(out, data_dict):
         filename = out + band + '.txt'
         np.savetxt(filename, data_dict[band])
 
-def parse_json(t0, file, bands, out, maxpts=np.inf, tmax=np.inf):
+def _convert_time(t0):
+    t = Time(t0, format='gps')
+    return t.mjd
+
+def parse_json(t0, file, bands, out, maxpts=np.inf, tmax=np.inf, gps_time=False):
     '''
     Parse JSON file.
 
@@ -102,13 +108,16 @@ def parse_json(t0, file, bands, out, maxpts=np.inf, tmax=np.inf):
         Maximum number of points to keep for each band
     tmax : float
         Upper bound for time points to keep
+    time_format :
     '''
+    if gps_time:
+        t0 = _convert_time(t0)
     data_dict = _read_data(t0, file, bands, out, maxpts, tmax)
     _save_data(out, data_dict)
 
 def main():
     args = _parse_command_line_args()
-    parse_json(args.t0, args.f, args.b, args.out, args.maxpts, args.tmax)
+    parse_json(args.t0, args.f, args.b, args.out, args.maxpts, args.tmax, args.time_format)
 
 if __name__ == '__main__':
     main()
