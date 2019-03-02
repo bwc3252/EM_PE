@@ -50,9 +50,10 @@ def _parse_command_line_args():
     parser.add_argument('--c', type=float, default=0, help='Minimum likelihood for points to keep. Takes precedence over --frac')
     parser.add_argument('--frac', type=float, default=1.0, help='Fraction of points to keep')
     parser.add_argument('--legend', action='append', help='Name of posterior sample set for plot legend. Assumed to be in the same order as the posterior sample files')
+    parser.add_argument('--default_contours', default=False, action='store_true', help='Whether or not to use default contours from corner.py')
     return parser.parse_args()
 
-def generate_plot(sample_files, out, params, truths=None, cutoff=0, frac=1.0, leg=None):
+def generate_plot(sample_files, out, params, truths=None, cutoff=0, frac=1.0, leg=None, default_contours=False):
     '''
     Generates a corner plot for the specified posterior samples and parameters.
 
@@ -128,8 +129,10 @@ def generate_plot(sample_files, out, params, truths=None, cutoff=0, frac=1.0, le
         x = x[mask]
         x = x[mask2]
         color = color_list[i % len(color_list)]
-        #levels = None
-        levels = [0.5, 0.9]
+        if default_contours:
+            levels = None
+        else:
+            levels = [0.5, 0.9]
         ### make the corner plot
         fig_base = corner.corner(x, weights=weights, levels=levels, fig=fig_base, labels=param_names, truths=truths,
                                  color=color, plot_datapoints=False, plot_density=False, no_fill_contours=True,
@@ -159,4 +162,5 @@ if __name__ == '__main__':
     cutoff = args.c
     frac = args.frac
     leg = args.legend
-    generate_plot(sample_files, out, params, truths, cutoff, frac, leg)
+    default_contours = args.default_contours
+    generate_plot(sample_files, out, params, truths, cutoff, frac, leg, default_contours)
