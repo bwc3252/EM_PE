@@ -83,7 +83,7 @@ def generate_plot(sample_files, out, params, truths=None, cutoff=0, frac=1.0, le
     else:
         min_lnL = np.log(cutoff)
     if truths is not None:
-        truths = np.loadtxt(truth_file)
+        truths = np.loadtxt(truths)
     else:
         truths = None
     fig_base = None
