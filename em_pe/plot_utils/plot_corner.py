@@ -140,10 +140,11 @@ def generate_plot(sample_files, out, params, truths=None, cutoff=0, frac=1.0, le
         i += 1
     if leg is not None:
         ### figure out where to put the legend so it doesn't cover anything
-        xcoord = len(params)
+        xcoord = 0 #len(params) - 1
         ycoord = len(params)
         ### generate the legend
-        lgd = plt.legend(leg, bbox_to_anchor=(xcoord, ycoord), loc="center right")
+        lgd = plt.legend(leg, bbox_to_anchor=(xcoord, ycoord), loc='upper left')
+        #lgd = plt.legend(leg, loc="center left")
         ### fix the colors in the legend -- for some reason, if truth values are provided,
         ### every entry in the legend will have the same color
         for i in range(len(sample_files)):
