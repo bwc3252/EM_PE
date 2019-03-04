@@ -51,9 +51,10 @@ def _parse_command_line_args():
     parser.add_argument('--frac', type=float, default=1.0, help='Fraction of points to keep')
     parser.add_argument('--legend', action='append', help='Name of posterior sample set for plot legend. Assumed to be in the same order as the posterior sample files')
     parser.add_argument('--default_contours', default=False, action='store_true', help='Whether or not to use default contours from corner.py')
+    parser.add_argument('--title', help='Title for plot')
     return parser.parse_args()
 
-def generate_plot(sample_files, out, params, truths=None, cutoff=0, frac=1.0, leg=None, default_contours=False):
+def generate_plot(sample_files, out, params, truths=None, cutoff=0, frac=1.0, leg=None, default_contours=False, title=None):
     '''
     Generates a corner plot for the specified posterior samples and parameters.
 
