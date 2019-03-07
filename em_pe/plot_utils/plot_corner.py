@@ -136,7 +136,7 @@ def generate_plot(sample_files, out, params, truths=None, cutoff=0, frac=1.0, le
             levels = [0.5, 0.9]
         ### make the corner plot
         fig_base = corner.corner(x, weights=weights, levels=levels, fig=fig_base, labels=param_names, truths=truths,
-                                 color=color, plot_datapoints=False, plot_density=False, no_fill_contours=True,
+                                 color=color, plot_datapoints=False, plot_density=True,
                                  contours=True)
         i += 1
     if leg is not None:
