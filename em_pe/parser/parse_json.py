@@ -84,7 +84,7 @@ def _read_data(t0, file, bands, out, maxpts, tmax):
 def _save_data(out, data_dict):
     for band in data_dict:
         filename = out + band + '.txt'
-        np.savetxt(filename, data_dict[band])
+        np.savetxt(filename, data_dict[band].T)
 
 def _convert_time(t0):
     t = Time(t0, format='gps')

@@ -39,7 +39,7 @@ for band in model.bands:
     data[0] = tdays
     data[2] = m + np.random.uniform(-1 * err_lim, err_lim, n) # generate errors
     data[3] = np.ones(n) * err_lim
-    np.savetxt(filename, data)
+    np.savetxt(filename, data.T)
 
 ### save true values
 

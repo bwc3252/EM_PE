@@ -84,7 +84,7 @@ def plot_lightcurves():
     if args.dat is not None:
         ### load the data
         for band in args.b:
-            actual_data[band] = np.loadtxt(args.dat + '/' + band + '.txt')
+            actual_data[band] = np.loadtxt(args.dat + '/' + band + '.txt').T
     if args.div:
         ### we are plotting data divided by model
         ### basically go through the same steps as above to initialize the model

@@ -164,15 +164,15 @@ class sampler:
         self.model.set_params(params, self.t_bounds)
         for band in self.model.bands:
             if band in self.bands_used:
-                t = self.data[band][0]
+                t = self.data[band][:,0]
                 m, m_err = self.model.evaluate(t, band)
                 temp_data[band][0] += m
                 temp_data[band][1] += m_err**2
         lnL = 0
         ### calculate lnL
         for band in self.bands_used:
-            x = self.data[band][2]
-            err = self.data[band][3]
+            x = self.data[band][:,2]
+            err = self.data[band][:,3]
             m = temp_data[band][0]
             m_err_squared = temp_data[band][1]
             diff = x - m

@@ -30,7 +30,7 @@ data[2] = (1 / np.cosh(a * t)) - b + np.random.uniform(-1 * err_lim, err_lim, n)
 data[3] = np.ones(n) * err_lim
 
 filename = 'em_pe/tests/temp/test_bandB.txt'
-np.savetxt(filename, data)
+np.savetxt(filename, data.T)
 
 ### save true values
 
