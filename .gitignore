@@ -1,5 +1,6 @@
 venv/
 dist/
+nohup.out
 *.egg-info
 
 *.pyc
