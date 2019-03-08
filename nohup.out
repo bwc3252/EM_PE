@@ -1,0 +1,39 @@
+2880648 samples with weight > 0
+Traceback (most recent call last):
+  File "em_pe/plot_utils/plot_corner.py", line 207, in <module>
+    title, combine)
+  File "em_pe/plot_utils/plot_corner.py", line 162, in generate_plot
+    lablels.append(tex_dict[param])
+NameError: global name 'lablels' is not defined
+/home/ben.champion/.local/lib/python2.7/site-packages/numpy/ma/core.py:6447: MaskedArrayFutureWarning: In the future the default for ma.maximum.reduce will be axis=0, not the current None, to match np.maximum.reduce. Explicitly pass 0 or None to silence this warning.
+  return self.reduce(a)
+/home/ben.champion/.local/lib/python2.7/site-packages/numpy/ma/core.py:6447: MaskedArrayFutureWarning: In the future the default for ma.minimum.reduce will be axis=0, not the current None, to match np.minimum.reduce. Explicitly pass 0 or None to silence this warning.
+  return self.reduce(a)
+/opt/rh/python27/root/usr/lib/python2.7/site-packages/matplotlib-1.4.3-py2.7-linux-x86_64.egg/matplotlib/collections.py:650: FutureWarning: elementwise comparison failed; returning scalar instead, but in the future will perform elementwise comparison
+  if self._edgecolors_original != str('face'):
+/opt/rh/python27/root/usr/lib/python2.7/site-packages/matplotlib-1.4.3-py2.7-linux-x86_64.egg/matplotlib/collections.py:590: FutureWarning: elementwise comparison failed; returning scalar instead, but in the future will perform elementwise comparison
+  if self._edgecolors == str('face'):
+2880648 samples with weight > 0
+2869669 samples with weight > 0
+2874456 samples with weight > 0
+2468791 samples with weight > 0
+2709289 samples with weight > 0
+2440062 samples with weight > 0
+2885150 samples with weight > 0
+2907941 samples with weight > 0
+21995202 samples with weight > 0
+/home/ben.champion/.local/lib/python2.7/site-packages/numpy/ma/core.py:6447: MaskedArrayFutureWarning: In the future the default for ma.maximum.reduce will be axis=0, not the current None, to match np.maximum.reduce. Explicitly pass 0 or None to silence this warning.
+  return self.reduce(a)
+/home/ben.champion/.local/lib/python2.7/site-packages/numpy/ma/core.py:6447: MaskedArrayFutureWarning: In the future the default for ma.minimum.reduce will be axis=0, not the current None, to match np.minimum.reduce. Explicitly pass 0 or None to silence this warning.
+  return self.reduce(a)
+/opt/rh/python27/root/usr/lib/python2.7/site-packages/matplotlib-1.4.3-py2.7-linux-x86_64.egg/matplotlib/collections.py:650: FutureWarning: elementwise comparison failed; returning scalar instead, but in the future will perform elementwise comparison
+  if self._edgecolors_original != str('face'):
+/opt/rh/python27/root/usr/lib/python2.7/site-packages/matplotlib-1.4.3-py2.7-linux-x86_64.egg/matplotlib/collections.py:590: FutureWarning: elementwise comparison failed; returning scalar instead, but in the future will perform elementwise comparison
+  if self._edgecolors == str('face'):
+1769404 samples with weight > 0
+827177 samples with weight > 0
+6723130 samples with weight > 0
+3293149 samples with weight > 0
+5675263 samples with weight > 0
+4849875 samples with weight > 0
+23137998 samples with weight > 0

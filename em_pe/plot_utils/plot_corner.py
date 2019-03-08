@@ -52,9 +52,11 @@ def _parse_command_line_args():
     parser.add_argument('--legend', action='append', help='Name of posterior sample set for plot legend. Assumed to be in the same order as the posterior sample files')
     parser.add_argument('--default_contours', default=False, action='store_true', help='Whether or not to use default contours from corner.py')
     parser.add_argument('--title', help='Title for plot')
+    parser.add_argument('--combine', action='store_true', help='Generate a plot using ALL sample files specified')
     return parser.parse_args()
 
-def generate_plot(sample_files, out, params, truths=None, cutoff=0, frac=1.0, leg=None, default_contours=False, title=None):
+def generate_plot(sample_files, out, params, truths=None, cutoff=0, frac=1.0, leg=None, 
+                  default_contours=False, title=None, combine=False):
     '''
     Generates a corner plot for the specified posterior samples and parameters.
 
@@ -79,6 +81,14 @@ def generate_plot(sample_files, out, params, truths=None, cutoff=0, frac=1.0, le
     ### colors to iterate through
     color_list=['black', 'red', 'orange', 'yellow', 'green', 'cyan', 'blue',
                 'purple', 'gray']
+    ### dictionary of LaTeX parameter name strings
+    tex_dict = {'mej':'$m_{ej}$ $(M_\\odot)$',
+                'mej1':'$m_{ej1}$ $(M_\\odot)$',
+                'mej2':'$m_{ej2}$ $(M_\\odot)$',
+                'vej':'$v_{ej}$ $(v/c)$',
+                'vej1':'$v_{ej1}$ $(v/c)$',
+                'vej2':'$v_{ej2}$ $(v/c)$'
+               }
     if cutoff <= 0:
         min_lnL = -1 * np.inf
     else:
@@ -89,11 +99,23 @@ def generate_plot(sample_files, out, params, truths=None, cutoff=0, frac=1.0, le
         truths = None
     fig_base = None
     i = 0
+    total_samples = []
+    headers = []
     for file in sample_files:
         samples = np.loadtxt(file, skiprows=1)
+        total_samples.append(samples)
         with open(file) as f:
             ### the "header" contains the column names
             header = f.readline().strip().split(' ')
+        headers.append(header)
+    if combine:
+        total_samples.append(np.concatenate(total_samples, axis=0))
+        headers.append(headers[0]) # is this safe?
+        if leg is not None:
+            leg.append('combined')
+    for ind in range(len(total_samples)):
+        samples = total_samples[ind]
+        header = headers[ind]
         ### the parameter samples are in columns 4 and up, so to get their
         ### names look at the corresponding words in the header
         param_names = header[4:]
@@ -134,11 +156,25 @@ def generate_plot(sample_files, out, params, truths=None, cutoff=0, frac=1.0, le
             levels = None
         else:
             levels = [0.5, 0.9]
+        labels = []
+        for param in params:
+            if param in tex_dict:
+                labels.append(tex_dict[param])
+            else:
+                labels.append(param)
+        if combine and ind == len(total_samples) - 1:
+            plot_density = True
+        elif len(total_samples) == 1:
+            plot_density = True
+        else:
+            plot_density = False
         ### make the corner plot
-        fig_base = corner.corner(x, weights=weights, levels=levels, fig=fig_base, labels=param_names, truths=truths,
-                                 color=color, plot_datapoints=False, plot_density=True,
+        fig_base = corner.corner(x, weights=weights, levels=levels, fig=fig_base, labels=labels, truths=truths,
+                                 color=color, plot_datapoints=False, plot_density=plot_density,
                                  contours=True)
         i += 1
+    if title is not None:
+        plt.title(title)
     if leg is not None:
         ### figure out where to put the legend so it doesn't cover anything
         xcoord = 0 #len(params) - 1
@@ -165,4 +201,7 @@ if __name__ == '__main__':
     frac = args.frac
     leg = args.legend
     default_contours = args.default_contours
-    generate_plot(sample_files, out, params, truths, cutoff, frac, leg, default_contours)
+    title = args.title
+    combine = args.combine
+    generate_plot(sample_files, out, params, truths, cutoff, frac, leg, default_contours, 
+                  title, combine)
