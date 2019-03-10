@@ -13,7 +13,7 @@ class two_comp(model_base):
 
     def __init__(self, weight=1):
         name = 'two_comp'
-        param_names = ['mej1', 'vej1', 'mej2', 'vej2', 'frac']
+        param_names = ['mej1', 'vej1', 'mej2', 'vej2', 'frac', 'dist']
         bands = ['g', 'r', 'i', 'z', 'y', 'J', 'H', 'K']
         model_base.__init__(self, name, param_names, bands, weight)
         self.model1 = woko2017(1.0)
