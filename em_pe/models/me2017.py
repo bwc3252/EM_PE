@@ -2,7 +2,7 @@
 '''
 Me2017 model
 ----------------------
-Models adapted from code found in `gwemlightcurves <https://github.com/mcoughlin/gwemlightcurves/tree/master/gwemlightcurves/KNModels/io>`_
+Model adapted from code found in `gwemlightcurves <https://github.com/mcoughlin/gwemlightcurves/tree/master/gwemlightcurves/KNModels/io>`_
 '''
 
 from __future__ import print_function
@@ -15,6 +15,8 @@ from .model import model_base
 class me2017(model_base):
     '''
     Implementation of Metzger model
+
+    This model currently does not work correctly -- do not use
 
     Parameters
     ----------

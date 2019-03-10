@@ -22,7 +22,7 @@ class woko2017(model_base):
 
     def __init__(self, weight=1):
         name = 'woko2017'
-        param_names = ['mej', 'vej']
+        param_names = ['mej', 'vej', 'dist']
         bands = ['g', 'r', 'i', 'z', 'y', 'J', 'H', 'K']
         model_base.__init__(self, name, param_names, bands, weight)
         modelfile = 'Data/DZ2_mags_2017-03-20.dat'
@@ -127,7 +127,7 @@ class woko2017(model_base):
         #delta_t = self.params['delta_t']
         delta_t = 0
 
-        dist = 40.0
+        #dist = 40.0
 
         # time shift
         tvec_days += delta_t
@@ -161,7 +161,7 @@ class woko2017(model_base):
         mAB_new = np.zeros((len(tvec_days),9))
         mAB_new[:,0] = np.squeeze(mAB_y)
         mAB_new[:,1:] = mAB
-        mAB_new += 5*(np.log10(dist*1e6) - 1)
+        #mAB_new += 5*(np.log10(dist*1e6) - 1)
 
         band_ind = dict(zip(self.bands, range(len(self.bands)))) # map bands to indices
         index = self.band_ind[band]
