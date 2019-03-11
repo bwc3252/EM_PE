@@ -55,7 +55,7 @@ def _parse_command_line_args():
     parser.add_argument('--combine', action='store_true', help='Generate a plot using ALL sample files specified')
     return parser.parse_args()
 
-def generate_plot(sample_files, out, params, truths=None, cutoff=0, frac=1.0, leg=None, 
+def generate_plot(sample_files, out, params, truths=None, cutoff=0, frac=1.0, leg=None,
                   default_contours=False, title=None, combine=False):
     '''
     Generates a corner plot for the specified posterior samples and parameters.
@@ -203,5 +203,5 @@ if __name__ == '__main__':
     default_contours = args.default_contours
     title = args.title
     combine = args.combine
-    generate_plot(sample_files, out, params, truths, cutoff, frac, leg, default_contours, 
+    generate_plot(sample_files, out, params, truths, cutoff, frac, leg, default_contours,
                   title, combine)

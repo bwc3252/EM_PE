@@ -1,3 +1,10 @@
+# -*- coding: utf-8 -*-
+'''
+Generate test data from a model
+-------------------------------
+Code to generate synthetic test data from one of the models.
+'''
+
 from __future__ import print_function
 import numpy as np
 import argparse
