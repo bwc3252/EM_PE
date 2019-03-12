@@ -50,7 +50,7 @@ headerfont=\Large\bf\textsc, % Large, bold and sans serif font in the headers of
 linewidth=2pt % Width of the border lines around content boxes
 }
 %----------------------------------------------------------------------------------------
-%	TITLE SECTION
+%	TITLE SECTION 
 %----------------------------------------------------------------------------------------
 %
 {\includegraphics[height=5em]{RIT_tiger.png}} % First university/lab logo on the left
@@ -66,30 +66,22 @@ and EM data channels}\vspace{-0.1em}} % Poster title
 
 \headerbox{Objectives}{name=objectives,column=0,row=0}{
 
-Donec non nisl a \textbf{arcu consequat} varius. Sed suscipit cursus luctus. Nulla sit amet elit augue. Curabitur scelerisque mollis dolor, quis blandit lorem condimentum at. Pellentesque sed nibh vel \textbf{dolor} sagittis semper.
+Donec non nisl a \textbf{arcu consequat} varius. Sed suscipit cursus luctus. Nulla sit amet elit augue. Curabitur scelerisque mollis dolor, quis blandit lorem condimentum at. Pellentesque sed nibh vel \textbf{dolor} sagittis semper. 
 
 \begin{enumerate}\compresslist
 \item Feugiat vitae elit
 \item bibendum ante sed lacinia eros in
 \item Curabitur scelerisque arcu consequat varius
 \item Dapibus nulla id purus consectetur
-\item Fringilla integer
+\item Fringilla integer 
 \end{enumerate}
 
 \vspace{0.3em} % When there are two boxes, some whitespace may need to be added if the one on the right has more content
 }
 
-%----------------------------------------------------------------------------------------
-%	INTRODUCTION
-%----------------------------------------------------------------------------------------
-
-\headerbox{Introduction}{name=introduction,column=1,row=0,bottomaligned=objectives}{
-
-Aliquam non lacus dolor, \textit{a aliquam quam}. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Nulla in nibh mauris. Donec vel ligula nisi, a lacinia arcu. Sed mi dui, malesuada vel consectetur et, egestas porta nisi. Sed eleifend pharetra dolor, et dapibus est vulputate eu. \textbf{Integer faucibus elementum felis vitae fringilla.} In hac habitasse platea dictumst. Duis tristique rutrum nisl, nec vulputate elit porta ut. Donec sodales sollicitudin turpis sed convallis. Etiam mauris ligula, blandit adipiscing condimentum eu, dapibus pellentesque risus.
-}
 
 %----------------------------------------------------------------------------------------
-%	RESULTS 1
+%	Code Design
 %----------------------------------------------------------------------------------------
 
 \headerbox{Code Design}{name=codedesign,column=2,span=2,row=0}
@@ -185,40 +177,18 @@ E = mc^{2}
 }
 
 %----------------------------------------------------------------------------------------
-%	RESULTS 2
+%	Light Curves
 %----------------------------------------------------------------------------------------
 
-\headerbox{Results 2}{name=results2,column=1,below=objectives,bottomaligned=conclusion}{ % This block's bottom aligns with the bottom of the conclusion block
-
-Donec faucibus purus at tortor egestas eu fermentum dolor facilisis. Maecenas tempor dui eu neque fringilla rutrum. Mauris \emph{lobortis} nisl accumsan.
-
-\begin{center}
-\begin{tabular}{l l l}
-\toprule
-\textbf{Treatments} & \textbf{Response 1} & \textbf{Response 2}\\
-\midrule
-Treatment 1 & 0.0003262 & 0.562 \\
-Treatment 2 & 0.0015681 & 0.910 \\
-Treatment 3 & 0.0009271 & 0.296 \\
-\bottomrule
-\end{tabular}
-\captionof{table}{Table caption}
-\end{center}
-
-Nulla ut porttitor enim. Suspendisse venenatis dui eget eros gravida tempor. Mauris feugiat elit et augue placerat ultrices. Morbi accumsan enim nec tortor consectetur non commodo.
+\headerbox{Light Curves}{name=results2,column=1,row=0,bottomaligned=conclusion}
+{ % This block's bottom aligns with the bottom of the conclusion block
 
 \begin{center}
-\begin{tabular}{l l l}
-\toprule
-\textbf{Treatments} & \textbf{Response 1} & \textbf{Response 2}\\
-\midrule
-Treatment 1 & 0.0003262 & 0.562 \\
-Treatment 2 & 0.0015681 & 0.910 \\
-Treatment 3 & 0.0009271 & 0.296 \\
-\bottomrule
-\end{tabular}
-\captionof{table}{Table caption}
+\includegraphics[width=1\linewidth]{real_lc_merged}
+\captionof{figure}{GW170817 lightcurves}
 \end{center}
+
+
 }
 
 %----------------------------------------------------------------------------------------
