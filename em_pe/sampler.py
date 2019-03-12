@@ -168,8 +168,8 @@ class sampler:
                 m, m_err = self.model.evaluate(t, band)
                 temp_data[band][0] += m
                 temp_data[band][1] += m_err**2
-                if 'dist' in self.ordered_params and dist in params:
-                    dist = params[dist]
+                if 'dist' in params:
+                    dist = params['dist']
                     temp_data[band][0] += 5*(np.log10(dist*1e6) - 1)
         lnL = 0
         ### calculate lnL

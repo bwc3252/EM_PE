@@ -42,6 +42,8 @@ tdays = np.linspace(args.tmin, args.tmax, args.n)
 for band in model.bands:
     filename = args.out + band + '.txt'
     m, _ = model.evaluate(tdays, band)
+    dist = params['dist']
+    m += 5*(np.log10(dist*1e6) - 1)
     data = np.empty((4, args.n))
     data[0] = tdays
     data[2] = m + np.random.uniform(-1 * args.err, args.err, args.n) # generate errors
