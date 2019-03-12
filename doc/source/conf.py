@@ -18,6 +18,7 @@
 
 import os
 import sys
+import em_pe
 sys.path.insert(0, os.path.abspath('../../'))
 #sys.path.insert(0, os.path.abspath('../../em_pe/'))
 #sys.path.insert(0, os.path.abspath('../../em_pe/plot_utils/'))
@@ -26,7 +27,7 @@ sys.path.insert(0, os.path.abspath('../../'))
 # -- Project information -----------------------------------------------------
 
 project = u'EM_PE'
-copyright = u'2018, Ben Champion'
+copyright = u'2019, Ben Champion'
 author = u'Ben Champion'
 
 # The short X.Y version
