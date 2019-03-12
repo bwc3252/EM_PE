@@ -31,7 +31,7 @@ def _parse_command_line_args():
 def generate_plot(sample_files, out, m, tmin, tmax, b, lc_file=None, fixed_params=None):
     n = len(sample_files)
     #fig = plt.figure(figsize=(6, 2 * n))
-    fig, axes = plt.subplots(n, 1, sharex='all', figsize=(6, 1.75 * n))
+    fig, axes = plt.subplots(n, 1, sharex='all', figsize=(6, 1.3 * n))
     model = model_dict[m]()
     for i in range(n):
         #fignum = str(n) + '1' + str(i + 1)
@@ -90,7 +90,7 @@ def generate_plot(sample_files, out, m, tmin, tmax, b, lc_file=None, fixed_param
         ax.set_yticks(new_yticks)
         ax.invert_yaxis()
         ax.set_xscale('log')
-        ax.set_ylabel('AB Magnitude')
+        ax.set_ylabel('$m_{AB}$')
         ax.legend()
     ax.set_xlabel('Time (days)')
     plt.tight_layout()
