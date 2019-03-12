@@ -30,11 +30,12 @@ def _parse_command_line_args():
 
 def generate_plot(sample_files, out, m, tmin, tmax, b, lc_file=None, fixed_params=None):
     n = len(sample_files)
-    fig = plt.figure(figsize=(6, 2 * n))
+    #fig = plt.figure(figsize=(6, 2 * n))
+    fig, axes = plt.subplots(n, 1, sharex='all', figsize=(6, 1.75 * n))
     model = model_dict[m]()
     for i in range(n):
-        fignum = str(n) + '1' + str(i + 1)
-        plt.subplot(int(fignum))
+        #fignum = str(n) + '1' + str(i + 1)
+        ax =axes[i] #plt.subplot(int(fignum), sharex=True)
         samples = np.loadtxt(sample_files[i], skiprows=1)
         with open(sample_files[i]) as f:
             ### the "header" contains the column names
@@ -55,8 +56,8 @@ def generate_plot(sample_files, out, m, tmin, tmax, b, lc_file=None, fixed_param
             p = header[col]
             values = samples[:,col]
             ### get itervals of parameters
-            lower = _quantile(values, 0.4, weights)
-            upper = _quantile(values, 0.6, weights)
+            lower = _quantile(values, 0.3, weights)
+            upper = _quantile(values, 0.7, weights)
             ### randomly sample some points in this range
             param_array[:,col - 3] = np.random.uniform(lower, upper, num_samples)
         n_pts = 200
@@ -73,20 +74,27 @@ def generate_plot(sample_files, out, m, tmin, tmax, b, lc_file=None, fixed_param
             lc_array[row] = model.evaluate(t, b[i])[0] + 5*(np.log10(dist*1e6) - 1)
         min_lc = np.amin(lc_array, axis=0)
         max_lc = np.amax(lc_array, axis=0)
-        plt.plot(t, min_lc, '--', color='black')
-        plt.plot(t, max_lc, '--', color='black')
-        plt.fill_between(t, min_lc, max_lc, color='red', alpha=0.4)
+        ax.plot(t, min_lc, '--', color='black', label=b[i])
+        ax.plot(t, max_lc, '--', color='black')
+        ax.fill_between(t, min_lc, max_lc, color='red', alpha=0.4)
         if lc_file is not None:
             lc = np.loadtxt(lc_file[i])
             t = lc[:,0]
+            err = lc[:,3]
             lc = lc[:,2]
-            plt.scatter(t, lc)
-        ax = plt.gca()
+            ax.errorbar(t, lc, yerr=err, fmt='+', color='black')
+        #ax = plt.gca()
+        ax.set_xlim((tmin - 0.1, max(tmax + 1, 10))) # these are kind of arbitrary
+        old_yticks = ax.get_yticks()
+        new_yticks = old_yticks[1:-1] # strip off outer yticks
+        ax.set_yticks(new_yticks)
         ax.invert_yaxis()
         ax.set_xscale('log')
-        plt.xlabel('Time (days)')
-        plt.ylabel('AB Magnitude')
+        ax.set_ylabel('AB Magnitude')
+        ax.legend()
+    ax.set_xlabel('Time (days)')
     plt.tight_layout()
+    plt.subplots_adjust(hspace=0)
     plt.savefig(out)
 
 def _quantile(x, q, weights=None):
