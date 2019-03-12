@@ -81,10 +81,42 @@ Donec non nisl a \textbf{arcu consequat} varius. Sed suscipit cursus luctus. Nul
 
 
 %----------------------------------------------------------------------------------------
+%	Recovery Plots
+%----------------------------------------------------------------------------------------
+
+\headerbox{Recovery Plots}{name=recovery,column=0,below=objectives}
+{ % This block's bottom aligns with the bottom of the conclusion block
+
+\begin{center}
+\includegraphics[width=1\linewidth]{syn_combined_corner_poster.png}
+\captionof{figure}{Recovery of injection across bands}
+\end{center}
+
+}
+
+%----------------------------------------------------------------------------------------
+%	Light Curves
+%----------------------------------------------------------------------------------------
+
+\headerbox{Light Curves}{name=lightcurves,column=1,row=0,bottomaligned=recovery}
+{ % This block's bottom aligns with the bottom of the conclusion block
+
+\begin{center}
+\includegraphics[width=1\linewidth]{real_lc_merged}
+\captionof{figure}{GW170817 lightcurves}
+\end{center}
+
+
+}
+
+%----------------------------------------------------------------------------------------
+
+
+%----------------------------------------------------------------------------------------
 %	Code Design
 %----------------------------------------------------------------------------------------
 
-\headerbox{Code Design}{name=codedesign,column=2,span=2,row=0}
+\headerbox{Code Design}{name=codedesign,column=2,span=2,row=0,bottomaligned=recovery}
 {
 
 \begin{multicols}{2}
@@ -97,6 +129,7 @@ Donec non nisl a \textbf{arcu consequat} varius. Sed suscipit cursus luctus. Nul
 \end{multicols}
 
 }
+
 
 %----------------------------------------------------------------------------------------
 %	REFERENCES
@@ -135,7 +168,7 @@ Donec non nisl a \textbf{arcu consequat} varius. Sed suscipit cursus luctus. Nul
 %	CONCLUSION
 %----------------------------------------------------------------------------------------
 
-\headerbox{Conclusion \& Future Research}{name=conclusion,column=2,span=2,row=0,below=codedesign,above=references}{
+\headerbox{Conclusion \& Future Research}{name=conclusion,column=0,span=4,row=0,below=lightcurves,above=references}{
 
 \begin{multicols}{2}
 
@@ -147,51 +180,6 @@ Donec non nisl a \textbf{arcu consequat} varius. Sed suscipit cursus luctus. Nul
 \end{multicols}
 }
 
-%----------------------------------------------------------------------------------------
-%	MATERIALS AND METHODS
-%----------------------------------------------------------------------------------------
-
-\headerbox{Materials \& Methods}{name=method,column=0,below=objectives,bottomaligned=conclusion}{ % This block's bottom aligns with the bottom of the conclusion block
-
-The following materials were required to complete the research:
-
-\begin{itemize}\compresslist
-\item Curabitur pellentesque dignissim
-\item Eu facilisis est tempus quis
-\item Duis porta consequat lorem
-\item Eu facilisis est tempus quis
-\end{itemize}
-
-The following equations were used for statistical analysis:
-
-\begin{equation}
-\cos^3 \theta =\frac{1}{4}\cos\theta+\frac{3}{4}\cos 3\theta
-\label{eq:refname}
-\end{equation}\
-
-\begin{equation}
-E = mc^{2}
-\label{eqn:Einstein}
-\end{equation}
-
-}
-
-%----------------------------------------------------------------------------------------
-%	Light Curves
-%----------------------------------------------------------------------------------------
-
-\headerbox{Light Curves}{name=results2,column=1,row=0,bottomaligned=conclusion}
-{ % This block's bottom aligns with the bottom of the conclusion block
-
-\begin{center}
-\includegraphics[width=1\linewidth]{real_lc_merged}
-\captionof{figure}{GW170817 lightcurves}
-\end{center}
-
-
-}
-
-%----------------------------------------------------------------------------------------
 
 \end{poster}
 
