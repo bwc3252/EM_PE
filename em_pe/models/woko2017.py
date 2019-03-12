@@ -31,6 +31,9 @@ class woko2017(model_base):
         self.band_ind = dict(zip(self.bands, range(len(self.bands)))) # map bands to indices
         self.f_list = []
         self.params = None
+        self.prev_params = None
+        self.reevaluate = True
+        self.prev_mAB = None
 
         ### Do the major interpolations
         ### define constants
@@ -96,7 +99,15 @@ class woko2017(model_base):
             [upper bound, lower bound] pair for time values
         '''
         self.params = params
-
+        self.reevaluate = True
+        if self.prev_params is not None:
+            self.reevaluate = False
+            for p in self.params:
+                if (self.params[p] != self.prev_params[p]) and (p != 'dist'):
+                    self.reevaluate = True
+                    break
+        else:
+            self.reevaluate = True
 
     def evaluate(self, tvec_days, band):
         '''
@@ -109,6 +120,10 @@ class woko2017(model_base):
         band : string
             Band to evaluate
         '''
+        if not self.reevaluate:
+            band_ind = dict(zip(self.bands, range(len(self.bands)))) # map bands to indices
+            index = self.band_ind[band]
+            return self.prev_mAB[index], 0
         ### define constants
         mej0 = 0.013+0.005
         vej0 = 0.132+0.08
@@ -165,4 +180,5 @@ class woko2017(model_base):
 
         band_ind = dict(zip(self.bands, range(len(self.bands)))) # map bands to indices
         index = self.band_ind[band]
+        self.prev_mAB = mAB_new.T
         return mAB_new.T[index], 0
