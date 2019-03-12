@@ -28,3 +28,5 @@ build/
 Makefile
 .buildinfo
 _sources
+
+*.swp
