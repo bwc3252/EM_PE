@@ -6,3 +6,4 @@ multiprocess==0.70.6.1
 corner==2.0.1
 numpy==1.16.0
 progressbar2==3.39.2
+sphinxcontrib-napoleon==0.7
