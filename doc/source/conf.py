@@ -19,6 +19,11 @@
 import os
 import sys
 import em_pe
+import em_pe.sampler
+import em_pe.integrator_utils
+import em_pe.models
+import em_pe.parser
+import em_pe.plot_utils
 sys.path.insert(0, os.path.abspath('../../'))
 #sys.path.insert(0, os.path.abspath('../../em_pe/'))
 #sys.path.insert(0, os.path.abspath('../../em_pe/plot_utils/'))
