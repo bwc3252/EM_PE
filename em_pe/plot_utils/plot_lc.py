@@ -30,12 +30,19 @@ def _parse_command_line_args():
 
 def generate_plot(sample_files, out, m, tmin, tmax, b, lc_file=None, fixed_params=None):
     n = len(sample_files)
+    if n %2 == 0:
+        nrows = n / 2
+    else:
+        nrows = int(n / 2) + 1
+    ### colors to iterate through
+    color_list=['black', 'red', 'orange', 'yellow', 'green', 'cyan', 'blue',
+                'purple', 'gray']
     #fig = plt.figure(figsize=(6, 2 * n))
-    fig, axes = plt.subplots(n, 1, sharex='all', figsize=(6, 1.3 * n))
+    fig, axes = plt.subplots(nrows, 1, sharex='all', figsize=(6, 0.7 * n))
     model = model_dict[m]()
     for i in range(n):
         #fignum = str(n) + '1' + str(i + 1)
-        ax =axes[i] #plt.subplot(int(fignum), sharex=True)
+        ax = axes[int(i / 2)]
         samples = np.loadtxt(sample_files[i], skiprows=1)
         with open(sample_files[i]) as f:
             ### the "header" contains the column names
@@ -72,26 +79,28 @@ def generate_plot(sample_files, out, m, tmin, tmax, b, lc_file=None, fixed_param
             model.set_params(params, [tmin, tmax])
             dist = params['dist']
             lc_array[row] = model.evaluate(t, b[i])[0] + 5*(np.log10(dist*1e6) - 1)
+        color = color_list[i % len(color_list)]
         min_lc = np.amin(lc_array, axis=0)
         max_lc = np.amax(lc_array, axis=0)
-        ax.plot(t, min_lc, '--', color='black', label=b[i])
-        ax.plot(t, max_lc, '--', color='black')
-        ax.fill_between(t, min_lc, max_lc, color='red', alpha=0.4)
+        ax.plot(t, min_lc, '--', color=color, label=b[i])
+        ax.plot(t, max_lc, '--', color=color)
+        ax.fill_between(t, min_lc, max_lc, color='black', alpha=0.1)
         if lc_file is not None:
             lc = np.loadtxt(lc_file[i])
             t = lc[:,0]
             err = lc[:,3]
             lc = lc[:,2]
-            ax.errorbar(t, lc, yerr=err, fmt='+', color='black')
-        #ax = plt.gca()
-        ax.set_xlim((tmin - 0.1, max(tmax + 1, 10))) # these are kind of arbitrary
-        old_yticks = ax.get_yticks()
-        new_yticks = old_yticks[1:-1] # strip off outer yticks
-        ax.set_yticks(new_yticks)
-        ax.invert_yaxis()
-        ax.set_xscale('log')
-        ax.set_ylabel('$m_{AB}$')
-        ax.legend()
+            ax.errorbar(t, lc, yerr=err, fmt='+', color=color)
+        if (i % 2 == 1) or (i == n - 1):
+            ### only bother doing this stuff once for each plot
+            ax.set_xlim((tmin - 0.1, max(tmax + 1, 10))) # these are kind of arbitrary
+            old_yticks = ax.get_yticks()
+            new_yticks = old_yticks[1:-1] # strip off outer yticks
+            ax.set_yticks(new_yticks)
+            ax.invert_yaxis()
+            ax.set_xscale('log')
+            ax.set_ylabel('$m_{AB}$')
+            ax.legend()
     ax.set_xlabel('Time (days)')
     plt.tight_layout()
     plt.subplots_adjust(hspace=0)
