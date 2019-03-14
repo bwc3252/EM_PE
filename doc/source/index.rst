@@ -10,11 +10,10 @@ EM PE Documentation
    :maxdepth: 2
    :caption: Contents:
 
-   plot_utils
-   integrator_utils
-   models
    sampler
+   plot_utils
    parser
+   low_level_utils
 
 Examples and Usage
 ------------------
