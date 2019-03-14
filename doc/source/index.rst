@@ -36,14 +36,14 @@ bands are used::
 
     ### assumes temp/H/ directory exists
     ### fix 'frac' parameter to 0.5 and 'dist' parameter to 40.0
-    python em_pe/sampler.py --dat temp/ --m two_comp -v --f g.txt \
+    python em_pe/sampler.py --dat temp/ --m two_comp -v --f H.txt \
                             --min $n --max $n \
                             --out temp/H/posterior_samples.txt \
                             --fixed_param frac 0.5 --fixed_param dist 40 &
 
     ### assumes temp/J/ directory exists
     ### fix 'frac' parameter to 0.5 and 'dist' parameter to 40.0
-    python em_pe/sampler.py --dat temp/ --m two_comp -v --f r.txt \
+    python em_pe/sampler.py --dat temp/ --m two_comp -v --f J.txt \
                             --min $n --max $n \
                             --out temp/J/posterior_samples.txt \
                             --fixed_param frac 0.5 --fixed_param dist 40
