@@ -50,7 +50,7 @@ headerfont=\Large\bf\textsc, % Large, bold and sans serif font in the headers of
 linewidth=2pt % Width of the border lines around content boxes
 }
 %----------------------------------------------------------------------------------------
-%	TITLE SECTION
+%	TITLE SECTION 
 %----------------------------------------------------------------------------------------
 %
 {\includegraphics[height=5em]{RIT_tiger.png}} % First university/lab logo on the left
@@ -66,14 +66,15 @@ and EM data channels}\vspace{-0.1em}} % Poster title
 
 \headerbox{Overview}{name=objectives,column=0,span=2,row=0}{
 
-Donec non nisl a \textbf{arcu consequat} varius. Sed suscipit cursus luctus. Nulla sit amet elit augue. Curabitur scelerisque mollis dolor, quis blandit lorem condimentum at. Pellentesque sed nibh vel \textbf{dolor} sagittis semper.
+We automate generation of light-curves from astrophysical explosions \\
+to facillitate joint EM \& GW parameter estimation from multi-messenger sources. \\
 
+Features include:
 \begin{enumerate}\compresslist
-\item Feugiat vitae elit
-\item bibendum ante sed lacinia eros in
-\item Curabitur scelerisque arcu consequat varius
-\item Dapibus nulla id purus consectetur
-\item Fringilla integer
+\item Lightcurve generation across multiple bands in EM spectrum
+\item Modular design for multi-component models
+\item Monte-Carlo integrator and Gaussian Mixture Models for parameter estimation
+\item Open-source python implementation
 \end{enumerate}
 
 \vspace{0.3em} % When there are two boxes, some whitespace may need to be added if the one on the right has more content
@@ -192,16 +193,17 @@ Donec non nisl a \textbf{arcu consequat} varius. Sed suscipit cursus luctus. Nul
 %	CONCLUSION
 %----------------------------------------------------------------------------------------
 
-\headerbox{Conclusion \& Future Research}{name=conclusion,column=2,span=2,row=0,below=recovery2,above=references}{
+\headerbox{Upcoming Developement}{name=conclusion,column=2,span=2,row=0,below=recovery2,above=references}{
 
-\begin{multicols}{2}
+%\begin{multicols}{2}
 
 \begin{itemize}\compresslist
-\item Pellentesque eget orci eros. Fusce ultricies, tellus et pellentesque fringilla, ante massa luctus libero, quis tristique purus urna nec nibh. Phasellus fermentum rutrum elementum. Nam quis justo lectus.
-\item Vestibulum sem ante, hendrerit a gravida ac, blandit quis magna.
+\item Add orientation to lightcurves
+\item optimize over sky position, orientation and lightcurve generation
+\item Run together with gravitational waveforms, for full multi-messenger parameter estimation!
 \end{itemize}
 
-\end{multicols}
+%\end{multicols}
 }
 %----------------------------------------------------------------------------------------
 
