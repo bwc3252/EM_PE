@@ -61,10 +61,10 @@ and EM data channels}\vspace{-0.1em}} % Poster title
 {\includegraphics[height=5em]{ccrg_logo.png}} % Second university/lab logo on the right
 
 %----------------------------------------------------------------------------------------
-%	OBJECTIVES
+%	Overview
 %----------------------------------------------------------------------------------------
 
-\headerbox{Objectives}{name=objectives,column=0,span=2,row=0}{
+\headerbox{Overview}{name=objectives,column=0,span=2,row=0}{
 
 Donec non nisl a \textbf{arcu consequat} varius. Sed suscipit cursus luctus. Nulla sit amet elit augue. Curabitur scelerisque mollis dolor, quis blandit lorem condimentum at. Pellentesque sed nibh vel \textbf{dolor} sagittis semper. 
 
@@ -80,59 +80,6 @@ Donec non nisl a \textbf{arcu consequat} varius. Sed suscipit cursus luctus. Nul
 }
 
 
-%----------------------------------------------------------------------------------------
-%	Recovery Plots
-%----------------------------------------------------------------------------------------
-
-\headerbox{Recovery Plots}{name=recovery,column=0,below=objectives}
-{ % This block's bottom aligns with the bottom of the conclusion block
-
-\begin{center}
-\includegraphics[width=1\linewidth]{syn_combined_corner_poster.png}
-\captionof{figure}{Recovery of injection across bands}
-\end{center}
-
-}
-
-%----------------------------------------------------------------------------------------
-%	Light Curves
-%----------------------------------------------------------------------------------------
-
-\headerbox{Light Curves}{name=lightcurves,column=1,below=objectives,bottomaligned=recovery}
-{ % This block's bottom aligns with the bottom of the conclusion block
-
-\begin{center}
-\includegraphics[width=1\linewidth]{lc_real}
-\captionof{figure}{GW170817 lightcurves}
-\end{center}
-
-
-}
-
-%----------------------------------------------------------------------------------------
-
-
-%----------------------------------------------------------------------------------------
-%	Code Design
-%----------------------------------------------------------------------------------------
-
-\headerbox{Code Design}{name=codedesign,column=2,span=2,row=0,bottomaligned=recovery}
-{
-
-\begin{multicols}{2}
-\begin{center}
-\includegraphics[width=2.25\linewidth]{UML2}
-\captionof{figure}{code}
-\end{center}
-
-\end{multicols}
-
-\vspace{1em}
-
-}
-
-
-%----------------------------------------------------------------------------------------
 %	REFERENCES
 %----------------------------------------------------------------------------------------
 
@@ -150,6 +97,114 @@ Donec non nisl a \textbf{arcu consequat} varius. Sed suscipit cursus luctus. Nul
 \end{multicols}
 
 }
+%----------------------------------------------------------------------------------------
+
+
+
+%----------------------------------------------------------------------------------------
+%	Code Design
+%----------------------------------------------------------------------------------------
+
+\headerbox{Code Design}{name=codedesign,below=objectives=2,span=2,above=references}%,bottomaligned=conclusion}
+{
+
+\begin{multicols}{2}
+\begin{center}
+\includegraphics[width=1.83\linewidth]{UML2}
+\captionof{figure}{code}
+\end{center}
+
+\end{multicols}
+
+\vspace{1em}
+
+}
+%----------------------------------------------------------------------------------------
+
+
+%----------------------------------------------------------------------------------------
+%	Recovery Plots 1
+%----------------------------------------------------------------------------------------
+
+\headerbox{Recovery of Injection}{name=recovery,column=2,row=0}
+{ % This block's bottom aligns with the bottom of the conclusion block
+
+\begin{center}
+\includegraphics[width=1\linewidth]{syn_combined_corner_poster.png}
+\captionof{figure}{Recovery of injection across bands}
+\end{center}
+
+}
+
+%----------------------------------------------------------------------------------------
+%	Light Curves 1
+%----------------------------------------------------------------------------------------
+
+\headerbox{Mock Light Curves}{name=lightcurves,column=3,row=0,bottomaligned=recovery}
+{ % This block's bottom aligns with the bottom of the conclusion block
+
+\begin{center}
+\includegraphics[width=1\linewidth]{lc_synthetic}
+\captionof{figure}{Synthetic lightcurves}
+\end{center}
+
+
+}
+
+%----------------------------------------------------------------------------------------
+
+%----------------------------------------------------------------------------------------
+%	Recovery Plots 2
+%----------------------------------------------------------------------------------------
+
+\headerbox{Recovery of GW170817}{name=recovery2,column=2,below=recovery}
+{ % This block's bottom aligns with the bottom of the conclusion block
+
+\begin{center}
+\includegraphics[width=1\linewidth]{real_combined_corner_poster_thin}
+\captionof{figure}{Recovery of GW170817 across bands}
+\end{center}
+
+}
+
+%----------------------------------------------------------------------------------------
+%	Light Curves 2
+%----------------------------------------------------------------------------------------
+
+\headerbox{Real Light Curves}{name=lightcurves2,column=3,below=lightcurves,bottomaligned=recovery2}
+{ % This block's bottom aligns with the bottom of the conclusion block
+
+\begin{center}
+\includegraphics[width=1\linewidth]{lc_real_thin}
+\captionof{figure}{GW170817 lightcurves}
+\end{center}
+
+
+}
+%----------------------------------------------------------------------------------------
+
+
+%----------------------------------------------------------------------------------------
+
+
+
+%----------------------------------------------------------------------------------------
+%	CONCLUSION
+%----------------------------------------------------------------------------------------
+
+\headerbox{Conclusion \& Future Research}{name=conclusion,column=2,span=2,row=0,below=recovery2,above=references}{
+
+\begin{multicols}{2}
+
+\begin{itemize}\compresslist
+\item Pellentesque eget orci eros. Fusce ultricies, tellus et pellentesque fringilla, ante massa luctus libero, quis tristique purus urna nec nibh. Phasellus fermentum rutrum elementum. Nam quis justo lectus.
+\item Vestibulum sem ante, hendrerit a gravida ac, blandit quis magna.
+\end{itemize}
+
+\end{multicols}
+}
+%----------------------------------------------------------------------------------------
+
 
 
 %----------------------------------------------------------------------------------------
@@ -165,21 +220,6 @@ Donec non nisl a \textbf{arcu consequat} varius. Sed suscipit cursus luctus. Nul
 \end{description}
 }
 
-%----------------------------------------------------------------------------------------
-%	CONCLUSION
-%----------------------------------------------------------------------------------------
-
-\headerbox{Conclusion \& Future Research}{name=conclusion,column=0,span=4,row=0,below=lightcurves,above=references}{
-
-\begin{multicols}{2}
-
-\begin{itemize}\compresslist
-\item Pellentesque eget orci eros. Fusce ultricies, tellus et pellentesque fringilla, ante massa luctus libero, quis tristique purus urna nec nibh. Phasellus fermentum rutrum elementum. Nam quis justo lectus.
-\item Vestibulum sem ante, hendrerit a gravida ac, blandit quis magna.
-\end{itemize}
-
-\end{multicols}
-}
 
 
 \end{poster}
