@@ -15,6 +15,6 @@ s = sampler("em_pe/tests/temp/", "two_comp", ["H.txt"],
 s.generate_samples()
 
 ### Make a corner plot
-plot_corner.generate_plot(["results/two_comp/posterior_samples.txt"],
+plot_corner.generate_corner_plot(["results/two_comp/posterior_samples.txt"],
                            "results/two_comp/corner.png", ["mej1", "vej1", "mej2", "vej2"],
                            leg=["test (frac=0.5)"])

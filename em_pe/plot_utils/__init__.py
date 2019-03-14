@@ -1,2 +1,2 @@
 import plot_corner
-import plot_lightcurves
+import plot_lc
