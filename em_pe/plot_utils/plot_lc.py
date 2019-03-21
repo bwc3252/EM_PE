@@ -38,11 +38,14 @@ def generate_plot(sample_files, out, m, tmin, tmax, b, lc_file=None, fixed_param
     color_list=['black', 'red', 'orange', 'yellow', 'green', 'cyan', 'blue',
                 'purple', 'gray']
     #fig = plt.figure(figsize=(6, 2 * n))
-    fig, axes = plt.subplots(nrows, 1, sharex='all', figsize=(6, 0.7 * n))
+    fig, axes = plt.subplots(nrows, 1, sharex='all', figsize=(6, 0.7 * n + 0.7))
     model = model_dict[m]()
     for i in range(n):
         #fignum = str(n) + '1' + str(i + 1)
-        ax = axes[int(i / 2)]
+        if nrows > 2:
+            ax = axes[int(i / 2)]
+        else:
+            ax = axes
         samples = np.loadtxt(sample_files[i], skiprows=1)
         with open(sample_files[i]) as f:
             ### the "header" contains the column names
