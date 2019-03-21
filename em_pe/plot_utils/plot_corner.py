@@ -4,16 +4,19 @@ Plot corner
 -----------
 Generates and saves a corner plot from posterior samples.
 
+CLI Usage
+^^^^^^^^^
 Example::
 
-    $ python plot_corner.py --posterior_samples samples.txt --truth_file truths.txt --out fig.png --p a --p b
+    $ python plot_corner.py --posterior_samples [sample file] --truth_file [truth file] --out [output filename] --p [parameter name]
 
 To see full command line parameter documentation::
 
     $ python plot_corner.py -h
     usage: plot_corner.py [-h] [--posterior_samples POSTERIOR_SAMPLES]
                           [--truth_file TRUTH_FILE] [--out OUT] [--p P] [--c C]
-                          [--frac FRAC] [--legend LEGEND]
+                          [--frac FRAC] [--legend LEGEND] [--default_contours]
+                          [--title TITLE] [--combine]
 
     Generate corner plot from posterior samples
 
@@ -30,6 +33,21 @@ To see full command line parameter documentation::
       --frac FRAC           Fraction of points to keep
       --legend LEGEND       Name of posterior sample set for plot legend. Assumed
                             to be in the same order as the posterior sample files
+      --default_contours    Whether or not to use default contours from corner.py
+      --title TITLE         Title for plot
+      --combine             Generate a plot using ALL sample files specified
+
+Python API
+^^^^^^^^^^
+Example::
+
+    from em_pe.plot_utils import plot_corner
+
+    sample_files = ['samples.txt']
+    out = 'corner.png'
+    params = ['mej', 'vej', 'dist']
+
+    generate_corner_plot(sample_files, out, params)
 '''
 
 from __future__ import print_function
@@ -55,7 +73,7 @@ def _parse_command_line_args():
     parser.add_argument('--combine', action='store_true', help='Generate a plot using ALL sample files specified')
     return parser.parse_args()
 
-def generate_plot(sample_files, out, params, truths=None, cutoff=0, frac=1.0, leg=None,
+def generate_corner_plot(sample_files, out, params, truths=None, cutoff=0, frac=1.0, leg=None,
                   default_contours=False, title=None, combine=False):
     '''
     Generates a corner plot for the specified posterior samples and parameters.
@@ -77,6 +95,13 @@ def generate_plot(sample_files, out, params, truths=None, cutoff=0, frac=1.0, le
     leg : list
         List of names of posterior sample set for plot legend. Assumed to be in
         the same order as the posterior sample files
+    default_contours : bool
+        Whether or not to use corner.py's default contour levels
+    title : str
+        Title for plot
+    combine : bool
+        Combine samples for all bands into a single dataset and plot this in
+        addition to individual bands (useful for generating density gradient)
     '''
     ### colors to iterate through
     color_list=['black', 'red', 'orange', 'yellow', 'green', 'cyan', 'blue',
@@ -203,5 +228,5 @@ if __name__ == '__main__':
     default_contours = args.default_contours
     title = args.title
     combine = args.combine
-    generate_plot(sample_files, out, params, truths, cutoff, frac, leg, default_contours,
+    generate_corner_plot(sample_files, out, params, truths, cutoff, frac, leg, default_contours,
                   title, combine)

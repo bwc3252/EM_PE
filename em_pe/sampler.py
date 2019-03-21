@@ -6,30 +6,51 @@ Generate posterior parameter samples according to the given command line
 arguments (if used from command line) or function arguments (if called from
 another python script)
 
-CLI example::
+CLI Usage
+^^^^^^^^^
+Example::
 
-    $ python sampler.py --dat Data/ --m test_modelA --cutoff 10e-8 --f test_bandA.txt --out posterior_samples.txt
+    $ python sampler.py --dat [data directory] --m [model name] --f [data filename] --out [file to save samples to]
 
 To see full command line parameter documentation::
 
     $ python sampler.py -h
-    usage: sampler.py [-h] [--dat DAT] [--m M M] [-v]
-                                         [--cutoff CUTOFF] [--f F] [--min MIN]
-                                         [--max MAX] [--out OUT]
+    usage: sampler.py [-h] [--dat DAT] [--m M] [-v] [--cutoff CUTOFF] [--f F]
+                      [--min MIN] [--max MAX] [--out OUT] [--ncomp NCOMP]
+                      [--fixed_param FIXED_PARAM FIXED_PARAM]
 
     Generate posterior parameter samples from lightcurve data
 
     optional arguments:
-      -h, --help       show this help message and exit
-      --dat DAT        Path to data directory
-      --m M M          Name of a model to use
-      -v               Verbose mode
-      --cutoff CUTOFF  Likelihood cutoff for storing posterior samples
-      --f F            Name of a data file
-      --min MIN        Minimum number of integrator iterations
-      --max MAX        Maximum number of integrator iterations
-      --out OUT        Location to store posterior samples
-      --ncomp NCOMP    Number of Gaussian components for integrator
+      -h, --help            show this help message and exit
+      --dat DAT             Path to data directory
+      --m M                 Name of model to use
+      -v                    Verbose mode
+      --cutoff CUTOFF       Likelihood cutoff for storing posterior samples
+      --f F                 Name of a data file
+      --min MIN             Minimum number of integrator iterations
+      --max MAX             Maximum number of integrator iterations
+      --out OUT             Location to store posterior samples
+      --ncomp NCOMP         Number of Gaussian components for integrator
+      --fixed_param FIXED_PARAM FIXED_PARAM
+                            Parameters with fixed values
+
+Python API
+^^^^^^^^^^
+Example::
+
+    from em_pe import sampler
+
+    dat = './'
+    m = 'two_comp'
+    f = ['H.txt', 'J.txt']
+    out = 'posterior_samples.txt'
+
+    ### Initialize sampler
+    s = sampler(dat, m, f, out)
+
+    ### Generate samples
+    s.generate_samples()
 '''
 
 from __future__ import print_function
@@ -87,6 +108,8 @@ class sampler:
         Maximum number of integrator iterations
     ncomp : int
         Number of Gaussian components to use for integrator
+    fixed_params : list
+        List of [param_name, value] pairs
     '''
     def __init__(self, data_loc, m, files, out, v=True, L_cutoff=0, min_iter=20,
                  max_iter=20, ncomp=1, fixed_params=None):
@@ -247,7 +270,6 @@ class sampler:
             Dictionary mapping parameter names to values. The values can either
             be single floats or arrays. If arrays, the vect parameter should be
             True
-
         vect : bool
             Set to True if passing arrays of parameter samples
 

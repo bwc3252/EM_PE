@@ -1,8 +1,56 @@
 # -*- coding: utf-8 -*-
 '''
-Plot posterior samples
-----------------------
+Plot lightcurves
+----------------
 Code to plot lightcurves from posterior samples and a model.
+
+CLI Usage
+^^^^^^^^^
+Example::
+
+    $ python plot_lc.py --posterior_samples [sample file] --out [output filename] --m [model name] --tmin [start time] --tmax [end time] --lc_file [lightcurve data] --b [band]
+
+To see full command line parameter documentation::
+
+    $ python plot_lc.py -h
+    usage: plot_lc.py [-h] [--posterior_samples POSTERIOR_SAMPLES] [--out OUT]
+                      [--m M] [--tmin TMIN] [--tmax TMAX] [--lc_file LC_FILE]
+                      [--b B] [--fixed_param FIXED_PARAM FIXED_PARAM]
+
+    Generate lightcurve plot from data or models
+
+    optional arguments:
+      -h, --help            show this help message and exit
+      --posterior_samples POSTERIOR_SAMPLES
+                            Posterior sample file to plot
+      --out OUT             Filename to save plot to
+      --m M                 Model name
+      --tmin TMIN           Minimum time
+      --tmax TMAX           Maximum time
+      --lc_file LC_FILE     Actual lightcurve data to plot (in same order as
+                            posterior sample files)
+      --b B                 Bands to plot (in same order as posterior sample
+                            files)
+      --fixed_param FIXED_PARAM FIXED_PARAM
+                            Fixed parameters (i.e. parameters without posterior
+                            samples)
+
+Python API
+^^^^^^^^^^
+Example::
+
+    from em_pe.plot_utils import plot_lc
+
+    sample_files = ['samples_H.txt', 'samples_J.txt']
+    out = 'lc.png'
+    m = 'model'
+    tmin = 0.5
+    tmax = 8
+    lc_files = ['H.txt', 'J.txt']
+    b = ['H', 'J']
+    fixed_params = [['dist', 40.0]]
+
+    plot_lc.generate_lc_plot(sample_file, out, m, tmin, tmax, b, lc_file=lc_files, fixed_params=fixed_params)
 '''
 
 from __future__ import print_function
@@ -25,10 +73,32 @@ def _parse_command_line_args():
     parser.add_argument('--tmax', type=float, help='Maximum time')
     parser.add_argument('--lc_file', action='append', help='Actual lightcurve data to plot (in same order as posterior sample files)')
     parser.add_argument('--b', action='append', help='Bands to plot (in same order as posterior sample files)')
-    parser.add_argument('--fixed_param', action='append', nargs=2, help='Fixed parameters')
+    parser.add_argument('--fixed_param', action='append', nargs=2, help='Fixed parameters (i.e. parameters without posterior samples)')
     return parser.parse_args()
 
-def generate_plot(sample_files, out, m, tmin, tmax, b, lc_file=None, fixed_params=None):
+def generate_lc_plot(sample_files, out, m, tmin, tmax, b, lc_file=None, fixed_params=None):
+    '''
+    Generate a lightcurve plot
+
+    Parameters
+    ----------
+    sample_files : list
+        List of posterior sample files
+    out : str
+        Filename to save plot to
+    m : str
+        Name of model to use
+    tmin : float
+        Start time
+    tmax : float
+        End time
+    b : list
+        List of data bands
+    lc_file : list
+        List of lightcurve data files (assumed to be in same order as posterior sample files)
+    fixed_params : list
+        List of [param_name, value] pairs
+    '''
     n = len(sample_files)
     if n %2 == 0:
         nrows = n / 2
@@ -120,6 +190,7 @@ def _quantile(x, q, weights=None):
     ----
     When ``weights`` is ``None``, this method simply calls numpy's percentile
     function with the values of ``q`` multiplied by 100.
+
     Parameters
     ----------
     x : array_like[nsamples,]
@@ -128,7 +199,8 @@ def _quantile(x, q, weights=None):
        The list of quantiles to compute. These should all be in the range
        ``[0, 1]``.
     weights : Optional[array_like[nsamples,]]
-        An optional weight corresponding to each sample. These
+        An optional weight corresponding to each sample.
+
     Returns
     -------
     quantiles : array_like[nquantiles,]
@@ -171,7 +243,7 @@ def main():
     if fixed_params is not None:
         for i in range(len(fixed_params)):
             fixed_params[i][1] = float(fixed_params[i][1])
-    generate_plot(samples, out, m, tmin, tmax, b, lc_file, fixed_params)
+    generate_lc_plot(samples, out, m, tmin, tmax, b, lc_file, fixed_params)
 
 if __name__ == '__main__':
     main()
