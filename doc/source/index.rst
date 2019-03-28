@@ -85,9 +85,11 @@ lightcurve plot (again as a bash script)::
         --lc_file temp/y.txt \
         --m two_comp --fixed_param frac 0.5 --fixed_param dist 40
 
-Python API Example for GW170817
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-The Python equivalent to the previous example::
+Python API Example for Synthetic Data
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+The Python equivalent to the previous example. Note that there is not yet a Python
+interface for synthetic data generation, so the first command in the above bash
+script should be run prior to this.
 
     from em_pe import sampler
     from em_pe.plot_utils import plot_corner, plot_lc
