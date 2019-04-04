@@ -68,13 +68,13 @@ def _parse_command_line_args():
     parser.add_argument('--c', type=float, default=0, help='Minimum likelihood for points to keep. Takes precedence over --frac')
     parser.add_argument('--frac', type=float, default=1.0, help='Fraction of points to keep')
     parser.add_argument('--legend', action='append', help='Name of posterior sample set for plot legend. Assumed to be in the same order as the posterior sample files')
-    parser.add_argument('--default_contours', default=False, action='store_true', help='Whether or not to use default contours from corner.py')
     parser.add_argument('--title', help='Title for plot')
+    parser.add_argument('--cl', action='append', help='Adds a confidence level. Set to "default" for default contours')
     parser.add_argument('--combine', action='store_true', help='Generate a plot using ALL sample files specified')
     return parser.parse_args()
 
 def generate_corner_plot(sample_files, out, params, truths=None, cutoff=0, frac=1.0, leg=None,
-                  default_contours=False, title=None, combine=False):
+                  cl='default', title=None, combine=False):
     '''
     Generates a corner plot for the specified posterior samples and parameters.
 
@@ -95,8 +95,8 @@ def generate_corner_plot(sample_files, out, params, truths=None, cutoff=0, frac=
     leg : list
         List of names of posterior sample set for plot legend. Assumed to be in
         the same order as the posterior sample files
-    default_contours : bool
-        Whether or not to use corner.py's default contour levels
+    cl : string or list
+        List of confidence levels to plot. Set to 'default' for default contours.
     title : str
         Title for plot
     combine : bool
@@ -177,10 +177,12 @@ def generate_corner_plot(sample_files, out, params, truths=None, cutoff=0, frac=
         x = x[mask]
         x = x[mask2]
         color = color_list[i % len(color_list)]
-        if default_contours:
+        if cl == 'default' or (len(cl) > 0 and cl[0] == 'default'):
             levels = None
         else:
-            levels = [0.5, 0.9]
+            levels = []
+            for level in cl:
+                levels.append(float(level))
         labels = []
         for param in params:
             if param in tex_dict:
@@ -225,8 +227,8 @@ if __name__ == '__main__':
     cutoff = args.c
     frac = args.frac
     leg = args.legend
-    default_contours = args.default_contours
+    cl = args.cl
     title = args.title
     combine = args.combine
-    generate_corner_plot(sample_files, out, params, truths, cutoff, frac, leg, default_contours,
+    generate_corner_plot(sample_files, out, params, truths, cutoff, frac, leg, cl,
                   title, combine)

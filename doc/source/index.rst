@@ -85,9 +85,11 @@ lightcurve plot (again as a bash script)::
         --lc_file temp/y.txt \
         --m two_comp --fixed_param frac 0.5 --fixed_param dist 40
 
-Python API Example for GW170817
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-The Python equivalent to the previous example::
+Python API Example for Synthetic Data
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+The Python equivalent to the previous example. Note that there is not yet a Python
+interface for synthetic data generation, so the first command in the above bash
+script should be run prior to this::
 
     from em_pe import sampler
     from em_pe.plot_utils import plot_corner, plot_lc
@@ -139,3 +141,40 @@ The plots generated should be similar to:
 
 .. image:: corner.png
 .. image:: lc.png
+
+Using Log-Likelihood Function
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+In addition to full parameter estimation, this code also provides access to the
+internal log-likelihood function::
+
+    from em_pe import sampler
+
+    dat = './'
+    m = 'two_comp'
+    f = ['H.txt', 'J.txt']
+    out = 'placeholder.txt'
+
+    ### Initialize sampler
+    s = sampler(dat, m, f, out)
+
+    ### Log-likelihood function takes a dictionary mapping parameter
+    ### names to values
+
+    params = {'mej1':0.01, 'mej2':0.04, 'vej1':0.1, 'vej2':0.3, 'frac':0.5, 'dist':40.0}
+
+    ### Evaluate lnL
+
+    lnL = s.log_likelihood(params)
+
+    ### Alternatively, log_likelihood can take arrays of parameter samples
+
+    n = 100
+
+    params = {'mej1':np.random.uniform(0.01, 0.04, n),
+              'mej2':np.random.uniform(0.01, 0.04, n),
+              'vej1':np.random.uniform(0.1, 0.3, n),
+              'vej2':np.random.uniform(0.1, 0.3, n),
+              'frac':np.random.uniform(0.3, 0.7, n),
+              'dist':np.random.uniform(30.0, 50.0, n)}
+    
+    lnL = s.log_likelihood(params, vect=True)
