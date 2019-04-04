@@ -20,15 +20,19 @@ parser.add_argument('--tmin', type=float, help='Minimum time (in days)')
 parser.add_argument('--tmax', type=float, help='Maximum time (in days)')
 parser.add_argument('--n', type=int, help='Number of data points per band')
 parser.add_argument('--err', type=float, help='Error std. dev.')
+parser.add_argument('--orientation', default=0, type=float, help='Orientation angle (defaults to 0)')
 args = parser.parse_args()
 
 ### initialize the model
-model = model_dict[args.m]()
+model = model_dict['oriented'](args.m)
 
 ### create a dictionary mapping parameter names to values
 params = dict(args.p)
 for p in params:
     params[p] = float(params[p])
+
+### add orientation
+params['angle'] = args.orientation
 
 t_bounds = [args.tmin, args.tmax]
 

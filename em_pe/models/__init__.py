@@ -3,6 +3,7 @@ from .me2017 import *
 from .woko2017 import *
 from .linear_model import *
 from .two_comp_model import *
+from .oriented_model import *
 from .lightcurve_utils import *
 
 model_dict = {
@@ -11,7 +12,8 @@ model_dict = {
     'woko2017':woko2017,
     'me2017':me2017,
     'linear':linear_model,
-    'two_comp':two_comp
+    'two_comp':two_comp,
+    'oriented':oriented
 }
 
 bounds_dict = {
@@ -26,5 +28,6 @@ bounds_dict = {
     'mej2':[0.001, 0.1],
     'vej2':[0.01, 0.5],
     'frac':[0.0, 1.0],
-    'dist':[30.0, 50.0]
+    'dist':[30.0, 50.0],
+    'angle':[0.0, 90.0]
 }

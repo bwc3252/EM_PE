@@ -84,6 +84,7 @@ def _parse_command_line_args():
     parser.add_argument('--out', help='Location to store posterior samples')
     parser.add_argument('--ncomp', type=int, default=1, help='Number of Gaussian components for integrator')
     parser.add_argument('--fixed_param', action='append', nargs=2, help='Parameters with fixed values')
+    parser.add_argument('--orientation', action='store_true', help='Use orientation dependance')
     return parser.parse_args()
 
 class sampler:
@@ -112,7 +113,7 @@ class sampler:
         List of [param_name, value] pairs
     '''
     def __init__(self, data_loc, m, files, out, v=True, L_cutoff=0, min_iter=20,
-                 max_iter=20, ncomp=1, fixed_params=None):
+                 max_iter=20, ncomp=1, fixed_params=None, orientation=False):
         ### parameters passed in from user or main()
         self.data_loc = data_loc
         self.m = m
@@ -123,6 +124,7 @@ class sampler:
         self.min_iter = min_iter
         self.max_iter = max_iter
         self.ncomp = ncomp
+        self.orientation = orientation
         self.fixed_params = {}
 
         ### convert types for fixed params, make it a dict
@@ -159,8 +161,11 @@ class sampler:
     def _initialize_model(self):
         if self.v:
             print('Initializing models... ', end='')
-        ### initialize model objects
-        model = model_dict[self.m]()
+        ### initialize model object
+        if self.orientation:
+            model = model_dict['oriented'](self.m)
+        else:
+            model = model_dict[self.m]()
         ordered_params = [] # keep track of all parameters used
         bounds = [] # bounds for each parameter
         for param in model.param_names:
@@ -312,7 +317,9 @@ def main():
     out = args.out
     ncomp = args.ncomp
     fixed_params = args.fixed_param
-    s = sampler(data_loc, m, files, out, v, L_cutoff, min_iter, max_iter, ncomp, fixed_params)
+    orientation = args.orientation
+    s = sampler(data_loc, m, files, out, v, L_cutoff, min_iter, max_iter, ncomp, 
+            fixed_params, orientation)
     s.generate_samples()
 
 if __name__ == '__main__':
