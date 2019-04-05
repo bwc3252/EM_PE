@@ -69,7 +69,7 @@ def _parse_command_line_args():
     parser.add_argument('--frac', type=float, default=1.0, help='Fraction of points to keep')
     parser.add_argument('--legend', action='append', help='Name of posterior sample set for plot legend. Assumed to be in the same order as the posterior sample files')
     parser.add_argument('--title', help='Title for plot')
-    parser.add_argument('--cl', action='append', help='Adds a confidence level. Set to "default" for default contours')
+    parser.add_argument('--cl', default='default', action='append', help='Adds a confidence level. Set to "default" for default contours')
     parser.add_argument('--combine', action='store_true', help='Generate a plot using ALL sample files specified')
     return parser.parse_args()
 

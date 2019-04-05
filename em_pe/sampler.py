@@ -84,7 +84,7 @@ def _parse_command_line_args():
     parser.add_argument('--out', help='Location to store posterior samples')
     parser.add_argument('--ncomp', type=int, default=1, help='Number of Gaussian components for integrator')
     parser.add_argument('--fixed_param', action='append', nargs=2, help='Parameters with fixed values')
-    parser.add_argument('--orientation', action='store_true', help='Use orientation dependance')
+    parser.add_argument('--orientation', help='Orientation dependance to use (defaults to None)')
     return parser.parse_args()
 
 class sampler:
@@ -113,7 +113,7 @@ class sampler:
         List of [param_name, value] pairs
     '''
     def __init__(self, data_loc, m, files, out, v=True, L_cutoff=0, min_iter=20,
-                 max_iter=20, ncomp=1, fixed_params=None, orientation=False):
+                 max_iter=20, ncomp=1, fixed_params=None, orientation=None):
         ### parameters passed in from user or main()
         self.data_loc = data_loc
         self.m = m
@@ -162,8 +162,8 @@ class sampler:
         if self.v:
             print('Initializing models... ', end='')
         ### initialize model object
-        if self.orientation:
-            model = model_dict['oriented'](self.m)
+        if self.orientation is not None:
+            model = model_dict['oriented'](self.m, self.orientation)
         else:
             model = model_dict[self.m]()
         ordered_params = [] # keep track of all parameters used

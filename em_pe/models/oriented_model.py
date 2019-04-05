@@ -69,6 +69,8 @@ class oriented(model_base):
         m, err = self.model.evaluate(tvec_days, band)
         if self.profile == 'flat':
             if self.params['angle'] > self.max_angle:
-                m = np.zeros(m.size) 
-        m, err
+                m = np.zeros(m.size)
+        elif self.profile == 'gaussian':
+            m *= np.exp(-1 * self.params['angle']**2)
+        return m, err
 
