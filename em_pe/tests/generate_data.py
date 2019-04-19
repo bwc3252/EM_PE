@@ -9,6 +9,8 @@ from __future__ import print_function
 import numpy as np
 import argparse
 import sys
+from astropy.time import Time
+import json
 
 from em_pe.models import model_dict
 
@@ -21,8 +23,21 @@ parser.add_argument('--tmax', type=float, help='Maximum time (in days)')
 parser.add_argument('--n', type=int, help='Number of data points per band')
 parser.add_argument('--err', type=float, help='Error std. dev.')
 parser.add_argument('--orientation', nargs=2, help='Orientation profile and angle')
+parser.add_argument('--t0', type=float, default=0, help='Start time for event')
+parser.add_argument('--time_format', default='gps', help='Time format for t0 (gps or mjd)')
+parser.add_argument('--json', action='store_true', help='Export data in JSON format')
 args = parser.parse_args()
 
+def convert_time(t0):
+    t = Time(t0, format='gps')
+    return t.mjd
+
+delta_t = 0
+if args.t0 != 0:
+    delta_t = 0
+
+if args.time_format == 'gps':
+    delta_t = convert_time(delta_t)
 
 ### create a dictionary mapping parameter names to values
 params = dict(args.p)
@@ -46,17 +61,46 @@ model.set_params(params, t_bounds)
 ### generate times
 tdays = np.linspace(args.tmin, args.tmax, args.n)
 
-### generate and save the data
+data_dict = {}
+
+### generate the data
 for band in model.bands:
-    filename = args.out + band + '.txt'
     m, _ = model.evaluate(tdays, band)
     dist = params['dist']
     m += 5*(np.log10(dist*1e6) - 1)
     data = np.empty((4, args.n))
-    data[0] = tdays
+    data[0] = tdays + delta_t
     data[2] = m + np.random.uniform(-1 * args.err, args.err, args.n) # generate errors
     data[3] = np.ones(args.n) * args.err
-    np.savetxt(filename, data.T)
+    data_dict[band] = data
+
+### if not json format, just save as internal format
+if not args.json:
+    for band in data_dict:
+        data = data_dict[band]
+        filename = args.out + band + '.txt'
+        np.savetxt(filename, data.T)
+
+### json
+else:
+    photometry = []
+    json_dict = {
+        'SyntheticEvent': {
+            'photometry': photometry
+        }
+    }
+    for band in data_dict:
+        data = data_dict[band]
+        for i in range(args.n):
+            [t, _, m, m_err] = data[:,i]
+            photometry.append({
+                'band':band,
+                'time':t,
+                'magnitude':m,
+                'e_magnitude':m_err
+            })
+    with open(args.out + 'SyntheticEvent.json', 'w') as f:
+        json.dump(json_dict, f, indent=4)
 
 ### save true values
 

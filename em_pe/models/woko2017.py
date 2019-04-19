@@ -7,6 +7,7 @@ Models adapted from code found in `gwemlightcurves <https://github.com/mcoughlin
 from __future__ import print_function
 import numpy as np
 from scipy.interpolate import splrep, splev
+import os
 
 from .model import model_base
 
@@ -25,7 +26,7 @@ class woko2017(model_base):
         param_names = ['mej', 'vej', 'dist']
         bands = ['g', 'r', 'i', 'z', 'y', 'J', 'H', 'K']
         model_base.__init__(self, name, param_names, bands, weight)
-        modelfile = 'Data/DZ2_mags_2017-03-20.dat'
+        modelfile = os.environ['EM_PE_INSTALL_DIR'] + '/Data/DZ2_mags_2017-03-20.dat'
         #modelfile = 'Data/gamA2_mags_2017-03-20.dat'
         self.data_out = np.loadtxt(modelfile)
         self.band_ind = dict(zip(self.bands, range(len(self.bands)))) # map bands to indices
