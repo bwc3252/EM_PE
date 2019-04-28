@@ -12,7 +12,6 @@ from .me2017 import *
 from .woko2017 import *
 from .linear_model import *
 from .two_comp_model import *
-from .lightcurve_utils import *
 
 model_dict = {
     'one_band_test':one_band_test_model,
