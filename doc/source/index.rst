@@ -13,6 +13,8 @@ EM PE Documentation
    sampler
    plot_utils
    parser
+   models
+   lightcurve_utils
    low_level_utils
 
 Examples and Usage
