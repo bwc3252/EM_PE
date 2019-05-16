@@ -12,7 +12,11 @@ import sys
 from astropy.time import Time
 import json
 
+import lal
+import lalsimulation as lalsim
+
 from em_pe.models import model_dict
+from em_pe.lightcurve_utils import calc_mej, calc_vej
 
 parser = argparse.ArgumentParser(description='Generate synthetic data for PE tests')
 parser.add_argument('--m', help='Name of model to use')
@@ -26,6 +30,7 @@ parser.add_argument('--orientation', nargs=2, help='Orientation profile and angl
 parser.add_argument('--t0', type=float, default=0, help='Start time for event')
 parser.add_argument('--time_format', default='gps', help='Time format for t0 (gps or mjd)')
 parser.add_argument('--json', action='store_true', help='Export data in JSON format')
+parser.add_argument('--bns_params', action='store_true', help='Calculate EM parameters using BNS parameters')
 args = parser.parse_args()
 
 def convert_time(t0):
@@ -43,6 +48,26 @@ if args.time_format == 'gps':
 params = dict(args.p)
 for p in params:
     params[p] = float(params[p])
+
+### convert BNS parameters to EM parameters, if needed
+### borrowed from EOSManager.py
+def lambda_from_m(m):
+    eos = lalsim.SimNeutronStarEOSByName("AP4")
+    eos_fam = lalsim.CreateSimNeutronStarFamily(eos)
+    if m<10**15:
+        m=m*lal.MSUN_SI
+    k2=lalsim.SimNeutronStarLoveNumberK2(m, eos_fam)
+    r=lalsim.SimNeutronStarRadius(m, eos_fam)
+    m=m*lal.G_SI/lal.C_SI**2
+    lam=2./(3*lal.G_SI)*k2*r**5
+    dimensionless_lam=lal.G_SI*lam*(1/m)**5
+    return dimensionless_lam
+
+if args.bns_params:
+    lambda1 = lambda_from_m(params['m1'])
+    lambda2 = lambda_from_m(params['m2'])
+    params['mej'] = calc_mej(params['m1'], lambda1, params['m2'], lambda2)
+    params['vej'] = calc_vej(params['m1'], lambda1, params['m2'], lambda2)
 
 ### initialize the model
 if args.orientation is not None:

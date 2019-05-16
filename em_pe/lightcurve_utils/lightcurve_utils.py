@@ -10,6 +10,9 @@ Mostly taken from `here <https://github.com/mcoughlin/gwemlightcurves/blob/maste
 import numpy as np
 import scipy
 
+import lal
+import lalsimulation as lalsim
+
 def calc_mej(m1, lambda1, m2, lambda2):
     """
     Funtion to calculate ejecta mass based on BNS parameters
@@ -45,3 +48,4 @@ def calc_compactness(lambda1, lambda2):
     c2 = 0.371 - 0.0391 * np.log(lambda2) + 0.001056 * np.log(lambda2)**2
 
     return c1, c2
+
