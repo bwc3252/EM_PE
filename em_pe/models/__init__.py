@@ -29,8 +29,6 @@ bounds_dict = {
     'vej1':[0.01, 0.99],
     'vej2':[0.01, 0.99],
     'frac':[0.0, 1.0],
-    'dist':[30.0, 50.0],
+    'dist':[10.0, 80.0],
     'angle':[0.0, 90.0],
-    'kappa_r_nl':[0.7, 5.0], # non-lanthanide
-    'kappa_r_l':[5.0, 15.0] # lanthanide
 }
