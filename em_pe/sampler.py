@@ -85,6 +85,7 @@ def _parse_command_line_args():
     parser.add_argument('--ncomp', type=int, default=1, help='Number of Gaussian components for integrator')
     parser.add_argument('--fixed_param', action='append', nargs=2, help='Parameters with fixed values')
     parser.add_argument('--orientation', help='Orientation dependance to use (defaults to None)')
+    parser.add_argument('--interp_model', help='Name of interpolated model')
     return parser.parse_args()
 
 class sampler:
@@ -113,7 +114,8 @@ class sampler:
         List of [param_name, value] pairs
     '''
     def __init__(self, data_loc, m, files, out, v=True, L_cutoff=0, min_iter=20,
-                 max_iter=20, ncomp=1, fixed_params=None, orientation=None):
+                 max_iter=20, ncomp=1, fixed_params=None, orientation=None,
+                 interp_model=None):
         ### parameters passed in from user or main()
         self.data_loc = data_loc
         self.m = m
@@ -318,8 +320,9 @@ def main():
     ncomp = args.ncomp
     fixed_params = args.fixed_param
     orientation = args.orientation
+    interp_model = args.interp_model
     s = sampler(data_loc, m, files, out, v, L_cutoff, min_iter, max_iter, ncomp, 
-            fixed_params, orientation)
+            fixed_params, orientation, interp_model)
     s.generate_samples()
 
 if __name__ == '__main__':

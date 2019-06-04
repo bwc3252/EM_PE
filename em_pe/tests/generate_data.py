@@ -91,8 +91,9 @@ data_dict = {}
 ### generate the data
 for band in model.bands:
     m, _ = model.evaluate(tdays, band)
-    dist = params['dist']
-    m += 5*(np.log10(dist*1e6) - 1)
+    if 'dist' in params:
+        dist = params['dist']
+        m += 5*(np.log10(dist*1e6) - 1)
     data = np.empty((4, args.n))
     data[0] = tdays + delta_t
     data[2] = m + np.random.uniform(-1 * args.err, args.err, args.n) # generate errors
