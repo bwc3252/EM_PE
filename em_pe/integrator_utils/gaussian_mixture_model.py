@@ -40,7 +40,7 @@ class estimator:
         self.d = None
         self.p_nk = None
         self.log_prob = None
-        self.cov_avg_ratio = 0.1
+        self.cov_avg_ratio = 0.05
 
     def _initialize(self, n, sample_array, sample_weights=None):
         p_weights = (sample_weights / np.sum(sample_weights)).flatten()
@@ -90,11 +90,11 @@ class estimator:
             cov = np.dot((p_k * diff).T, diff) / w
             # attempt to fix non-positive-semidefinite covariances
             if self._is_pos_def(cov):
-                self.covariances[index] = (cov + (self.cov_avg_ratio * self.prev_covariances[index])) / (1 + self.cov_avg_ratio)
-            else:
                 self.covariances[index] = np.identity(self.d)
+            else:
+                self.covariances[index] = (cov + (self.cov_avg_ratio * self.prev_covariances[index])) / (1 + self.cov_avg_ratio)
             self.prev_covariances[index] = self.covariances[index]
-            #self.covariances[index] = cov
+            self.covariances[index] = cov
             # (16.17)
         weights /= np.sum(p_nk)
         self.weights = weights

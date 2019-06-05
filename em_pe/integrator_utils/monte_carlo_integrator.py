@@ -168,7 +168,7 @@ class integrator:
             lnL = self.value_array
         else:
             value_array = np.copy(self.value_array)
-            lnL = self.value_array
+            lnL = np.log(self.value_array)
         #mask = value_array >= self.L_cutoff
         mask = value_array > self.L_cutoff
         mask = mask.flatten()
