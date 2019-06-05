@@ -10,9 +10,6 @@ import numpy as np
 import pyDOE
 from scipy import interpolate
 
-### surrogate model imports
-from gwemlightcurves.KNModels.io import Me2017
-
 ### parse command line arguments
 parser = argparse.ArgumentParser(description="Generate a model file for an interpolated model")
 parser.add_argument("--m", default="", help="Name of model")
@@ -21,6 +18,10 @@ parser.add_argument("--tmax", type=float, default=10.0, help="Stop time for inte
 parser.add_argument("--n", type=int, default=1000, help="Number of samples to use")
 parser.add_argument("--n_times", type=int, default=50, help="Number of time points to use")
 args = parser.parse_args()
+
+### surrogate model imports
+if args.m in ["me2017_lanthanide", "me2017_non_lanthanide"]:
+    from gwemlightcurves.KNModels.io import Me2017
 
 class surrogate_model:
     def __init__(self, args):
@@ -37,15 +38,15 @@ class surrogate_model:
         if self.name == "me2017_non_lanthanide":
             self.lc_func = self.me2017
             self.param_names = ["mej", "vej"]
-            self.lims = np.array([[1.0e-7, 0.1],            # mej
-                                  [0.01, 0.4]])             # vej
+            self.lims = np.array([[1.0e-5, 0.5],            # mej
+                                  [0.001, 0.9]])            # vej
             self.fixed_params["kappa_r"] = 1.0
             self.bands = ["u", "g", "r", "i", "z", "y", "J", "H", "K"]
         elif self.name == "me2017_lanthanide":
             self.lc_func = self.me2017
             self.param_names = ["mej", "vej"]
-            self.lims = np.array([[1.0e-7, 0.1],            # mej
-                                  [0.01, 0.4]])             # vej
+            self.lims = np.array([[1.0e-5, 0.5],            # mej
+                                  [0.001, 0.9]])            # vej
             self.fixed_params["kappa_r"] = 10.0
             self.bands = ["u", "g", "r", "i", "z", "y", "J", "H", "K"]
         else:

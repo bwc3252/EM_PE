@@ -21,9 +21,9 @@ class woko2017(model_base):
         Weight of the model
     '''
 
-    def __init__(self, weight=1):
+    def __init__(self, weight=1, kappa_r=10.0):
         name = 'woko2017'
-        param_names = ['mej', 'vej', 'dist']
+        param_names = ['mej', 'vej']
         bands = ['g', 'r', 'i', 'z', 'y', 'J', 'H', 'K']
         model_base.__init__(self, name, param_names, bands, weight)
         modelfile = os.environ['EM_PE_INSTALL_DIR'] + '/Data/DZ2_mags_2017-03-20.dat'
@@ -35,6 +35,7 @@ class woko2017(model_base):
         self.prev_params = None
         self.reevaluate = True
         self.prev_mAB = None
+        self.kappa_r = kappa_r
 
         ### Do the major interpolations
         ### define constants
@@ -45,7 +46,7 @@ class woko2017(model_base):
         vejconst = [-1.28,-1.60,-1.52,-1.56,-1.61,-1.61,-1.55,-1.33]
         kappaconst = [2.65,2.27,2.02,1.87,1.76,1.56,1.33,1.13]
         ### temporarily hardcode these
-        kappa_r = 1.0
+        #kappa_r = 10.0
         theta_r = 0.0
         data_out = self.data_out
         ndata, nslices = data_out.shape
@@ -129,7 +130,7 @@ class woko2017(model_base):
         mej0 = 0.013+0.005
         vej0 = 0.132+0.08
         ### temporarily hardcode these
-        kappa_r = 1.0
+        kappa_r = self.kappa_r
         theta_r = 0.0
         kappa0 = 1.0
         mejconst = [-1.13,-1.01,-0.94,-0.94,-0.93,-0.93,-0.95,-0.99]

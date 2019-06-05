@@ -37,9 +37,7 @@ def convert_time(t0):
     t = Time(t0, format='gps')
     return t.mjd
 
-delta_t = 0
-if args.t0 != 0:
-    delta_t = 0
+delta_t = args.t0
 
 if args.time_format == 'gps':
     delta_t = convert_time(delta_t)

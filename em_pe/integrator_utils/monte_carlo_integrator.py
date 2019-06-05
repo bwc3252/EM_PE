@@ -170,7 +170,7 @@ class integrator:
             value_array = np.copy(self.value_array)
             lnL = np.log(self.value_array)
         #mask = value_array >= self.L_cutoff
-        mask = value_array > self.L_cutoff
+        mask = value_array >= self.L_cutoff
         mask = mask.flatten()
         self.cumulative_samples = np.append(self.cumulative_samples, self.sample_array[mask], axis=0)
         self.cumulative_values = np.append(self.cumulative_values, lnL[mask], axis=0)
@@ -196,7 +196,14 @@ class integrator:
         self.integral = ((self.integral * self.iterations) + curr_integral) / (self.iterations + 1)
         self.var = ((self.var * self.iterations) + curr_var) / (self.iterations + 1)
 
-    def integrate(self, func, min_iter=10, max_iter=20, var_thresh=0.0, max_err=10, neff=float('inf'), nmax=None, progress=False):
+    def _reset(self):
+        ### reset GMMs
+        for k in self.gmm_dict:
+            self.gmm_dict[k] = None
+        
+
+    def integrate(self, func, min_iter=10, max_iter=20, var_thresh=0.0, max_err=10,
+            neff=float('inf'), nmax=None, progress=False, epoch=None):
         '''
         Evaluate the integral
 
@@ -266,6 +273,9 @@ class integrator:
                 self.user_func(self)
             if progress:
                 for k in self.gmm_dict:
-                    self.gmm_dict[k].print_params()
+                    if self.gmm_dict[k] is not None:
+                        self.gmm_dict[k].print_params()
+            if epoch is not None and self.iterations % epoch == 0:
+                self._reset()
         print('cumulative eval time: ', cumulative_eval_time)
         print('integrator iterations: ', self.iterations)
