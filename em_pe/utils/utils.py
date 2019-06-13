@@ -1,17 +1,18 @@
 # -*- coding: utf-8 -*-
 """
-Lightcurve Utils
-----------------
-Functions for converting BNS parameters to ejecta parameters
+Utils
+-----
+Useful functions for doing conversions, etc.
 
 Mostly taken from `here <https://github.com/mcoughlin/gwemlightcurves/blob/master/gwemlightcurves/EjectaFits/Di2018b.py>`_
 """
 
 import numpy as np
-import scipy
+from scipy import interpolate
 
 import lal
 import lalsimulation as lalsim
+from astropy.cosmology import FlatLambdaCDM # is this the best choice?
 
 def calc_mej(m1, lambda1, m2, lambda2):
     """
@@ -49,3 +50,11 @@ def calc_compactness(lambda1, lambda2):
 
     return c1, c2
 
+def precompute_redshift():
+    """
+    Returns a function to compute redshift at a given distance (in Mpc)
+    """
+    cosmo = FlatLambdaCDM(H0=70, Om0=0.3)
+    z = np.logspace(-4, 1, 1000) # correct bounds? should it be logspace?
+    d = cosmo.luminosity_distance(z)
+    return interpolate.interp1d(d, z, fill_value="extrapolate")
