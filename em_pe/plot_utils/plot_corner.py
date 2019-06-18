@@ -52,9 +52,15 @@ Example::
 
 from __future__ import print_function
 import numpy as np
-import matplotlib.pyplot as plt
 import corner
 import argparse
+
+try:
+    import matplotlib.pyplot as plt
+except:
+    import matplotlib
+    matplotlib.use("Agg")
+    import matplotlib.pyplot as plt
 
 def _parse_command_line_args():
     '''

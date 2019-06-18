@@ -57,7 +57,13 @@ from __future__ import print_function
 import numpy as np
 import argparse
 import sys
-import matplotlib.pyplot as plt
+
+try:
+    import matplotlib.pyplot as plt
+except:
+    import matplotlib
+    matplotlib.use("Agg")
+    import matplotlib.pyplot as plt
 
 from em_pe.models import model_dict
 
