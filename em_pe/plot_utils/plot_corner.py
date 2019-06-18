@@ -75,12 +75,13 @@ def _parse_command_line_args():
     parser.add_argument('--frac', type=float, default=1.0, help='Fraction of points to keep')
     parser.add_argument('--legend', action='append', help='Name of posterior sample set for plot legend. Assumed to be in the same order as the posterior sample files')
     parser.add_argument('--title', help='Title for plot')
-    parser.add_argument('--cl', default='default', action='append', help='Adds a confidence level. Set to "default" for default contours')
+    parser.add_argument('--cl', action='append', type=float, help='Adds a confidence level. Set to "default" for default contours')
     parser.add_argument('--combine', action='store_true', help='Generate a plot using ALL sample files specified')
+    parser.add_argument('--min_weight', type=float, default=0.0, help='Minimum weight to keep')
     return parser.parse_args()
 
 def generate_corner_plot(sample_files, out, params, truths=None, cutoff=0, frac=1.0, leg=None,
-                  cl='default', title=None, combine=False):
+                  cl='default', title=None, combine=False, min_weight=0):
     '''
     Generates a corner plot for the specified posterior samples and parameters.
 
@@ -114,11 +115,16 @@ def generate_corner_plot(sample_files, out, params, truths=None, cutoff=0, frac=
                 'purple', 'gray']
     ### dictionary of LaTeX parameter name strings
     tex_dict = {'mej':'$m_{ej}$ $(M_\\odot)$',
+                'log_mej':'$\\log(m_{ej})$',
                 'mej1':'$m_{ej1}$ $(M_\\odot)$',
                 'mej2':'$m_{ej2}$ $(M_\\odot)$',
                 'vej':'$v_{ej}$ $(v/c)$',
                 'vej1':'$v_{ej1}$ $(v/c)$',
-                'vej2':'$v_{ej2}$ $(v/c)$'
+                'vej2':'$v_{ej2}$ $(v/c)$',
+                'mej_red':'$m_{ej}$(red) $(M_\\odot)$',
+                'mej_blue':'$m_{ej}$(blue) $(M_\\odot)$',
+                'vej_red':'$v_{ej}$(red) $(v/c)$',
+                'vej_blue':'$v_{ej}$(blue) $(v/c)$',
                }
     if cutoff <= 0:
         min_lnL = -1 * np.inf
@@ -176,19 +182,20 @@ def generate_corner_plot(sample_files, out, params, truths=None, cutoff=0, frac=
         ### calculate weights
         weights = L * p / p_s
         weights /= np.sum(weights)
-        ### throw out points with weight 0
-        mask2 = weights > 0
-        print(np.sum(mask2), 'samples with weight > 0')
+        ### throw out points with weight less than minimum weight
+        mask2 = weights > min_weight
+        print(np.sum(mask2), 'samples with weight >', min_weight)
+        print('Median weight:', np.median(weights))
         weights = weights[mask2]
         x = x[mask]
         x = x[mask2]
         color = color_list[i % len(color_list)]
-        if cl == 'default' or (len(cl) > 0 and cl[0] == 'default'):
-            levels = None
-        else:
-            levels = []
-            for level in cl:
-                levels.append(float(level))
+        #if cl == None: #'default' or (len(cl) > 0 and cl[0] == 'default'):
+        #    levels = None
+        #else:
+        #    levels = []
+        #    for level in cl:
+        #        levels.append(level)
         labels = []
         for param in params:
             if param in tex_dict:
@@ -202,9 +209,9 @@ def generate_corner_plot(sample_files, out, params, truths=None, cutoff=0, frac=
         else:
             plot_density = False
         ### make the corner plot
-        fig_base = corner.corner(x, weights=weights, levels=levels, fig=fig_base, labels=labels, truths=truths,
+        fig_base = corner.corner(x, weights=weights, levels=args.cl, fig=fig_base, labels=labels, truths=truths,
                                  color=color, plot_datapoints=False, plot_density=plot_density,
-                                 contours=True)
+                                 contours=True, smooth1d=1.0, smooth=1.0)
         i += 1
     if title is not None:
         plt.title(title)
@@ -236,5 +243,6 @@ if __name__ == '__main__':
     cl = args.cl
     title = args.title
     combine = args.combine
+    min_weight = args.min_weight
     generate_corner_plot(sample_files, out, params, truths, cutoff, frac, leg, cl,
-                  title, combine)
+                  title, combine, min_weight)

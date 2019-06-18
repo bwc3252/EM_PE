@@ -9,15 +9,15 @@ import numpy as np
 from .model import model_base
 from .woko2017 import woko2017
 
-class two_comp(model_base):
+class woko2017_two_comp(model_base):
 
     def __init__(self, weight=1):
         name = 'two_comp'
-        param_names = ['mej1', 'vej1', 'mej2', 'vej2', 'frac', 'dist']
+        param_names = ['mej_red', 'vej_red', 'mej_blue', 'vej_blue', 'frac']
         bands = ['g', 'r', 'i', 'z', 'y', 'J', 'H', 'K']
         model_base.__init__(self, name, param_names, bands, weight)
-        self.model1 = woko2017(1.0)
-        self.model2 = woko2017(1.0)
+        self.blue_model = woko2017(kappa_r=1.0)
+        self.red_model = woko2017(kappa_r=10.0)
 
     def set_params(self, params, t_bounds):
         '''
@@ -32,10 +32,10 @@ class two_comp(model_base):
             [upper bound, lower bound] pair for time values
         '''
         self.params = params
-        model1_params = {'mej':params['mej1'], 'vej':params['vej1']}
-        model2_params = {'mej':params['mej2'], 'vej':params['vej2']}
-        self.model1.set_params(model1_params, t_bounds)
-        self.model2.set_params(model2_params, t_bounds)
+        blue_params = {'mej':params['mej_blue'], 'vej':params['vej_blue']}
+        red_params = {'mej':params['mej_red'], 'vej':params['vej_red']}
+        self.blue_model.set_params(blue_params, t_bounds)
+        self.red_model.set_params(red_params, t_bounds)
 
     def evaluate(self, tvec_days, band):
         '''
@@ -48,8 +48,8 @@ class two_comp(model_base):
         band : string
             Band to evaluate
         '''
-        m1, m1err = self.model1.evaluate(tvec_days, band)
-        m2, m2err = self.model2.evaluate(tvec_days, band)
+        blue, _ = self.blue_model.evaluate(tvec_days, band)
+        red, _ = self.red_model.evaluate(tvec_days, band)
         w1 = self.params['frac']
         w2 = 1 - w1
-        return ((w1 * m1) + (w2 * m2)), 0
+        return ((w1 * red) + (w2 * blue)), 0

@@ -168,9 +168,9 @@ class integrator:
             lnL = self.value_array
         else:
             value_array = np.copy(self.value_array)
-            lnL = self.value_array
+            lnL = np.log(self.value_array)
         #mask = value_array >= self.L_cutoff
-        mask = value_array > self.L_cutoff
+        mask = value_array >= self.L_cutoff
         mask = mask.flatten()
         self.cumulative_samples = np.append(self.cumulative_samples, self.sample_array[mask], axis=0)
         self.cumulative_values = np.append(self.cumulative_values, lnL[mask], axis=0)
@@ -196,7 +196,14 @@ class integrator:
         self.integral = ((self.integral * self.iterations) + curr_integral) / (self.iterations + 1)
         self.var = ((self.var * self.iterations) + curr_var) / (self.iterations + 1)
 
-    def integrate(self, func, min_iter=10, max_iter=20, var_thresh=0.0, max_err=10, neff=float('inf'), nmax=None):
+    def _reset(self):
+        ### reset GMMs
+        for k in self.gmm_dict:
+            self.gmm_dict[k] = None
+        
+
+    def integrate(self, func, min_iter=10, max_iter=20, var_thresh=0.0, max_err=10,
+            neff=float('inf'), nmax=None, progress=False, epoch=None):
         '''
         Evaluate the integral
 
@@ -216,6 +223,8 @@ class integrator:
             Effective samples threshold for terminating integration
         nmax : int
             Maximum number of samples to draw
+        progress : bool
+            Print GMM parameters each iteration
         '''
         err_count = 0
         cumulative_eval_time = 0
@@ -230,9 +239,8 @@ class integrator:
                 self._sample()
             except KeyboardInterrupt:
                 print('KeyboardInterrupt, exiting...')
-                exit()
+                break
             except Exception as e:
-#                print(e)
                 print(traceback.format_exc())
                 print('Error sampling, retrying...')
                 err_count += 1
@@ -248,7 +256,6 @@ class integrator:
             cumulative_eval_time += time.time() - t1
             self._calculate_prior()
             self._calculate_results()
-            #print(self.integral, '+/-', np.sqrt(self.var), 'with eff_samp', self.eff_samp)
             self.iterations += 1
             self.ntotal += self.n
             if self.iterations >= min_iter and self.var < var_thresh:
@@ -257,13 +264,18 @@ class integrator:
                 self._train()
             except KeyboardInterrupt:
                 print('KeyboardInterrupt, exiting...')
-                exit()
+                break
             except Exception as e:
-#                print(e)
                 print(traceback.format_exc())
                 print('Error training, retrying...')
                 err_count += 1
             if self.user_func is not None:
                 self.user_func(self)
+            if progress:
+                for k in self.gmm_dict:
+                    if self.gmm_dict[k] is not None:
+                        self.gmm_dict[k].print_params()
+            if epoch is not None and self.iterations % epoch == 0:
+                self._reset()
         print('cumulative eval time: ', cumulative_eval_time)
         print('integrator iterations: ', self.iterations)

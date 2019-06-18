@@ -30,23 +30,23 @@ class estimator:
         Maximum number of Expectation-Maximization iterations
     '''
 
-    def __init__(self, k, max_iters=100):
+    def __init__(self, k, max_iters=100, tempering_coeff=0.001):
         self.k = k # number of gaussian components
         self.max_iters = max_iters # maximum number of iterations to convergence
         self.means = [None] * k
         self.covariances =[None] * k
-        self.prev_covariances = [None] * k
         self.weights = [None] * k
         self.d = None
         self.p_nk = None
         self.log_prob = None
-        self.cov_avg_ratio = 0.1
+        self.cov_avg_ratio = 0.05
+        self.epsilon = 0.1
+        self.tempering_coeff = tempering_coeff
 
     def _initialize(self, n, sample_array, sample_weights=None):
         p_weights = (sample_weights / np.sum(sample_weights)).flatten()
         self.means = sample_array[np.random.choice(n, self.k, p=p_weights.astype(sample_array.dtype)), :]
         self.covariances = [np.identity(self.d)] * self.k
-        self.prev_covariances = self.covariances
         self.weights = np.array([1.0 / self.k] * self.k)
 
     def _e_step(self, n, sample_array, sample_weights):
@@ -89,12 +89,7 @@ class estimator:
             diff = sample_array - mean
             cov = np.dot((p_k * diff).T, diff) / w
             # attempt to fix non-positive-semidefinite covariances
-            if self._is_pos_def(cov):
-                self.covariances[index] = (cov + (self.cov_avg_ratio * self.prev_covariances[index])) / (1 + self.cov_avg_ratio)
-            else:
-                self.covariances[index] = np.identity(self.d)
-            self.prev_covariances[index] = self.covariances[index]
-            #self.covariances[index] = cov
+            self.covariances[index] = self._near_psd(cov)
             # (16.17)
         weights /= np.sum(p_nk)
         self.weights = weights
@@ -107,19 +102,40 @@ class estimator:
         '''
         return (self.d * self.k * n) * 10e-4
 
+    def _near_psd(self, x):
+	'''
+	Calculates the nearest postive semi-definite matrix for a correlation/covariance matrix
 
-    def _is_pos_def(self, M):
-        '''
-        Idea from here:
-        https://stackoverflow.com/questions/43238173/python-convert-matrix-to-positive-semi-definite
-        '''
-        try:
-            _ = np.linalg.cholesky(M)
-            return True
-        except np.linalg.LinAlgError:
-            return False
+        Code from here:
+        https://stackoverflow.com/questions/10939213/how-can-i-calculate-the-nearest-positive-semi-definite-matrix
+	'''
+        while True:
+            epsilon = self.epsilon
+            if min(np.linalg.eigvals(x)) > epsilon:
+                return x
 
+            # Removing scaling factor of covariance matrix
+            n = x.shape[0]
+            var_list = np.array([np.sqrt(x[i,i]) for i in xrange(n)])
+            y = np.array([[x[i, j]/(var_list[i]*var_list[j]) for i in xrange(n)] for j in xrange(n)])
 
+            # getting the nearest correlation matrix
+            eigval, eigvec = np.linalg.eig(y)
+            val = np.matrix(np.maximum(eigval, epsilon))
+            vec = np.matrix(eigvec)
+            T = 1/(np.multiply(vec, vec) * val.T)
+            T = np.matrix(np.sqrt(np.diag(np.array(T).reshape((n)) )))
+            B = T * vec * np.diag(np.array(np.sqrt(val)).reshape((n)))
+            near_corr = B*B.T    
+
+            # returning the scaling factors
+            near_cov = np.array([[near_corr[i, j]*(var_list[i]*var_list[j]) for i in xrange(n)] for j in xrange(n)])
+            if np.isreal(near_cov).all():
+                break
+            else:
+                x = near_cov.real
+	return near_cov
+    
     def fit(self, sample_array, sample_weights):
         '''
         Fit the model to data
@@ -141,7 +157,11 @@ class estimator:
             self._e_step(n, sample_array, sample_weights)
             self._m_step(n, sample_array)
             count += 1
-
+        for index in range(self.k):
+            cov = self.covariances[index]
+            # temper
+            cov = (cov + self.tempering_coeff * np.eye(self.d)) / (1 + self.tempering_coeff)
+            self.covariances[index] = cov
 
     def print_params(self):
         '''
@@ -187,6 +207,8 @@ class gmm:
         self.p_nk = None
         self.log_prob = None
         self.N = 0
+        self.epsilon = 0.1
+        self.tempering_coeff = 0.01
 
     def fit(self, sample_array, sample_weights=None):
         '''
@@ -203,7 +225,7 @@ class gmm:
         if sample_weights is None:
             sample_weights = np.ones((self.N, 1))
         # just use base estimator
-        model = estimator(self.k)
+        model = estimator(self.k, tempering_coeff=self.tempering_coeff)
         model.fit(sample_array, sample_weights)
         self.means = model.means
         self.covariances = model.covariances
@@ -262,15 +284,47 @@ class gmm:
             cov2 /= denominator
             cov = cov1 + cov2 - mean * mean.T
             # check for positive-semidefinite
-            if not self._is_pos_def(cov):
-                print('Non-positive-semidefinite covariance in component', i, ', reinitializing...')
-                cov = np.identity(self.d)
+            cov = self._near_psd(cov)
             # start equation (8)
             weight = denominator / (self.N + M)
             # update everything
             self.means[i] = mean
             self.covariances[i] = cov
             self.weights[i] = weight
+
+    def _near_psd(self, x):
+	'''
+	Calculates the nearest postive semi-definite matrix for a correlation/covariance matrix
+
+        Code from here:
+        https://stackoverflow.com/questions/10939213/how-can-i-calculate-the-nearest-positive-semi-definite-matrix
+	'''
+        while True:
+            epsilon = self.epsilon
+            if min(np.linalg.eigvals(x)) > epsilon:
+                return x
+
+            # Removing scaling factor of covariance matrix
+            n = x.shape[0]
+            var_list = np.array([np.sqrt(x[i,i]) for i in xrange(n)])
+            y = np.array([[x[i, j]/(var_list[i]*var_list[j]) for i in xrange(n)] for j in xrange(n)])
+
+            # getting the nearest correlation matrix
+            eigval, eigvec = np.linalg.eig(y)
+            val = np.matrix(np.maximum(eigval, epsilon))
+            vec = np.matrix(eigvec)
+            T = 1/(np.multiply(vec, vec) * val.T)
+            T = np.matrix(np.sqrt(np.diag(np.array(T).reshape((n)) )))
+            B = T * vec * np.diag(np.array(np.sqrt(val)).reshape((n)))
+            near_corr = B*B.T    
+
+            # returning the scaling factors
+            near_cov = np.array([[near_corr[i, j]*(var_list[i]*var_list[j]) for i in xrange(n)] for j in xrange(n)])
+            if np.isreal(near_cov).all():
+                break
+            else:
+                x = near_cov.real
+	return near_cov
 
     def update(self, sample_array, sample_weights=None):
         '''
@@ -283,7 +337,8 @@ class gmm:
         sample_weights : np.ndarray
             Weights for samples
         '''
-        new_model = estimator(self.k, self.max_iters)
+        self.tempering_coeff /= 2
+        new_model = estimator(self.k, self.max_iters, self.tempering_coeff)
         new_model.fit(sample_array, sample_weights)
         M, _ = sample_array.shape
         self._merge(new_model, M)
@@ -357,20 +412,6 @@ class gmm:
                 print('Exiting due to non-positive-semidefinite')
                 exit()
         return sample_array
-
-
-
-    def _is_pos_def(self, M):
-        '''
-        idea from here:
-        https://stackoverflow.com/questions/43238173/python-convert-matrix-to-positive-semi-definite
-        '''
-        try:
-            _ = np.linalg.cholesky(M)
-            return True
-        except np.linalg.LinAlgError:
-            return False
-
 
     def print_params(self):
         '''

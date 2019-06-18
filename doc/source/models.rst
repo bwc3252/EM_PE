@@ -13,5 +13,8 @@ Models
 .. automodule:: em_pe.models.woko2017
     :members:
 
-.. automodule:: em_pe.models.linear_model
+.. automodule:: em_pe.models.two_comp
+    :members:
+
+ .. automodule:: em_pe.models.linear_model
     :members:

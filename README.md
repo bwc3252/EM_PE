@@ -12,6 +12,13 @@ First, clone this repository:
 $ git clone https://github.com/bwc3252/EM_PE
 ```
 
+For some models, you'll need to set the `EM_PE_INSTALL_DIR` environment variable 
+to the `EM_PE` install directory so that data files can be located. For example:
+
+```bash
+$ export EM_PE_INSTALL_DIR="~/Research/em_pe"
+```
+
 Then, switch to the top-level directory, and install:
 
 ```bash
