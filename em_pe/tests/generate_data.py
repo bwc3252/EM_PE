@@ -16,7 +16,7 @@ import lal
 import lalsimulation as lalsim
 
 from em_pe.models import model_dict
-from em_pe.lightcurve_utils import calc_mej, calc_vej
+from em_pe.utils import calc_mej, calc_vej
 
 parser = argparse.ArgumentParser(description='Generate synthetic data for PE tests')
 parser.add_argument('--m', help='Name of model to use')
