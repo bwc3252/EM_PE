@@ -131,5 +131,7 @@ else:
 truths = []
 for param in model.param_names:
     truths.append(params[param])
+if 'dist' in params:
+    truths.append(params['dist'])
 filename = args.out + 'test_truths.txt'
 np.savetxt(filename, truths)

@@ -173,7 +173,7 @@ def generate_lc_plot(sample_files, out, m, tmin, tmax, b, lc_file=None, fixed_pa
             ax.errorbar(t, lc, yerr=err, fmt='+', color=color)
         if (i % 2 == 1) or (i == n - 1):
             ### only bother doing this stuff once for each plot
-            ax.set_xlim((tmin - 0.1, max(tmax + 1, 10))) # these are kind of arbitrary
+            ax.set_xlim((0.8 * tmin, max(tmax + 1, 10))) # these are kind of arbitrary
             old_yticks = ax.get_yticks()
             new_yticks = old_yticks[1:-1] # strip off outer yticks
             ax.set_yticks(new_yticks)

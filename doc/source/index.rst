@@ -14,7 +14,7 @@ EM PE Documentation
    plot_utils
    parser
    models
-   lightcurve_utils
+   utils
    low_level_utils
 
 Examples and Usage
