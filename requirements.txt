@@ -2,7 +2,7 @@ astropy==2.0.12
 lalsuite==6.48.1.dev20180906
 setuptools==39.0.1
 multiprocess==0.70.6.1
-gwemlightcurves==0+untagged.219.g132bcc6
+gwemlightcurves
 scipy==1.2.1
 corner==2.0.1
 matplotlib==2.0.2
