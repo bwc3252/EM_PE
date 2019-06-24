@@ -13,7 +13,6 @@ EM PE Documentation
    sampler
    plot_utils
    parser
-   models
    utils
    low_level_utils
 
