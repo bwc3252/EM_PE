@@ -6,21 +6,7 @@ Oriented model
 
 import numpy as np
 
-from .model import model_base
-from .test_models import *
-from .me2017 import *
-from .woko2017 import *
-from .linear_model import *
-from .two_comp_model import *
-
-model_dict = {
-    'one_band_test':one_band_test_model,
-    'two_band_test':two_band_test_model,
-    'woko2017':woko2017,
-    'me2017':me2017,
-    'linear':linear_model,
-    'two_comp':two_comp
-}
+from . import *
  
 
 class oriented(model_base):
