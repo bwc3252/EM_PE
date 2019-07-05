@@ -135,7 +135,7 @@ def parse_json(t0, file, bands, out, maxpts=np.inf, tmax=np.inf, gps_time=False)
 
 def main():
     args = _parse_command_line_args()
-    parse_json(args.t0, args.f, args.b, args.out, args.maxpts, args.tmax, args.time_format)
+    parse_json(args.t0, args.f, args.b, args.out, args.maxpts, args.tmax, (args.time_format == 'gps'))
 
 if __name__ == '__main__':
     main()

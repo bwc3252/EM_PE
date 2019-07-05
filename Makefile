@@ -38,3 +38,15 @@ GW170817_woko2017_fixed_dist_orientation: directories
 	echo "python ${EM_PE_INSTALL_DIR}/em_pe/sampler.py --orientation gaussian --epoch 5 --dat ./ --m woko2017 -v --f r.txt --min 20 --max 20 --out samples_r.txt --fixed_param dist 40" > pe_runs/$@/sample.sh
 	echo "python ${EM_PE_INSTALL_DIR}/em_pe/plot_utils/plot_corner.py --posterior_samples samples_r.txt --out corner_r.png --p mej --p vej --p angle" > pe_runs/$@/plot_corner.sh
 	echo "python ${EM_PE_INSTALL_DIR}/em_pe/plot_utils/plot_lc.py --posterior_samples samples_r.txt --out lc_r.png --m woko2017 --tmin ${TMIN} --tmax ${TMAX} --lc_file r.txt --b r --fixed_param dist 40" > pe_runs/$@/plot_lc.sh
+
+### GRB160821B
+
+GRB160821B_START = 0.0
+
+GRB160821B_woko2017: directories
+	mkdir -p pe_runs/$@/
+	python ${EM_PE_INSTALL_DIR}/em_pe/parser/parse_json.py --time_format mjd --t0 ${GRB160821B_START} --f ${EM_PE_INSTALL_DIR}/Data/GRB160821B.json --b g --out pe_runs/$@/ --maxpts 100 --tmax ${TMAX}
+	echo "python ${EM_PE_INSTALL_DIR}/em_pe/sampler.py --epoch 5 --dat ./ --m woko2017 -v --f g.txt --min 20 --max 20 --out samples_g.txt --fixed_param dist 776" > pe_runs/$@/sample.sh
+	echo "python ${EM_PE_INSTALL_DIR}/em_pe/plot_utils/plot_corner.py --posterior_samples samples_g.txt --out corner_g.png --p mej --p vej" > pe_runs/$@/plot_corner.sh
+	echo "python ${EM_PE_INSTALL_DIR}/em_pe/plot_utils/plot_lc.py --posterior_samples samples_g.txt --out lc_g.png --m woko2017 --tmin ${TMIN} --tmax ${TMAX} --lc_file g.txt --b g --fixed_param dist 776" > pe_runs/$@/plot_lc.sh
+
