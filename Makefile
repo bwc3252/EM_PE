@@ -5,7 +5,6 @@ TMIN = 0.1
 TMAX = 8.0
 
 ### general injection parameters
-
 INJECTION_PARAMS = --n 50 --err 0.2 --time_format mjd --tmin ${TMIN} --tmax ${TMAX}
 
 ### woko2017 injection test using z band
@@ -25,19 +24,35 @@ GW170817_START = 1187008882.43
 
 TMIN = 0.5
 
+BAND = H
+
 GW170817_woko2017_fixed_dist: directories
 	mkdir -p pe_runs/$@/
-	python ${EM_PE_INSTALL_DIR}/em_pe/parser/parse_json.py --t0 ${GW170817_START} --f ${EM_PE_INSTALL_DIR}/Data/GW170817.json --b r --out pe_runs/$@/ --maxpts 100 --tmax ${TMAX}
-	echo "python ${EM_PE_INSTALL_DIR}/em_pe/sampler.py --epoch 5 --dat ./ --m woko2017 -v --f r.txt --min 20 --max 20 --out samples_r.txt --fixed_param dist 40" > pe_runs/$@/sample.sh
-	echo "python ${EM_PE_INSTALL_DIR}/em_pe/plot_utils/plot_corner.py --posterior_samples samples_r.txt --out corner_r.png --p mej --p vej" > pe_runs/$@/plot_corner.sh
-	echo "python ${EM_PE_INSTALL_DIR}/em_pe/plot_utils/plot_lc.py --posterior_samples samples_r.txt --out lc_r.png --m woko2017 --tmin ${TMIN} --tmax ${TMAX} --lc_file r.txt --b r --fixed_param dist 40" > pe_runs/$@/plot_lc.sh
+	python ${EM_PE_INSTALL_DIR}/em_pe/parser/parse_json.py --t0 ${GW170817_START} --f ${EM_PE_INSTALL_DIR}/Data/GW170817.json --b ${BAND} --out pe_runs/$@/ --maxpts 100 --tmax ${TMAX}
+	echo "python ${EM_PE_INSTALL_DIR}/em_pe/sampler.py --epoch 5 --dat ./ --m woko2017 -v --f ${BAND}.txt --min 20 --max 20 --out samples_${BAND}.txt --fixed_param dist 40" > pe_runs/$@/sample.sh
+	echo "python ${EM_PE_INSTALL_DIR}/em_pe/plot_utils/plot_corner.py --posterior_samples samples_${BAND}.txt --out corner_${BAND}.png --p mej --p vej" > pe_runs/$@/plot_corner.sh
+	echo "python ${EM_PE_INSTALL_DIR}/em_pe/plot_utils/plot_lc.py --posterior_samples samples_${BAND}.txt --out lc_${BAND}.png --m woko2017 --tmin ${TMIN} --tmax ${TMAX} --lc_file ${BAND}.txt --b ${BAND} --fixed_param dist 40" > pe_runs/$@/plot_lc.sh
 
 GW170817_woko2017_fixed_dist_orientation: directories
 	mkdir -p pe_runs/$@/
-	python ${EM_PE_INSTALL_DIR}/em_pe/parser/parse_json.py --t0 ${GW170817_START} --f ${EM_PE_INSTALL_DIR}/Data/GW170817.json --b r --out pe_runs/$@/ --maxpts 100 --tmax ${TMAX}
-	echo "python ${EM_PE_INSTALL_DIR}/em_pe/sampler.py --orientation gaussian --epoch 5 --dat ./ --m woko2017 -v --f r.txt --min 20 --max 20 --out samples_r.txt --fixed_param dist 40" > pe_runs/$@/sample.sh
-	echo "python ${EM_PE_INSTALL_DIR}/em_pe/plot_utils/plot_corner.py --posterior_samples samples_r.txt --out corner_r.png --p mej --p vej --p angle" > pe_runs/$@/plot_corner.sh
-	echo "python ${EM_PE_INSTALL_DIR}/em_pe/plot_utils/plot_lc.py --posterior_samples samples_r.txt --out lc_r.png --m woko2017 --tmin ${TMIN} --tmax ${TMAX} --lc_file r.txt --b r --fixed_param dist 40" > pe_runs/$@/plot_lc.sh
+	python ${EM_PE_INSTALL_DIR}/em_pe/parser/parse_json.py --t0 ${GW170817_START} --f ${EM_PE_INSTALL_DIR}/Data/GW170817.json --b ${BAND} --out pe_runs/$@/ --maxpts 100 --tmax ${TMAX}
+	echo "python ${EM_PE_INSTALL_DIR}/em_pe/sampler.py --orientation gaussian --epoch 5 --dat ./ --m woko2017 -v --f ${BAND}.txt --min 20 --max 20 --out samples_${BAND}.txt --fixed_param dist 40" > pe_runs/$@/sample.sh
+	echo "python ${EM_PE_INSTALL_DIR}/em_pe/plot_utils/plot_corner.py --posterior_samples samples_${BAND}.txt --out corner_${BAND}.png --p mej --p vej --p angle" > pe_runs/$@/plot_corner.sh
+	echo "python ${EM_PE_INSTALL_DIR}/em_pe/plot_utils/plot_lc.py --posterior_samples samples_${BAND}.txt --out lc_${BAND}.png --m woko2017 --tmin ${TMIN} --tmax ${TMAX} --lc_file ${BAND}.txt --b ${BAND} --fixed_param dist 40" > pe_runs/$@/plot_lc.sh
+
+GW170817_afterglowpy: directories
+	mkdir -p pe_runs/$@/
+	python ${EM_PE_INSTALL_DIR}/em_pe/parser/parse_json.py --t0 ${GW170817_START} --f ${EM_PE_INSTALL_DIR}/Data/GW170817.json --b ${BAND} --out pe_runs/$@/ --maxpts 100 --tmax ${TMAX}
+	echo "python ${EM_PE_INSTALL_DIR}/em_pe/sampler.py --epoch 5 --dat ./ --m afterglowpy -v --f ${BAND}.txt --min 20 --max 20 --out samples_${BAND}.txt --estimate_dist" > pe_runs/$@/sample.sh
+	echo "python ${EM_PE_INSTALL_DIR}/em_pe/plot_utils/plot_corner.py --posterior_samples samples_${BAND}.txt --out corner_${BAND}.png --p log_E0 --p thetaV --p dist" > pe_runs/$@/plot_corner.sh
+	echo "python ${EM_PE_INSTALL_DIR}/em_pe/plot_utils/plot_lc.py --posterior_samples samples_${BAND}.txt --out lc_${BAND}.png --m afterglowpy --tmin ${TMIN} --tmax ${TMAX} --lc_file ${BAND}.txt --b ${BAND} --fixed_param dist 40" > pe_runs/$@/plot_lc.sh
+
+GW170817_afterglowpy_fixed_dist: directories
+	mkdir -p pe_runs/$@/
+	python ${EM_PE_INSTALL_DIR}/em_pe/parser/parse_json.py --t0 ${GW170817_START} --f ${EM_PE_INSTALL_DIR}/Data/GW170817.json --b ${BAND} --out pe_runs/$@/ --maxpts 100 --tmax ${TMAX}
+	echo "python ${EM_PE_INSTALL_DIR}/em_pe/sampler.py --epoch 5 --dat ./ --m afterglowpy -v --f ${BAND}.txt --min 20 --max 20 --out samples_${BAND}.txt --fixed_param dist 40" > pe_runs/$@/sample.sh
+	echo "python ${EM_PE_INSTALL_DIR}/em_pe/plot_utils/plot_corner.py --posterior_samples samples_${BAND}.txt --out corner_${BAND}.png --p log_E0 --p thetaV" > pe_runs/$@/plot_corner.sh
+	echo "python ${EM_PE_INSTALL_DIR}/em_pe/plot_utils/plot_lc.py --posterior_samples samples_${BAND}.txt --out lc_${BAND}.png --m afterglowpy --tmin ${TMIN} --tmax ${TMAX} --lc_file ${BAND}.txt --b ${BAND} --fixed_param dist 40" > pe_runs/$@/plot_lc.sh
 
 ### GRB160821B
 

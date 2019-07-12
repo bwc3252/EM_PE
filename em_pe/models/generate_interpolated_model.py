@@ -22,6 +22,8 @@ args = parser.parse_args()
 ### surrogate model imports
 if args.m in ["me2017_lanthanide", "me2017_non_lanthanide"]:
     from gwemlightcurves.KNModels.io import Me2017
+elif args.m in ["afterglowpy"]:
+    import grbpy as grb
 
 class surrogate_model:
     def __init__(self, args):
@@ -49,6 +51,12 @@ class surrogate_model:
                                   [0.001, 0.9]])            # vej
             self.fixed_params["kappa_r"] = 10.0
             self.bands = ["u", "g", "r", "i", "z", "y", "J", "H", "K"]
+        elif self.name == "afterglowpy":
+            self.lc_func = self.afterglowpy
+            self.param_names = ["log_E0", "thetaV"]
+            self.lims = np.array([[70.0, 125.0],            # log_E0
+                                  [0.0, np.pi / 2]])        # thetaV
+            self.bands = ["u", "g", "r", "i", "z", "y", "J", "H", "K"]
         else:
             print("Error: model '" + self.name + "' does not exist")
             exit()
@@ -64,6 +72,36 @@ class surrogate_model:
         mask = np.isfinite(lc) # filter out NaNs, since interp1d is undefined for them
         f = interpolate.interp1d(tdays[mask], lc[mask], fill_value="extrapolate")
         return f(t)
+
+    def afterglowpy(self, band, t, log_E0, thetaV):
+        ### constants
+        day = 86400.0
+        pc = 3.086e18
+        ### hard-coded parameters (see afterglowpy for more information)
+        jetType = 0     # for "Gaussian" shape
+        specType = 0
+        thC = 0.08
+        thW = 0.35
+        b = 6
+        L0 = 0.0
+        q = 0.0
+        ts = 0.0
+        n0 = 1.0e-3
+        p = 2.15
+        epse = 1.0e-1
+        epsB = 1.0e-3
+        ksiN = 1.0
+        dL = 10 * pc    # fiducial distance, since we'll add the distance modulus later
+        ### get lightcurve
+        t_sec = t * day
+        E0 = np.exp(log_E0)
+        Y = np.array([thetaV, E0, thC, thW, b, L0, q, ts, n0, p, epse, epsB, ksiN, dL])
+        wavelengths = np.array([354.3, 477.56, 612.95, 748.46, 865.78, 960.31, 1235.0, 1662.0, 2159.0]) * 1.0e-7 # convert to cm (???)
+        wavelength_dict = dict(zip(self.bands, wavelengths))
+        nu = np.ones(t.size) * 3.0e10 / wavelength_dict[band]
+        Fnu = grb.fluxDensity(t_sec, nu, jetType, specType, *Y, spread=True, latRes=5)
+        mAB = -2.5 * np.log10(Fnu) - 48.60
+        return mAB
 
 class interpolated_model:
     def __init__(self, args):
@@ -111,16 +149,3 @@ for ind in range(len(s_m.bands)):
 
 fname = os.environ["EM_PE_INSTALL_DIR"] + "/Data/" + args.m + ".npz"
 np.savez(fname, t_interp, x, lc_arr)
-
-
-"""
-
-    ### fit "time slices" to parameter array and store list of results
-    for j in range(args.n_times):
-        gp = GaussianProcessRegressor()
-        gp.fit(x, y[:,j])
-        i_m.gp_array[j] = gp
-
-    ### write model to disk
-    with open(fname, "wb") as f:
-        dump(i_m, f)"""
