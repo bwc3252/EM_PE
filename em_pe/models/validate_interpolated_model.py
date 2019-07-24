@@ -16,4 +16,5 @@ parser.add_argument("--n", type=int, default=1000, help="Number of samples to us
 parser.add_argument("--n-times", type=int, default=50, help="Number of time points to use")
 args = parser.parse_args()
 
-
+if args.m == "me2017_lanthanide":
+    from .me2017_lanthanide import me2017_lanthanide
