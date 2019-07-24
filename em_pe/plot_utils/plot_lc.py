@@ -72,14 +72,14 @@ def _parse_command_line_args():
     Parses and returns the command line arguments.
     '''
     parser = argparse.ArgumentParser(description='Generate lightcurve plot from data or models')
-    parser.add_argument('--posterior_samples', action='append', help='Posterior sample file to plot')
+    parser.add_argument('--posterior-samples', action='append', help='Posterior sample file to plot')
     parser.add_argument('--out', help='Filename to save plot to')
     parser.add_argument('--m', help='Model name')
     parser.add_argument('--tmin', type=float, help='Minimum time')
     parser.add_argument('--tmax', type=float, help='Maximum time')
-    parser.add_argument('--lc_file', action='append', help='Actual lightcurve data to plot (in same order as posterior sample files)')
+    parser.add_argument('--lc-file', action='append', help='Actual lightcurve data to plot (in same order as posterior sample files)')
     parser.add_argument('--b', action='append', help='Bands to plot (in same order as posterior sample files)')
-    parser.add_argument('--fixed_param', action='append', nargs=2, help='Fixed parameters (i.e. parameters without posterior samples)')
+    parser.add_argument('--fixed-param', action='append', nargs=2, help='Fixed parameters (i.e. parameters without posterior samples)')
     return parser.parse_args()
 
 def generate_lc_plot(sample_files, out, m, tmin, tmax, b, lc_file=None, fixed_params=None):

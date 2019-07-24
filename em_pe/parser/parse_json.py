@@ -62,7 +62,7 @@ def _parse_command_line_args():
     parser.add_argument('--out', help='Directory to save data to')
     parser.add_argument('--maxpts', type=float, default=np.inf, help='Maximum number of points to keep for each band')
     parser.add_argument('--tmax', type=float, default=np.inf, help='Upper bound for time points to keep')
-    parser.add_argument('--time_format', type=str, default='gps', help='Time format (MJD or GPS)')
+    parser.add_argument('--time-format', type=str, default='gps', help='Time format (MJD or GPS)')
     return parser.parse_args()
 
 def _read_data(t0, file, bands, out, maxpts, tmax):

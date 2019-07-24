@@ -83,9 +83,9 @@ def _parse_command_line_args():
     parser.add_argument('--max', default=20, type=int, help='Maximum number of integrator iterations')
     parser.add_argument('--out', help='Location to store posterior samples')
     parser.add_argument('--ncomp', type=int, default=1, help='Number of Gaussian components for integrator')
-    parser.add_argument('--fixed_param', action='append', nargs=2, help='Parameters with fixed values')
+    parser.add_argument('--fixed-param', action='append', nargs=2, help='Parameters with fixed values')
     parser.add_argument('--orientation', help='Orientation dependance to use (defaults to None)')
-    parser.add_argument('--estimate_dist', action="store_true", help='Estimate distance')
+    parser.add_argument('--estimate-dist', action="store_true", help='Estimate distance')
     parser.add_argument('--epoch', type=int, default=100, help='Iterations before resetting sampling distributions')
     return parser.parse_args()
 

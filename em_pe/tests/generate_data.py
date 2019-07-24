@@ -28,9 +28,9 @@ parser.add_argument('--n', type=int, help='Number of data points per band')
 parser.add_argument('--err', type=float, help='Error std. dev.')
 parser.add_argument('--orientation', nargs=2, help='Orientation profile and angle')
 parser.add_argument('--t0', type=float, default=0, help='Start time for event')
-parser.add_argument('--time_format', default='gps', help='Time format for t0 (gps or mjd)')
+parser.add_argument('--time-format', default='gps', help='Time format for t0 (gps or mjd)')
 parser.add_argument('--json', action='store_true', help='Export data in JSON format')
-parser.add_argument('--bns_params', action='store_true', help='Calculate EM parameters using BNS parameters')
+parser.add_argument('--bns-params', action='store_true', help='Calculate EM parameters using BNS parameters')
 args = parser.parse_args()
 
 def convert_time(t0):

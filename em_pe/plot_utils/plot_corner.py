@@ -67,8 +67,8 @@ def _parse_command_line_args():
     Parses and returns the command line arguments.
     '''
     parser = argparse.ArgumentParser(description='Generate corner plot from posterior samples')
-    parser.add_argument('--posterior_samples', action='append', help='File with posterior samples')
-    parser.add_argument('--truth_file', help='File with true parameter values')
+    parser.add_argument('--posterior-samples', action='append', help='File with posterior samples')
+    parser.add_argument('--truth-file', help='File with true parameter values')
     parser.add_argument('--out', help='File to save plot to')
     parser.add_argument('--p', action='append', help='Parameter name to plot')
     parser.add_argument('--c', type=float, default=0, help='Minimum likelihood for points to keep. Takes precedence over --frac')
@@ -77,7 +77,7 @@ def _parse_command_line_args():
     parser.add_argument('--title', help='Title for plot')
     parser.add_argument('--cl', action='append', type=float, help='Adds a confidence level. Set to "default" for default contours')
     parser.add_argument('--combine', action='store_true', help='Generate a plot using ALL sample files specified')
-    parser.add_argument('--min_weight', type=float, default=0.0, help='Minimum weight to keep')
+    parser.add_argument('--min-weight', type=float, default=0.0, help='Minimum weight to keep')
     return parser.parse_args()
 
 def generate_corner_plot(sample_files, out, params, truths=None, cutoff=0, frac=1.0, leg=None,
