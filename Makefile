@@ -9,7 +9,7 @@ INJECTION_PARAMS = --n 50 --err 0.2 --time-format mjd --tmin ${TMIN} --tmax ${TM
 
 ### woko2017 injection test using z band
 
-WOKO2017_INJECTION_PARAMS = --p mej 0.05 --p vej 0.2 --p dist 40.0
+WOKO2017_INJECTION_PARAMS = --p mej 0.05 --p vej 0.2 --p dist 40.0 --p m1 1.4 --p m2 1.35
 
 test_woko2017: directories
 	mkdir -p pe_runs/$@/
@@ -24,6 +24,13 @@ test_woko2017_quiet: directories
 	echo "python ${EM_PE_INSTALL_DIR}/em_pe/sampler.py --epoch 5 --dat ./ --m woko2017 --f z.txt --min 20 --max 20 --out samples_z.txt --fixed-param dist 40.0" > pe_runs/$@/sample.sh
 	echo "python ${EM_PE_INSTALL_DIR}/em_pe/plot_utils/plot_corner.py --posterior-samples samples_z.txt --truth-file test_truths.txt --out corner_z.png --p mej --p vej" > pe_runs/$@/plot_corner.sh
 	echo "python ${EM_PE_INSTALL_DIR}/em_pe/plot_utils/plot_lc.py --posterior-samples samples_z.txt --out lc_z.png --m woko2017 --tmin ${TMIN} --tmax ${TMAX} --lc-file z.txt --b z --fixed-param dist 40.0" > pe_runs/$@/plot_lc.sh
+
+test_woko2017_bns: directories
+	mkdir -p pe_runs/$@/
+	python em_pe/tests/generate_data.py --m woko2017_bns --out pe_runs/$@/ ${INJECTION_PARAMS} ${WOKO2017_INJECTION_PARAMS}
+	echo "python ${EM_PE_INSTALL_DIR}/em_pe/sampler.py --epoch 5 --dat ./ --m woko2017_bns -v --f z.txt --min 20 --max 20 --out samples_z.txt --fixed-param dist 40.0" > pe_runs/$@/sample.sh
+	echo "python ${EM_PE_INSTALL_DIR}/em_pe/plot_utils/plot_corner.py --posterior-samples samples_z.txt --truth-file test_truths.txt --out corner_z.png --p m1 --p m2" > pe_runs/$@/plot_corner.sh
+	echo "python ${EM_PE_INSTALL_DIR}/em_pe/plot_utils/plot_lc.py --posterior-samples samples_z.txt --out lc_z.png --m woko2017_bns --tmin ${TMIN} --tmax ${TMAX} --lc-file z.txt --b z --fixed-param dist 40.0" > pe_runs/$@/plot_lc.sh
 
 ### GW170817 runs
 

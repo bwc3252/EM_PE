@@ -8,6 +8,7 @@ from .me2017_non_lanthanide import *
 from .me2017_two_comp import *
 from .test_model import *
 from .afterglowpy import *
+from .woko2017_bns import *
 
 model_dict = {
     'woko2017':woko2017,
@@ -19,7 +20,8 @@ model_dict = {
     'me2017_non_lanthanide':me2017_non_lanthanide,
     'me2017_two_comp':me2017_two_comp,
     'test':test,
-    'afterglowpy':afterglowpy
+    'afterglowpy':afterglowpy,
+    'woko2017_bns':woko2017_bns
 }
 
 bounds_dict = {
@@ -39,5 +41,7 @@ bounds_dict = {
     'dist':[10.0, 1000.0],
     'angle':[-90.0, 90.0],
     'log_E0':[70, 125],
-    'thetaV':[0.0, 3.14 / 2]
+    'thetaV':[0.0, 3.14 / 2],
+    'm1':[1.35, 1.90],
+    'm2':[1.35, 1.90]
 }

@@ -143,8 +143,8 @@ def generate_lc_plot(sample_files, out, m, tmin, tmax, b, lc_file=None, fixed_pa
             p = header[col]
             values = samples[:,col]
             ### get itervals of parameters
-            lower = _quantile(values, 0.3, weights)
-            upper = _quantile(values, 0.7, weights)
+            lower = _quantile(values, 0.05, weights)
+            upper = _quantile(values, 0.95, weights)
             ### randomly sample some points in this range
             param_array[:,col - 3] = np.random.uniform(lower, upper, num_samples)
         n_pts = 200
