@@ -125,6 +125,8 @@ def generate_corner_plot(sample_files, out, params, truths=None, cutoff=0, frac=
                 'mej_blue':'$m_{ej}$(blue) $(M_\\odot)$',
                 'vej_red':'$v_{ej}$(red) $(v/c)$',
                 'vej_blue':'$v_{ej}$(blue) $(v/c)$',
+                'm1':'$m_1$ $(M_\\odot)$',
+                'm2':'$m_2$ $(M_\\odot)$'
                }
     if cutoff <= 0:
         min_lnL = -1 * np.inf
