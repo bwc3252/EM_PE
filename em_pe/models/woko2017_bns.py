@@ -13,7 +13,10 @@ from .model import model_base
 from .woko2017 import woko2017
 
 from em_pe.utils import calc_mej, calc_vej, calc_compactness
-import EOSManager
+try:
+    import EOSManager
+except:
+    print("No EOSManager")
 
 class woko2017_bns(model_base):
     '''
