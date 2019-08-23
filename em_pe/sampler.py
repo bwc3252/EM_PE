@@ -59,7 +59,7 @@ import argparse
 import sys
 
 from models import model_dict, bounds_dict
-from integrator_utils import monte_carlo_integrator
+from mcsampler_new.utils import monte_carlo_integrator
 
 try:
     import progressbar

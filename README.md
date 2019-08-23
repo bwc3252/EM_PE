@@ -6,7 +6,9 @@ Joint GW/EM parameter estimation.
 
 ## Installation
 
-First, clone this repository:
+First, you'll need to install the integrator code. Follow the instructions [here](https://github.com/bwc3252/mcsampler-replacement).
+
+Next, clone this repository:
 
 ```bash
 $ git clone https://github.com/bwc3252/EM_PE
