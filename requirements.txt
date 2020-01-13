@@ -9,3 +9,4 @@ numpy==1.16.2
 progressbar2==3.42.0
 pyDOE==0.3.8
 scikit_learn==0.20.0
+RIFT==0.0.14.6
