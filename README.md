@@ -6,7 +6,9 @@ Joint GW/EM parameter estimation.
 
 ## Installation
 
-First, you'll need to install the integrator code. Follow the instructions [here](https://github.com/bwc3252/mcsampler-replacement).
+The integrator used for parameter estimation is implemented in RIFT.
+Follow the instructions [here](https://github.com/oshaughn/research-projects-RIT/blob/master/INSTALL.md)
+to install it.
 
 Next, clone this repository:
 
