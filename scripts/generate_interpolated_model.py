@@ -3,17 +3,16 @@
 Generate Interpolated Models
 ----------------------------
 """
-from __future__ import print_function
+# -*- coding: utf-8 -*-
+"""
+Generate Interpolated Models
+----------------------------
+"""
 import argparse
 import os
 import numpy as np
-from sklearn.gaussian_process import GaussianProcessRegressor
-from joblib import dump
 import pyDOE
 from scipy import interpolate
-
-### surrogate model imports
-from gwemlightcurves.KNModels.io import Me2017
 
 ### parse command line arguments
 parser = argparse.ArgumentParser(description="Generate a model file for an interpolated model")
@@ -21,7 +20,12 @@ parser.add_argument("--m", default="", help="Name of model")
 parser.add_argument("--tmin", type=float, default=0.0, help="Start time for interpolated model")
 parser.add_argument("--tmax", type=float, default=10.0, help="Stop time for interpolated model")
 parser.add_argument("--n", type=int, default=1000, help="Number of samples to use")
+parser.add_argument("--n-times", type=int, default=50, help="Number of time points to use")
 args = parser.parse_args()
+
+### surrogate model imports
+if args.m in ["me2017_lanthanide", "me2017_non_lanthanide"]:
+    from gwemlightcurves.KNModels.io import Me2017
 
 class surrogate_model:
     def __init__(self, args):
@@ -32,70 +36,68 @@ class surrogate_model:
         self.param_names = None
         self.lims = None
         self.bands = None
-        self.kappa_r = None
+        self.fixed_params ={}
 
         ### check if available model is being requested
         if self.name == "me2017_non_lanthanide":
             self.lc_func = self.me2017
-            self.param_names = ["mej", "vej"]#, "kappa_r_nl"]
-            self.lims = np.array([[1.0e-7, 0.1],            # mej
-                                  [0.01, 0.4],              # vej
-                                 # [0.7, 5.0],               # kappa_r
-                                  [args.tmin, args.tmax]])  # t
-            self.kappa_r = 1.0
+            self.param_names = ["mej", "vej"]
+            self.lims = np.array([[1.0e-5, 0.5],            # mej
+                                  [0.001, 0.9]])            # vej
+            self.fixed_params["kappa_r"] = 1.0
             self.bands = ["u", "g", "r", "i", "z", "y", "J", "H", "K"]
         elif self.name == "me2017_lanthanide":
             self.lc_func = self.me2017
-            self.param_names = ["mej", "vej"]#, "kappa_r_l"]
-            self.lims = np.array([[1.0e-7, 0.1],            # mej
-                                  [0.01, 0.4],              # vej
-                                 # [5.0, 15.0],              # kappa_r
-                                  [args.tmin, args.tmax]])  # t
-            self.kappa_r = 10.0
+            self.param_names = ["mej", "vej"]
+            self.lims = np.array([[1.0e-5, 0.5],            # mej
+                                  [0.001, 0.9]])            # vej
+            self.fixed_params["kappa_r"] = 10.0
             self.bands = ["u", "g", "r", "i", "z", "y", "J", "H", "K"]
         else:
             print("Error: model '" + self.name + "' does not exist")
             exit()
 
-    def me2017(self, band, mej, vej, t):
+    def me2017(self, band, t, mej, vej):
         dt = 0.05
-        ret = np.empty(args.n)
         index_dict = dict(zip(self.bands, range(len(self.bands))))
         beta = 3.0
-        kappa_r = self.kappa_r
-        for i in range(args.n):
-            _mej, _vej, _t = mej[i], vej[i], t[i]
-            tdays, L, lightcurves, Tobs = Me2017.calc_lc(args.tmin, args.tmax, dt, _mej, _vej, beta, kappa_r)
-            lc = lightcurves[index_dict[band]]
-            mask = np.isfinite(lc) # filter out NaNs, since interp1d is undefined for them
-            f = interpolate.interp1d(tdays[mask], lc[mask], fill_value="extrapolate")
-            ret[i] = f(_t)
-        return ret
+        kappa_r = self.fixed_params["kappa_r"]
+        tdays, L, lightcurves, Tobs = Me2017.calc_lc(args.tmin, args.tmax, dt, 
+                mej, vej, beta, kappa_r)
+        lc = lightcurves[index_dict[band]]
+        mask = np.isfinite(lc) # filter out NaNs, since interp1d is undefined for them
+        f = interpolate.interp1d(tdays[mask], lc[mask], fill_value="extrapolate")
+        return f(t)
 
+### initialize surrogate model
+s_m = surrogate_model(args)
 
-### initialize model
-model = surrogate_model(args)
-
-ndim, _ = model.lims.shape
+ndim, _ = s_m.lims.shape
 
 ### generate Latin hypercube samples and transform to correct intervals
 x = pyDOE.lhs(ndim, samples=args.n) - 0.5
-interval_lengths = model.lims[:,1] - model.lims[:,0]
+interval_lengths = s_m.lims[:,1] - s_m.lims[:,0]
 x *= interval_lengths
-centers = np.mean(model.lims, axis=1).flatten()
+centers = np.mean(s_m.lims, axis=1).flatten()
 x += centers
 
-for band in model.bands:
+
+### array of times for interpolation
+t_interp = np.linspace(args.tmin, args.tmax, args.n_times)
+
+### three-dimensional array to save as output
+lc_arr = np.empty((len(s_m.bands), args.n, args.n_times))
+
+for ind in range(len(s_m.bands)):
+    band = s_m.bands[ind]
     print("Sampling and interpolating", band, "band...")
-    ### evaluate function at randomly sampled points
-    y = model.lc_func(band, *x.T)
+    y = np.empty((args.n, args.n_times))
     
-    ### initialize model
-    gp = GaussianProcessRegressor()
+    ### evaluate full lightcurve for each parameter combination
+    for i in range(args.n):
+        params = x[i]
+        y[i] = s_m.lc_func(band, t_interp, *params)
+    lc_arr[ind] = y
 
-    ### fit model
-    gp.fit(x, y)
-
-    ### write model to disk
-    fname = os.environ["EM_PE_INSTALL_DIR"] + "/Data/" + args.m + "_" + band + "_model.joblib"
-    dump(gp, fname)
+fname = os.environ["EM_PE_INSTALL_DIR"] + "/Data/" + args.m + ".npz"
+np.savez(fname, t_interp, x, lc_arr)

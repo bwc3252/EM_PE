@@ -1,4 +1,4 @@
-import models
+from .models import *
 from .parser import *
 from .plot_utils import *
 from .utils import *

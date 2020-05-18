@@ -23,3 +23,13 @@ test_woko2017: directories
 	chmod u+x pe_runs/$@/sample.sh
 	chmod u+x pe_runs/$@/plot_corner.sh
 	chmod u+x pe_runs/$@/plot_lc.sh
+
+test_me2017_non_lanthanide: directories
+	mkdir -p pe_runs/$@/
+	python3 em_pe/tests/generate_data.py --m me2017_non_lanthanide --out pe_runs/$@/ ${INJECTION_PARAMS} ${EJECTA_PARAMS}
+	echo "python3 ${EM_PE_INSTALL_DIR}/em_pe/sampler.py --dat ./ --m me2017_non_lanthanide -v --f z.txt --min 20 --max 20 --out samples_z.txt --fixed-param dist 40.0" > pe_runs/$@/sample.sh
+	echo "python3 ${EM_PE_INSTALL_DIR}/em_pe/plot_utils/plot_corner.py --posterior-samples samples_z.txt --truth-file test_truths.txt --out corner_z.png --p mej --p vej" > pe_runs/$@/plot_corner.sh
+	echo "python3 ${EM_PE_INSTALL_DIR}/em_pe/plot_utils/plot_lc.py --posterior-samples samples_z.txt --out lc_z.png --m me2017_non_lanthanide --tmin ${TMIN} --tmax ${TMAX} --lc-file z.txt --b z --fixed-param dist 40.0" > pe_runs/$@/plot_lc.sh
+	chmod u+x pe_runs/$@/sample.sh
+	chmod u+x pe_runs/$@/plot_corner.sh
+	chmod u+x pe_runs/$@/plot_lc.sh
