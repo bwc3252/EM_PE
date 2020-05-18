@@ -54,8 +54,8 @@ class woko2017(model_base):
 
         #mAB = np.zeros((len(tvec_days),8))
 
-        for ii in xrange(len(ints)):
-            idx = np.arange(ndata/9) + ii*(ndata/9)
+        for ii in range(len(ints)):
+            idx = (np.arange(int(ndata/9)) + ii*(int(ndata/9))).astype(int)
             data_out_slice = data_out[idx,:]
 
             t = data_out_slice[:,1]
@@ -152,7 +152,7 @@ class woko2017(model_base):
         ints = np.arange(0,ndata,ndata/9)
         mAB = np.zeros((len(tvec_days),8))
 
-        for ii in xrange(len(ints)):
+        for ii in range(len(ints)):
             f1, f2, weight1, weight2 = self.f_list[ii]
             fam1, fam2  = splev(tvec_days, f1), splev(tvec_days, f2)
             fam = weight1*fam1+weight2*fam2
@@ -173,7 +173,7 @@ class woko2017(model_base):
         wavelength_interp = 3543
 
         mAB_y = np.zeros(tvec_days.shape)
-        for ii in xrange(len(tvec_days)):
+        for ii in range(len(tvec_days)):
             mAB_y[ii] = np.interp(wavelength_interp,wavelengths,mAB[ii,:])
         mAB_new = np.zeros((len(tvec_days),9))
         mAB_new[:,0] = np.squeeze(mAB_y)

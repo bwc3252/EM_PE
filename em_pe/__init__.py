@@ -1,5 +1,5 @@
 import models
-import parser
-import plot_utils
-import utils
-from sampler import sampler
+from .parser import *
+from .plot_utils import *
+from .utils import *
+from .sampler import sampler

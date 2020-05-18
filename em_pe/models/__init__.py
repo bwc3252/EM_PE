@@ -1,3 +1,5 @@
+print("imported")
+
 from .woko2017 import *
 from .linear_model import *
 from .woko2017_two_comp import *
@@ -8,7 +10,7 @@ from .me2017_non_lanthanide import *
 from .me2017_two_comp import *
 from .test_model import *
 from .afterglowpy import *
-from .woko2017_bns import *
+#from .woko2017_bns import *
 
 model_dict = {
     'woko2017':woko2017,
@@ -21,7 +23,7 @@ model_dict = {
     'me2017_two_comp':me2017_two_comp,
     'test':test,
     'afterglowpy':afterglowpy,
-    'woko2017_bns':woko2017_bns
+#    'woko2017_bns':woko2017_bns
 }
 
 bounds_dict = {
