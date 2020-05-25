@@ -21,11 +21,10 @@ class model_base:
     weight : float
         Weight of model used in likelihood calculations
     '''
-    def __init__(self, name, param_names, bands, weight=1):
+    def __init__(self, name, param_names, bands):
         self.name = name
         self.param_names = param_names
         self.bands = bands
-        self.weight = weight
         self.params = None
         self.t_bounds = None
 

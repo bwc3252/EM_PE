@@ -58,8 +58,13 @@ import numpy as np
 import argparse
 import sys
 
-from models import model_dict, bounds_dict
-#from mcsampler_new.utils import monte_carlo_integrator
+### hacky fix because the import system is different when run as a package vs.
+### run as a script
+try:
+    from models import model_dict, bounds_dict
+except ModuleNotFoundError:
+    from .models import model_dict, bounds_dict
+
 import RIFT.integrators.MonteCarloEnsemble as monte_carlo_integrator
 
 try:
