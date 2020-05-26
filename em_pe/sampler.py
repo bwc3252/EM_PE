@@ -93,6 +93,7 @@ def _parse_command_line_args():
     parser.add_argument('--orientation', help='Orientation dependance to use (defaults to None)')
     parser.add_argument('--estimate-dist', action="store_true", help='Estimate distance')
     parser.add_argument('--epoch', type=int, default=100, help='Iterations before resetting sampling distributions')
+    parser.add_argument('--correlate-dims', action='append', nargs='+', help='Parameters to group together')
     return parser.parse_args()
 
 class sampler:
@@ -122,7 +123,7 @@ class sampler:
     '''
     def __init__(self, data_loc, m, files, out, v=True, L_cutoff=0, min_iter=20,
                  max_iter=20, ncomp=1, fixed_params=None, orientation=None,
-                 estimate_dist=True, epoch=5):
+                 estimate_dist=True, epoch=5, correlate_dims=None):
         ### parameters passed in from user or main()
         self.data_loc = data_loc
         self.m = m
@@ -137,6 +138,7 @@ class sampler:
         self.estimate_dist = estimate_dist
         self.epoch = epoch
         self.fixed_params = {}
+        self.correlate_dims = correlate_dims
 
         ### convert types for fixed params, make it a dict
         if fixed_params is not None:
@@ -253,10 +255,21 @@ class sampler:
         if self.v:
             print('Generating posterior samples')
             sys.stdout.flush()
-        ### get a tuple of integers as dimensions to make the integrator happy
-        param_ind = tuple(range(len(self.ordered_params)))
         dim = len(self.ordered_params) # number of dimensions
-        gmm_dict = {param_ind:None}
+        if self.correlate_dims is None:
+            ### assume separately-sampled dimensions
+            gmm_dict = {(i,):None for i in range(dim)}
+        else:
+            ### dictionary mapping parameter names to ordered_params index
+            param_ind = dict(zip(self.ordered_params, range(dim)))
+            ### make a flattened version of correlate_dims
+            correlated_params = [item for sublist in self.correlate_dims for item in sublist]
+            ### add the correlated dimensions to the gmm_dict
+            gmm_dict = {tuple([param_ind[p] for p in sublist]):None for sublist in self.correlate_dims}
+            ### add the non-correlated dimensions
+            for p in self.ordered_params:
+                if p not in correlated_params:
+                    gmm_dict[(param_ind[p],)] = None
         ### initialize and run the integrator
         integrator = monte_carlo_integrator.integrator(dim, self.bounds, gmm_dict, self.ncomp,
                         proc_count=None, L_cutoff=self.L_cutoff, use_lnL=True,
@@ -335,8 +348,9 @@ def main():
     orientation = args.orientation
     estimate_dist = args.estimate_dist
     epoch = args.epoch
+    correlate_dims = args.correlate_dims
     s = sampler(data_loc, m, files, out, v, L_cutoff, min_iter, max_iter, ncomp, 
-            fixed_params, orientation, estimate_dist, epoch)
+            fixed_params, orientation, estimate_dist, epoch, correlate_dims)
     s.generate_samples()
 
 if __name__ == '__main__':

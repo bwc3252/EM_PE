@@ -72,7 +72,7 @@ def _parse_command_line_args():
     Parses and returns the command line arguments.
     '''
     parser = argparse.ArgumentParser(description='Generate lightcurve plot from data or models')
-    parser.add_argument('--posterior-samples', action='append', help='Posterior sample file to plot')
+    parser.add_argument('--posterior-samples', help='Posterior sample file to plot')
     parser.add_argument('--out', help='Filename to save plot to')
     parser.add_argument('--m', help='Model name')
     parser.add_argument('--tmin', type=float, help='Minimum time')
@@ -82,14 +82,14 @@ def _parse_command_line_args():
     parser.add_argument('--fixed-param', action='append', nargs=2, help='Fixed parameters (i.e. parameters without posterior samples)')
     return parser.parse_args()
 
-def generate_lc_plot(sample_files, out, m, tmin, tmax, b, lc_file=None, fixed_params=None):
+def generate_lc_plot(out, b, tmin, tmax, m=None, sample_file=None, lc_file=None, fixed_params=None):
     '''
     Generate a lightcurve plot
 
     Parameters
     ----------
-    sample_files : list
-        List of posterior sample files
+    sample_file : str
+        Posterior sample file
     out : str
         Filename to save plot to
     m : str
@@ -101,32 +101,23 @@ def generate_lc_plot(sample_files, out, m, tmin, tmax, b, lc_file=None, fixed_pa
     b : list
         List of data bands
     lc_file : list
-        List of lightcurve data files (assumed to be in same order as posterior sample files)
+        List of lightcurve data files
     fixed_params : list
         List of [param_name, value] pairs
     '''
-    n = len(sample_files)
-    if n %2 == 0:
-        nrows = n / 2
-    else:
-        nrows = int(n / 2) + 1
-    ### colors to iterate through
-    color_list=['black', 'red', 'orange', 'yellow', 'green', 'cyan', 'blue',
-                'purple', 'gray']
-    #fig = plt.figure(figsize=(6, 2 * n))
-    height = max(0.7 * n + 0.7, 2)
-    fig, axes = plt.subplots(nrows, 1, sharex='all', figsize=(6, height))
-    model = model_dict[m]()
-    for i in range(n):
-        #fignum = str(n) + '1' + str(i + 1)
-        if nrows > 1:
-            ax = axes[int(i / 2)]
-        else:
-            ax = axes
-        samples = np.loadtxt(sample_files[i], skiprows=1)
-        with open(sample_files[i]) as f:
+    if m is None and lc_file is None:
+        raise RuntimeError("Nothing to plot.")
+    elif m is not None and sample_file is None and fixed_params is None:
+        raise RuntimeError("No samples supplied for model evaluation.")
+    ### colors to use for each band
+    colors = {"K":"darkred", "H":"red", "J":"orange", "y":"gold", "z":"greenyellow", "i":"green", "r":"lime", "g":"cyan", "u":"blue"}
+    plt.figure(figsize=(12, 8))
+    if m is not None:
+        model = model_dict[m]()
+        with open(sample_file) as f:
             ### the "header" contains the column names
             header = f.readline().strip().split(' ')
+        samples = np.loadtxt(sample_file)
         header = header[1:]
         lnL = samples[:,0]
         p = samples[:,1]
@@ -142,7 +133,7 @@ def generate_lc_plot(sample_files, out, m, tmin, tmax, b, lc_file=None, fixed_pa
         for col in range(3, c):
             p = header[col]
             values = samples[:,col]
-            ### get itervals of parameters
+            ### get intervals of parameters
             lower = _quantile(values, 0.05, weights)
             upper = _quantile(values, 0.95, weights)
             ### randomly sample some points in this range
@@ -150,40 +141,45 @@ def generate_lc_plot(sample_files, out, m, tmin, tmax, b, lc_file=None, fixed_pa
         n_pts = 200
         t = np.logspace(np.log10(tmin), np.log10(tmax), n_pts)
         param_names = header[3:]
-        lc_array = np.empty((num_samples, n_pts))
-        for row in range(num_samples):
-            params = dict(zip(param_names, param_array[row]))
-            if fixed_params is not None:
-                for [name, val] in fixed_params:
-                    params[name] = val
-            model.set_params(params, [tmin, tmax])
-            dist = params['dist']
-            lc_array[row] = model.evaluate(t, b[i])[0] + 5*(np.log10(dist*1e6) - 1)
-        color = color_list[i % len(color_list)]
-        min_lc = np.amin(lc_array, axis=0)
-        max_lc = np.amax(lc_array, axis=0)
-        ax.plot(t, min_lc, '--', color=color, label=b[i])
-        ax.plot(t, max_lc, '--', color=color)
-        ax.fill_between(t, min_lc, max_lc, color='black', alpha=0.1)
-        if lc_file is not None:
-            lc = np.loadtxt(lc_file[i])
+        for band in b:
+            lc_array = np.empty((num_samples, n_pts))
+            for row in range(num_samples):
+                params = dict(zip(param_names, param_array[row]))
+                if fixed_params is not None:
+                    for [name, val] in fixed_params:
+                        params[name] = val
+                model.set_params(params, [tmin, tmax])
+                dist = params['dist']
+                lc_array[row] = model.evaluate(t, band)[0] + 5*(np.log10(dist*1e6) - 1)
+            if band in colors:
+                color = colors[band]
+            else:
+                print("No matching color for band", band)
+                color=None
+            min_lc = np.amin(lc_array, axis=0)
+            max_lc = np.amax(lc_array, axis=0)
+            plt.plot(t, min_lc, color=color, label=band)
+            plt.plot(t, max_lc, color=color)
+            plt.fill_between(t, min_lc, max_lc, color=color, alpha=0.1)
+    if lc_file is not None:
+        for fname in lc_file:
+            band = fname.split(".")[0]
+            if band in colors:
+                color = colors[band]
+            else:
+                print("No matching color for band", band)
+                color=None
+            lc = np.loadtxt(fname)
             t = lc[:,0]
             err = lc[:,3]
             lc = lc[:,2]
-            ax.errorbar(t, lc, yerr=err, fmt='+', color=color)
-        if (i % 2 == 1) or (i == n - 1):
-            ### only bother doing this stuff once for each plot
-            ax.set_xlim((0.8 * tmin, max(tmax + 1, 10))) # these are kind of arbitrary
-            old_yticks = ax.get_yticks()
-            new_yticks = old_yticks[1:-1] # strip off outer yticks
-            ax.set_yticks(new_yticks)
-            ax.invert_yaxis()
-            ax.set_xscale('log')
-            ax.set_ylabel('$m_{AB}$')
-            ax.legend()
-    ax.set_xlabel('Time (days)')
+            plt.errorbar(t, lc, yerr=err, fmt="none", capsize=2, color=color)
+    plt.gca().invert_yaxis()
+    #plt.xscale('log')
+    plt.ylabel('$m_{AB}$')
+    plt.legend()
+    plt.xlabel('Time (days)')
     plt.tight_layout()
-    plt.subplots_adjust(hspace=0)
     plt.savefig(out)
 
 def _quantile(x, q, weights=None):
@@ -200,6 +196,7 @@ def _quantile(x, q, weights=None):
 
     Parameters
     ----------
+    generate_lc_plot(samples, out, m, tmin, tmax, b, lc_file, fixed_params)
     x : array_like[nsamples,]
        The samples.
     q : array_like[nquantiles,]
@@ -239,7 +236,7 @@ def _quantile(x, q, weights=None):
 
 def main():
     args = _parse_command_line_args()
-    samples = args.posterior_samples
+    sample_file = args.posterior_samples
     out = args.out
     m = args.m
     tmin = args.tmin
@@ -250,7 +247,7 @@ def main():
     if fixed_params is not None:
         for i in range(len(fixed_params)):
             fixed_params[i][1] = float(fixed_params[i][1])
-    generate_lc_plot(samples, out, m, tmin, tmax, b, lc_file, fixed_params)
+    generate_lc_plot(out, b, tmin, tmax, m=m, sample_file=sample_file, lc_file=lc_file, fixed_params=fixed_params)
 
 if __name__ == '__main__':
     main()
