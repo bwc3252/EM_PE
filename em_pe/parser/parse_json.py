@@ -70,7 +70,7 @@ def _read_data(t0, file, bands, out, maxpts, tmax):
     name = name.split('.')[0] # get event name from filename
     ### read in the data
     with open(file, "r") as read_file:
-        data = json.load(read_file)[name]['photometry']
+        data = json.load(read_file, encoding="UTF-8")[name]['photometry']
     ### create empty data arrays
     data_dict = {}
     for band in bands:
