@@ -94,6 +94,8 @@ def _parse_command_line_args():
     parser.add_argument('--estimate-dist', action="store_true", help='Estimate distance')
     parser.add_argument('--epoch', type=int, default=100, help='Iterations before resetting sampling distributions')
     parser.add_argument('--correlate-dims', action='append', nargs='+', help='Parameters to group together')
+    parser.add_argument('--burn-in', nargs=2, help='Number or iterations to use as burn-in and number of samples to start with per band')
+    parser.add_argument('--keep-npts', type=int, help='Store the n highest-likelihood samples')
     return parser.parse_args()
 
 class sampler:
@@ -123,7 +125,8 @@ class sampler:
     '''
     def __init__(self, data_loc, m, files, out, v=True, L_cutoff=0, min_iter=20,
                  max_iter=20, ncomp=1, fixed_params=None, orientation=None,
-                 estimate_dist=True, epoch=5, correlate_dims=None):
+                 estimate_dist=True, epoch=5, correlate_dims=None, burn_in_length=None,
+                 burn_in_start=None, keep_npts=None):
         ### parameters passed in from user or main()
         self.data_loc = data_loc
         self.m = m
@@ -139,6 +142,10 @@ class sampler:
         self.epoch = epoch
         self.fixed_params = {}
         self.correlate_dims = correlate_dims
+        self.burn_in_length = burn_in_length
+        self.burn_in_start = burn_in_start
+        self.burn_in_npts = burn_in_start
+        self.keep_npts = keep_npts
 
         ### convert types for fixed params, make it a dict
         if fixed_params is not None:
@@ -152,6 +159,7 @@ class sampler:
         self.ordered_params = None
         self.bounds = None
         self.t_bounds = None
+        self.iteration = 0
 
         ### initialization things
         self._read_data()
@@ -223,7 +231,13 @@ class sampler:
             m = temp_data[band][0]
             m_err_squared = temp_data[band][1]
             diff = x - m
-            #print(diff)
+            if self.burn_in_length is not None and self.iteration < self.burn_in_length:
+                npts = int(self.burn_in_start + (self.iteration / self.burn_in_length) * (diff.size - self.burn_in_start))
+                if npts < diff.size:
+                    ind = np.random.choice(diff.size, size=self.burn_in_npts, replace=False)
+                    diff = diff[ind]
+                    err = err[ind]
+                    #m_err_squared = m_err_squared[ind] # FIXME fix this when the models start actually having error bars
             lnL += np.sum(diff**2 / (err**2 + m_err_squared))
         return -0.5 * lnL
 
@@ -249,6 +263,7 @@ class sampler:
             print()
         ret = np.array(ret).reshape((n, 1))
         ret[np.isnan(ret)] = -1 * np.inf
+        self.iteration += 1
         return ret
 
     def _generate_samples(self):
@@ -281,6 +296,11 @@ class sampler:
         samples = np.append(samples, integrator.cumulative_p, axis=1)
         samples = np.append(samples, integrator.cumulative_p_s, axis=1)
         samples = np.append(samples, integrator.cumulative_samples, axis=1)
+        if self.burn_in_length is not None:
+            samples = samples[self.burn_in_length:]
+        if self.keep_npts is not None and self.keep_npts < samples.shape[0]:
+            ind_sorted = np.argsort(samples[:,0])
+            samples = samples[ind_sorted[samples.shape[0] - self.keep_npts:]]
         if self.v:
             print('Integral result:', integrator.integral)
         return samples
@@ -349,8 +369,13 @@ def main():
     estimate_dist = args.estimate_dist
     epoch = args.epoch
     correlate_dims = args.correlate_dims
+    if args.burn_in is not None:
+        burn_in_length = int(args.burn_in[0])
+        burn_in_start = int(args.burn_in[1])
+    keep_npts = args.keep_npts
     s = sampler(data_loc, m, files, out, v, L_cutoff, min_iter, max_iter, ncomp, 
-            fixed_params, orientation, estimate_dist, epoch, correlate_dims)
+            fixed_params, orientation, estimate_dist, epoch, correlate_dims,
+            burn_in_length, burn_in_start, keep_npts)
     s.generate_samples()
 
 if __name__ == '__main__':

@@ -11,7 +11,7 @@ model_dict = {
 }
 
 bounds_dict = {
-    "dist":[25.0, 50.0],
+    "dist":[35.0, 45.0],
     "log_mej":[-3.0, -1.0],
     "vej":[0.1, 0.4],
     "log_kappa":[-1.0, 2.0],

@@ -54,9 +54,9 @@ GW170817_kilonova_2c: directories
 GW170817_kilonova_3c: directories
 	mkdir -p pe_runs/$@/
 	python3 ${EM_PE_INSTALL_DIR}/em_pe/parser/parse_json.py --t0 ${GW170817_START} --f ${EM_PE_INSTALL_DIR}/Data/GW170817.json --b g --b r --b i --b z --b y --b J --b H --b K --out pe_runs/$@/
-	echo "python3 ${EM_PE_INSTALL_DIR}/em_pe/sampler.py --dat ./ --m kilonova_3c -v --f K.txt --min 20 --max 20 --out samples_${BAND}.txt --fixed-param dist 40.0 --fixed-param Tc_red 2500.0 --fixed-param Tc_purple 2500.0 --fixed-param Tc_blue 2500.0" > pe_runs/$@/sample.sh
-	echo "python3 ${EM_PE_INSTALL_DIR}/em_pe/plot_utils/plot_corner.py --posterior-samples samples_${BAND}.txt --out corner_${BAND}.png --p log_mej_red --p log_mej_purple --p log_mej_blue --p vej_red --p vej_purple --p vej_blue" > pe_runs/$@/plot_corner.sh
-	echo "python3 ${EM_PE_INSTALL_DIR}/em_pe/plot_utils/plot_lc.py --posterior-samples samples_${BAND}.txt --out lc_${BAND}.png --m kilonova_3c --tmin ${TMIN} --tmax ${TMAX} --lc-file ${BAND}.txt --b ${BAND}" > pe_runs/$@/plot_lc.sh
+	echo "python3 ${EM_PE_INSTALL_DIR}/em_pe/sampler.py --dat ./ --m kilonova_3c -v --f g.txt --f r.txt --f i.txt --f z.txt --f y.txt --f J.txt --f H.txt --f K.txt --min 60 --max 60 --out samples.txt --estimate-dist --burn-in 20 20 --keep-npts 1000000 --fixed-param Tc_red 3700.0 --fixed-param Tc_purple 1300.0 --fixed-param Tc_blue 700.0 --correlate-dims log_mej_red vej_red --correlate-dims log_mej_purple vej_purple --correlate-dims log_mej_blue vej_blue" > pe_runs/$@/sample.sh
+	echo "python3 ${EM_PE_INSTALL_DIR}/em_pe/plot_utils/plot_corner.py --posterior-samples samples.txt --out corner.png --p log_mej_red --p log_mej_purple --p log_mej_blue --p vej_red --p vej_purple --p vej_blue --p dist" > pe_runs/$@/plot_corner.sh
+	echo "python3 ${EM_PE_INSTALL_DIR}/em_pe/plot_utils/plot_lc.py --posterior-samples samples.txt --out lc.png --m kilonova_3c --tmin ${TMIN} --tmax ${TMAX} --lc-file g.txt --b g --lc-file r.txt --b r --lc-file i.txt --b i --lc-file z.txt --b z --lc-file y.txt --b y --lc-file J.txt --b J --lc-file H.txt --b H --lc-file K.txt --b K --fixed-param Tc_red 3700.0 --fixed-param Tc_purple 1300.0 --fixed-param Tc_blue 700.0" > pe_runs/$@/plot_lc.sh
 	chmod u+x pe_runs/$@/sample.sh
 	chmod u+x pe_runs/$@/plot_corner.sh
 	chmod u+x pe_runs/$@/plot_lc.sh
