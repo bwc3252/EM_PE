@@ -153,6 +153,7 @@ class sampler:
         self.bounds = None
         self.t_bounds = None
         self.iteration = 0
+        self.iteration_size = 0
 
         ### initialization things
         self._read_data()
@@ -245,6 +246,7 @@ class sampler:
 
     def _integrand(self, samples):
         n, _ = samples.shape
+        self.iteration_size = n
         if self.nprocs == 1:
             ret = self._integrand_subprocess((self.models[0], samples))
         elif self.nprocs > 1:
@@ -290,7 +292,7 @@ class sampler:
         samples = np.append(samples, integrator.cumulative_p_s, axis=1)
         samples = np.append(samples, integrator.cumulative_samples, axis=1)
         if self.burn_in_length is not None:
-            samples = samples[self.burn_in_length:]
+            samples = samples[self.burn_in_length * self.iteration_size:]
         if self.keep_npts is not None and self.keep_npts < samples.shape[0]:
             ind_sorted = np.argsort(samples[:,0])
             samples = samples[ind_sorted[samples.shape[0] - self.keep_npts:]]
