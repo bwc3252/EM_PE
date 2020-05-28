@@ -234,7 +234,6 @@ class sampler:
 
     def _integrand_subprocess(self, arg):
         model, samples = arg
-        print(model)
         ret = np.empty(samples.shape[0])
         for i in range(samples.shape[0]):
             row = samples[i]
