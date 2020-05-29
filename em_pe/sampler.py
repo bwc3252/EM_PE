@@ -87,6 +87,7 @@ def _parse_command_line_args():
     parser.add_argument('--epoch', type=int, default=100, help='Iterations before resetting sampling distributions')
     parser.add_argument('--correlate-dims', action='append', nargs='+', help='Parameters to group together')
     parser.add_argument('--burn-in', nargs=2, help='Number or iterations to use as burn-in and number of samples to start with per band')
+    parser.add_argument('--beta-start', type=float, default=1.0, help='Initial beta value: if burn-in is set, 0 < beta <= 1 is multiplied by lnL for every iteration of burn-in')
     parser.add_argument('--keep-npts', type=int, help='Store the n highest-likelihood samples')
     parser.add_argument('--nprocs', type=int, default=1, help='Number of parallel processes to use for likelihood evaluation')
     return parser.parse_args()
@@ -119,7 +120,7 @@ class sampler:
     def __init__(self, data_loc, m, files, out, v=True, L_cutoff=0, min_iter=20,
                  max_iter=20, ncomp=1, fixed_params=None,
                  estimate_dist=True, epoch=5, correlate_dims=None, burn_in_length=None,
-                 burn_in_start=None, keep_npts=None, nprocs=1):
+                 burn_in_start=None, beta_start=1.0, keep_npts=None, nprocs=1):
         ### parameters passed in from user or main()
         self.data_loc = data_loc
         self.m = m
@@ -137,6 +138,7 @@ class sampler:
         self.burn_in_length = burn_in_length
         self.burn_in_start = burn_in_start
         self.burn_in_npts = burn_in_start
+        self.beta_start = beta_start
         self.keep_npts = keep_npts
         self.nprocs = nprocs
 
@@ -245,6 +247,7 @@ class sampler:
         return ret
 
     def _integrand(self, samples):
+        beta = self.beta_start + (1.0 - self.beta_start) * (self.iteration / self.burn_in_length)
         n, _ = samples.shape
         self.iteration_size = n
         if self.nprocs == 1:
@@ -259,7 +262,7 @@ class sampler:
         ret = ret.reshape((n, 1))
         ret[np.isnan(ret)] = -1 * np.inf
         self.iteration += 1
-        return ret
+        return ret * beta
 
     def _generate_samples(self):
         if self.v:
@@ -358,11 +361,12 @@ def main():
     if args.burn_in is not None:
         burn_in_length = int(args.burn_in[0])
         burn_in_start = int(args.burn_in[1])
+    beta_start = args.beta_start
     keep_npts = args.keep_npts
     nprocs = args.nprocs
     s = sampler(data_loc, m, files, out, v, L_cutoff, min_iter, max_iter, ncomp, 
             fixed_params, estimate_dist, epoch, correlate_dims,
-            burn_in_length, burn_in_start, keep_npts, nprocs)
+            burn_in_length, burn_in_start, beta_start, keep_npts, nprocs)
     s.generate_samples()
 
 if __name__ == '__main__':
