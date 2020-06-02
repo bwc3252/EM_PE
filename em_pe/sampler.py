@@ -247,7 +247,10 @@ class sampler:
         return ret
 
     def _integrand(self, samples):
-        beta = self.beta_start + (1.0 - self.beta_start) * (self.iteration / self.burn_in_length)
+        if self.burn_in_length is not None and self.iteration < self.burn_in_length:
+            beta = self.beta_start + (1.0 - self.beta_start) * (self.iteration / self.burn_in_length)
+        else:
+            beta = 1.0
         n, _ = samples.shape
         self.iteration_size = n
         if self.nprocs == 1:
@@ -361,6 +364,9 @@ def main():
     if args.burn_in is not None:
         burn_in_length = int(args.burn_in[0])
         burn_in_start = int(args.burn_in[1])
+    else:
+        burn_in_length = None
+        burn_in_start = None
     beta_start = args.beta_start
     keep_npts = args.keep_npts
     nprocs = args.nprocs
