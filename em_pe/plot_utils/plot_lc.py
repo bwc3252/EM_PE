@@ -120,6 +120,7 @@ def generate_lc_plot(out, b, tmin, tmax, m=None, sample_file=None, lc_file=None,
         samples = np.loadtxt(sample_file)
         header = header[1:]
         lnL = samples[:,0]
+        best_params = samples[np.argmax(lnL)][3:]
         p = samples[:,1]
         p_s = samples[:,2]
         ### shift all the lnL values up so that we don't have rounding issues
@@ -141,8 +142,14 @@ def generate_lc_plot(out, b, tmin, tmax, m=None, sample_file=None, lc_file=None,
         n_pts = 200
         t = np.logspace(np.log10(tmin), np.log10(tmax), n_pts)
         param_names = header[3:]
+        best_params = dict(zip(param_names, best_params))
+        if fixed_params is not None:
+            for [name, val] in fixed_params:
+                best_params[name] = val
         for band in b:
             lc_array = np.empty((num_samples, n_pts))
+            model.set_params(best_params, [tmin, tmax])
+            best_lc = model.evaluate(t, band)[0] + 5.0 * (np.log10(best_params['dist'] * 1.0e6) - 1.0)
             for row in range(num_samples):
                 params = dict(zip(param_names, param_array[row]))
                 if fixed_params is not None:
@@ -150,7 +157,7 @@ def generate_lc_plot(out, b, tmin, tmax, m=None, sample_file=None, lc_file=None,
                         params[name] = val
                 model.set_params(params, [tmin, tmax])
                 dist = params['dist']
-                lc_array[row] = model.evaluate(t, band)[0] + 5*(np.log10(dist*1e6) - 1)
+                lc_array[row] = model.evaluate(t, band)[0] + 5.0 * (np.log10(dist * 1.0e6) - 1.0)
             if band in colors:
                 color = colors[band]
             else:
@@ -158,8 +165,9 @@ def generate_lc_plot(out, b, tmin, tmax, m=None, sample_file=None, lc_file=None,
                 color=None
             min_lc = np.amin(lc_array, axis=0)
             max_lc = np.amax(lc_array, axis=0)
-            plt.plot(t, min_lc, color=color, label=band)
-            plt.plot(t, max_lc, color=color)
+            #plt.plot(t, min_lc, color=color, label=band)
+            #plt.plot(t, max_lc, color=color)
+            plt.plot(t, best_lc, color=color, label=band)
             plt.fill_between(t, min_lc, max_lc, color=color, alpha=0.1)
     if lc_file is not None:
         for fname in lc_file:
