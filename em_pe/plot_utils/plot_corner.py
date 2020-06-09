@@ -116,6 +116,9 @@ def generate_corner_plot(sample_files, out, params, truths=None, cutoff=0, frac=
     ### dictionary of LaTeX parameter name strings
     tex_dict = {'mej':'$m_{ej}$ $(M_\\odot)$',
                 'log_mej':'$\\log(m_{ej})$',
+                'log_mej_blue':'$\\log(m_{ej} / M_\\odot)$ (blue)',
+                'log_mej_purple':'$\\log(m_{ej} / M_\\odot)$ (purple)',
+                'log_mej_red':'$\\log(m_{ej} / M_\\odot)$ (red)',
                 'mej1':'$m_{ej1}$ $(M_\\odot)$',
                 'mej2':'$m_{ej2}$ $(M_\\odot)$',
                 'vej':'$v_{ej}$ $(v/c)$',
@@ -123,10 +126,12 @@ def generate_corner_plot(sample_files, out, params, truths=None, cutoff=0, frac=
                 'vej2':'$v_{ej2}$ $(v/c)$',
                 'mej_red':'$m_{ej}$(red) $(M_\\odot)$',
                 'mej_blue':'$m_{ej}$(blue) $(M_\\odot)$',
-                'vej_red':'$v_{ej}$(red) $(v/c)$',
-                'vej_blue':'$v_{ej}$(blue) $(v/c)$',
+                'vej_red':'$v_{ej} / c$ (red)',
+                'vej_purple':'$v_{ej} / c$ (purple)',
+                'vej_blue':'$v_{ej} / c$ (blue)',
                 'm1':'$m_1$ $(M_\\odot)$',
-                'm2':'$m_2$ $(M_\\odot)$'
+                'm2':'$m_2$ $(M_\\odot)$',
+                'dist':'Distance (Mpc)'
                }
     if cutoff <= 0:
         min_lnL = -1 * np.inf
