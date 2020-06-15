@@ -265,7 +265,9 @@ class sampler:
         ret = ret.reshape((n, 1))
         ret[np.isnan(ret)] = -1 * np.inf
         self.iteration += 1
-        return ret * beta
+        ret *= beta
+        print("points with non-zero likelihood:", np.sum(np.exp(ret - np.max(ret)) > 0.0))
+        return ret
 
     def _generate_samples(self):
         if self.v:

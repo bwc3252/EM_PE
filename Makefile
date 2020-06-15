@@ -63,10 +63,10 @@ GW170817_kilonova: directories
 
 GW170817_kilonova_2c: directories
 	mkdir -p pe_runs/$@/
-	python3 ${EM_PE_INSTALL_DIR}/em_pe/parser/parse_json.py --t0 ${GW170817_START} --f ${EM_PE_INSTALL_DIR}/Data/GW170817.json --b g --b r --b i --b z --b y --b J --b H --b K --maxpts 20 --out pe_runs/$@/
-	echo "python3 ${EM_PE_INSTALL_DIR}/em_pe/sampler.py --dat ./ --m kilonova_2c -v --f K.txt --min 20 --f r.txt --max 20 --out samples.txt --estimate-dist --fixed-param Tc_red 1000.0 --fixed-param Tc_blue 4000.0" > pe_runs/$@/sample.sh
+	python3 ${EM_PE_INSTALL_DIR}/em_pe/parser/parse_json.py --t0 ${GW170817_START} --f ${EM_PE_INSTALL_DIR}/Data/GW170817.json --b g --b r --b i --b z --b y --b J --b H --b K --out pe_runs/$@/
+	echo "python3 ${EM_PE_INSTALL_DIR}/em_pe/sampler.py --nprocs 8 --dat ./ --m kilonova_2c -v --f K.txt --min 40 --max 40 --out samples.txt --estimate-dist --f g.txt --f r.txt --f i.txt --f z.txt --f y.txt --f J.txt --f H.txt --f K.txt --fixed-param Tc_red 1000.0 --fixed-param Tc_blue 4000.0 --burn-in 10 10 --beta-start 0.1 --correlate-dims log_mej_red vej_red --correlate-dims log_mej_blue vej_blue" > pe_runs/$@/sample.sh
 	echo "python3 ${EM_PE_INSTALL_DIR}/em_pe/plot_utils/plot_corner.py --posterior-samples samples.txt --out corner.png --p log_mej_red --p log_mej_blue --p vej_red --p vej_blue" > pe_runs/$@/plot_corner.sh
-	echo "python3 ${EM_PE_INSTALL_DIR}/em_pe/plot_utils/plot_lc.py --posterior-samples samples.txt --out lc.png --m kilonova_2c --tmin ${TMIN} --tmax ${TMAX} --lc-file K.txt --b K --lc-file r.txt --b r" > pe_runs/$@/plot_lc.sh
+	echo "python3 ${EM_PE_INSTALL_DIR}/em_pe/plot_utils/plot_lc.py --posterior-samples samples.txt --out lc.png --m kilonova_2c --tmin ${TMIN} --tmax ${TMAX} --lc-file K.txt --b K --lc-file g.txt --b g --lc-file r.txt --b r --lc-file i.txt --b i --lc-file z.txt --b z --lc-file y.txt --b y --lc-file J.txt --b J --lc-file H.txt --b H --lc-file K.txt --b K" > pe_runs/$@/plot_lc.sh
 	chmod u+x pe_runs/$@/sample.sh
 	chmod u+x pe_runs/$@/plot_corner.sh
 	chmod u+x pe_runs/$@/plot_lc.sh
