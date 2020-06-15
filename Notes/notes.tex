@@ -23,10 +23,10 @@
 
 \textbf{Note:} some of this text comes directly from \cite{Villar_2017}.
 
-The single-component, two-component, and three-component analytic kilonova models built into the code are an implementation of the model described in \cite{Villar_2017}.
+The single-component, two-component, and three-component analytic kilonova models provided with the code are an implementation of the model described in \cite{Villar_2017}.
 In the following equations, $M$ is the $r$-process ejecta mass and $v$ is the ejecta velocity.
 Note that for now we assume the ejecta consists entirely of $r$-process material, so $M$ is the full ejecta mass.
-The radioactive heating rate at time $t$ is given by \cite{Korobkin_2012}
+The radioactive heating rate at time $t$ is given by \cite{Korobkin_2012}:
 \begin{equation}
     L_\text{in}(t) = 4 \times 10^{18} M \times \left [ 0.5 - \pi^{-1} \arctan \left ( \frac {t - t_0} {\sigma} \right ) \right ]^{1.3} \text{ erg s}^{-1}
 \end{equation}
@@ -43,7 +43,7 @@ The bolometric luminosity is calculated as
 \footnote{\cite{Villar_2017} is missing a factor of time in the denominator (this can be seen from the units -- our $L_\text{bol}$ has the correct units of erg s$^{-1}$). 
 The factor of 1/$t_d$ seems to produce reasonable results with the correct units, and better aligns with e.g. \cite{Chatzopoulos_2012}.}
 \begin{equation}
-    L_\text{bol}(t) = \frac {1} {t_d} \exp{\left ( \frac {-t^2} {t_d^2} \right ) }
+    L_\text{bol}(t) = \frac {2} {t_d} \exp{\left ( \frac {-t^2} {t_d^2} \right ) }
                     \int_0^t L_\text{in} \epsilon_\text{th} \exp{\left ( \frac {t^2} {t_d^2} \right ) } \frac {t} {t_d} dt
 \end{equation}
 where $t_d$ is the diffusion timescale, $t_d = \sqrt{2 \kappa M / \beta v c}$, $\kappa$ is the opacity, and $\beta = 13.7$ is a dimensionless constant related to the ejecta's geometry.

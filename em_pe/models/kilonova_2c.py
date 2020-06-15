@@ -99,7 +99,7 @@ class kilonova_2c(model_base):
             L_bol = np.empty(t.size)
             L_bol[1:] = cumtrapz(integrand, t)
             L_bol[0] = L_bol[1]
-            L_bol *= np.exp(-(t / td)**2) / td
+            L_bol *= 2.0 * np.exp(-(t / td)**2) / td
             
             _T_photo = (L_bol / (4.0 * np.pi * sigmaSB * vej**2 * t**2))**0.25
             _R_photo = (L_bol / (4.0 * np.pi * sigmaSB * Tc**4))**0.5
