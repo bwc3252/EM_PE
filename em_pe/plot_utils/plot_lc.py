@@ -124,7 +124,7 @@ def generate_lc_plot(out, b, tmin, tmax, m=None, sample_file=None, lc_file=None,
         p = samples[:,1]
         p_s = samples[:,2]
         ### shift all the lnL values up so that we don't have rounding issues
-        lnL += abs(np.max(lnL))
+        lnL -= np.max(lnL)
         L = np.exp(lnL)
         ### calculate weights
         weights = L * p / p_s

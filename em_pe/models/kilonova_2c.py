@@ -12,7 +12,8 @@ class kilonova_2c(model_base):
                        "vej_red",
                        "vej_blue",
                        "Tc_red",
-                       "Tc_blue"]
+                       "Tc_blue",
+                       "sigma"]
         bands = ["g", "r", "i", "z", "y", "J", "H", "K"]
         model_base.__init__(self, name, param_names, bands)
         
@@ -56,6 +57,7 @@ class kilonova_2c(model_base):
         t_bounds : list
             [upper bound, lower bound] pair for time values
         """
+        self.sigma = params["sigma"]
         ### conversion factors and physical constants
         Msun = 1.988409870698051e33 # g
         c = 2.99792458e10 # cm/s
@@ -138,4 +140,4 @@ class kilonova_2c(model_base):
         mAB = -2.5 * np.log10(F_nu) - 48.6
         mask = np.isfinite(mAB)
         f = interp1d(self.tdays[mask], mAB[mask], fill_value="extrapolate")
-        return f(tvec_days), 0.0
+        return f(tvec_days), self.sigma

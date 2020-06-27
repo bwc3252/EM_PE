@@ -115,23 +115,28 @@ def generate_corner_plot(sample_files, out, params, truths=None, cutoff=0, frac=
                 'purple', 'gray']
     ### dictionary of LaTeX parameter name strings
     tex_dict = {'mej':'$m_{ej}$ $(M_\\odot)$',
-                'log_mej':'$\\log(m_{ej})$',
-                'log_mej_blue':'$\\log(m_{ej} / M_\\odot)$ (blue)',
-                'log_mej_purple':'$\\log(m_{ej} / M_\\odot)$ (purple)',
-                'log_mej_red':'$\\log(m_{ej} / M_\\odot)$ (red)',
+                #'log_mej':'$\\log(m_{ej})$',
+                #'log_mej_blue':'$\\log(m_{ej} / M_\\odot)$ (blue)',
+                #'log_mej_purple':'$\\log(m_{ej} / M_\\odot)$ (purple)',
+                #'log_mej_red':'$\\log(m_{ej} / M_\\odot)$ (red)',
                 'mej1':'$m_{ej1}$ $(M_\\odot)$',
                 'mej2':'$m_{ej2}$ $(M_\\odot)$',
                 'vej':'$v_{ej}$ $(v/c)$',
                 'vej1':'$v_{ej1}$ $(v/c)$',
                 'vej2':'$v_{ej2}$ $(v/c)$',
-                'mej_red':'$m_{ej}$(red) $(M_\\odot)$',
-                'mej_blue':'$m_{ej}$(blue) $(M_\\odot)$',
-                'vej_red':'$v_{ej} / c$ (red)',
-                'vej_purple':'$v_{ej} / c$ (purple)',
-                'vej_blue':'$v_{ej} / c$ (blue)',
+                'mej_red':'$m_{ej}$ [red] $(M_\\odot)$',
+                'mej_purple':'$m_{ej}$ [purple] $(M_\\odot)$',
+                'mej_blue':'$m_{ej}$ [blue] $(M_\\odot)$',
+                'vej_red':'$v_{ej} / c$ [red]',
+                'vej_purple':'$v_{ej} / c$ [purple]',
+                'vej_blue':'$v_{ej} / c$ [blue]',
+                'Tc_red':'Tc [red]',
+                'Tc_purple':'Tc [purple]',
+                'Tc_blue':'Tc [blue]',
                 'm1':'$m_1$ $(M_\\odot)$',
                 'm2':'$m_2$ $(M_\\odot)$',
-                'dist':'Distance (Mpc)'
+                'dist':'Distance (Mpc)',
+                'sigma':'$\\sigma$ (mag)'
                }
     if cutoff <= 0:
         min_lnL = -1 * np.inf
@@ -184,7 +189,7 @@ def generate_corner_plot(sample_files, out, params, truths=None, cutoff=0, frac=
         ### get columns of array corresponding to actual parameter samples
         x = samples[:,[index_dict[name] for name in params]]
         ### shift all the lnL values up so that we don't have rounding issues
-        lnL += abs(np.max(lnL))
+        lnL -= np.max(lnL)
         L = np.exp(lnL)
         ### calculate weights
         weights = L * p / p_s
@@ -197,12 +202,17 @@ def generate_corner_plot(sample_files, out, params, truths=None, cutoff=0, frac=
         x = x[mask]
         x = x[mask2]
         color = color_list[i % len(color_list)]
-        #if cl == None: #'default' or (len(cl) > 0 and cl[0] == 'default'):
-        #    levels = None
-        #else:
-        #    levels = []
-        #    for level in cl:
-        #        levels.append(level)
+        for i in range(len(params)):
+            if params[i] == 'log_mej_red':
+                params[i] = 'mej_red'
+                x[:,i] = 10.0**x[:,i]
+            elif params[i] == 'log_mej_purple':
+                params[i] = 'mej_purple'
+                x[:,i] = 10.0**x[:,i]
+            elif params[i] == 'log_mej_blue':
+                params[i] = 'mej_blue'
+                x[:,i] = 10.0**x[:,i]
+
         labels = []
         for param in params:
             if param in tex_dict:
