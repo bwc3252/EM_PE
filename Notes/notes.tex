@@ -6,6 +6,9 @@
 
 \usepackage[margin=1in]{geometry}
 
+\usepackage{color}
+\newcommand\editremark[1]{{\color{red}#1}}
+
 \begin{document}
 
 \title{EM PE Implementation and Usage}
@@ -78,9 +81,11 @@ The total flux density is the sum of the flux densities of the individual compon
 
 \subsection{Likelihood Function}
 
-For lightcurve magnitude $x(t)$, model value $m(t; \theta)$ computed with parameters $\theta$, and errors $\delta x(t)$ and $\delta m(t)$, the log-likelihood is
+\editremark{The following likelihood function is just copied from \cite{Villar_2017}}
+
+For lightcurve magnitudes $x_i$, model values $m_i$ computed with parameters $\theta$, data uncertainties $\sigma_i$, and a scatter term $\sigma$, fit as a parameter, that accounts for additional uncertainty in the data or model, the log-likelihood is
 \begin{equation}
-    \ln \mathcal{L}(\theta) = -0.5 \sum \frac {(x(t) - m(t; \theta))^2} {\delta x(t)^2 + \delta m(t; \theta)^2}
+    \ln \mathcal{L}(\theta) = -0.5 \sum_{i=1}^n \left [ \frac {(x_i - m_i)^2} {\sigma_i^2 + \sigma^2} - \ln(2 \pi \sigma_i^2) \right ] - \frac {n} {2} \ln(2 \pi \sigma^2)
 \end{equation}
 where the sum is taken over every data point in every band used in the analysis.
 
@@ -132,3 +137,4 @@ This will produce plots similar to Figure \ref{fig:corner} and Figure \ref{fig:l
 \bibliography{bibliography}
 
 \end{document}
+
