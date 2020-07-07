@@ -62,9 +62,9 @@ from multiprocessing import Pool
 ### hacky fix because the import system is different when run as a package vs.
 ### run as a script
 try:
-    from models import model_dict, bounds_dict
+    from models import model_dict, param_dict
 except ModuleNotFoundError:
-    from .models import model_dict, bounds_dict
+    from .models import model_dict, param_dict
 
 import RIFT.integrators.MonteCarloEnsemble as monte_carlo_integrator
 
@@ -81,12 +81,11 @@ def _parse_command_line_args():
     parser.add_argument('--min', default=20, type=int, help='Minimum number of integrator iterations')
     parser.add_argument('--max', default=20, type=int, help='Maximum number of integrator iterations')
     parser.add_argument('--out', help='Location to store posterior samples')
-    parser.add_argument('--ncomp', type=int, default=1, help='Number of Gaussian components for integrator')
+    parser.add_argument('--ncomp', action='append', nargs=2, help='Number of Gaussian components for a given dimension')
     parser.add_argument('--fixed-param', action='append', nargs=2, help='Parameters with fixed values')
     parser.add_argument('--estimate-dist', action="store_true", help='Estimate distance')
     parser.add_argument('--epoch', type=int, default=100, help='Iterations before resetting sampling distributions')
     parser.add_argument('--correlate-dims', action='append', nargs='+', help='Parameters to group together')
-    #parser.add_argument('--burn-in', nargs=2, help='Number or iterations to use as burn-in and number of samples to start with per band')
     parser.add_argument('--burn-in', type=int, help='Number or iterations to use as burn-in')
     parser.add_argument('--beta-start', type=float, default=1.0, help='Initial beta value: if burn-in is set, 0 < beta <= 1 is multiplied by lnL for every iteration of burn-in')
     parser.add_argument('--keep-npts', type=int, help='Store the n highest-likelihood samples')
@@ -119,7 +118,7 @@ class sampler:
         List of [param_name, value] pairs
     '''
     def __init__(self, data_loc, m, files, out, v=True, L_cutoff=0, min_iter=20,
-                 max_iter=20, ncomp=1, fixed_params=None,
+                 max_iter=20, ncomp=None, fixed_params=None,
                  estimate_dist=True, epoch=5, correlate_dims=None, burn_in_length=None,
                  beta_start=1.0, keep_npts=None, nprocs=1):
         ### parameters passed in from user or main()
@@ -131,7 +130,6 @@ class sampler:
         self.L_cutoff = L_cutoff
         self.min_iter = min_iter
         self.max_iter = max_iter
-        self.ncomp = ncomp
         self.estimate_dist = estimate_dist
         self.epoch = epoch
         self.fixed_params = {}
@@ -142,16 +140,21 @@ class sampler:
         self.beta_start = beta_start
         self.keep_npts = keep_npts
         self.nprocs = nprocs
+        if ncomp is None:
+            self.ncomp = 1
+        else:
+            self.ncomp = {name:int(nc) for [name, nc] in ncomp}
 
         ### convert types for fixed params, make it a dict
         if fixed_params is not None:
-            for [name, value]  in fixed_params:
+            for [name, value] in fixed_params:
                 self.fixed_params[name] = float(value)
 
         ###variables to store
         self.data = None
         self.bands_used = None
         self.models = []
+        self.params = None
         self.ordered_params = None
         self.bounds = None
         self.t_bounds = None
@@ -185,10 +188,12 @@ class sampler:
             self.models.append(model)
             ordered_params = [] # keep track of all parameters used
             bounds = [] # bounds for each parameter
+            params = {}
             for param in model.param_names:
                 if param not in ordered_params and param not in self.fixed_params:
                     ordered_params.append(param)
-                    bounds.append(bounds_dict[param])
+                    params[param] = param_dict[param]()
+                    bounds.append([params[param].llim, params[param].rlim])
         t_bounds = [np.inf, -1 * np.inf] # tmin and tmax for each band
         for band in self.bands_used:
             t = self.data[band][0]
@@ -196,12 +201,24 @@ class sampler:
             t_bounds[1] = max(max(t), t_bounds[1])
         if self.estimate_dist:
             ordered_params.append('dist')
-            bounds.append(bounds_dict['dist'])
-        if self.v:
-            print('finished')
+            params["dist"] = param_dict["dist"]()
+            bounds.append([params["dist"].llim, params["dist"].rlim])
+        self.params = params
         self.ordered_params = ordered_params
         self.bounds = bounds
         self.t_bounds = t_bounds
+        if self.v:
+            print('finished')
+
+    def _prior(self, sample_array):
+        n, m = sample_array.shape
+        ret = np.ones(n)
+        index_dict = dict(zip(self.ordered_params, range(len(self.ordered_params))))
+        ### evaluate the prior for each parameter
+        for p in self.ordered_params:
+            x = sample_array[:,index_dict[p]]
+            ret *= self.params[p].prior(x)
+        return ret.reshape((n, 1))
 
     def _evaluate_lnL(self, params, model):
         temp_data = {} # used to hold model data and squared model error
@@ -227,17 +244,9 @@ class sampler:
             m = temp_data[band][0]
             m_err = temp_data[band][1]
             diff = x - m
-            #if self.burn_in_length is not None and self.iteration < self.burn_in_length:
-            #    npts = int(self.burn_in_start + (self.iteration / self.burn_in_length) * (diff.size - self.burn_in_start))
-            #    if npts < diff.size:
-            #        ind = np.random.choice(diff.size, size=self.burn_in_npts, replace=False)
-            #        diff = diff[ind]
-            #        err = err[ind]
-            #        #m_err_squared = m_err_squared[ind]
-            #        #m_err_squared = m_err_squared[ind] # FIXME fix this when the models start actually having error bars
             npts_total += diff.size
-            lnL += np.sum(diff**2 / (err**2 + m_err**2) + np.log(2.0 * np.pi * (err**2 + m_err**2)))
-        return -0.5 * lnL# + (npts_total / 2.0) * np.log(2.0 * np.pi * m_err**2)
+            lnL += np.sum(diff**2 / (err**2 + m_err**2) - np.log(2.0 * np.pi * err**2))
+        return -0.5 * lnL - (npts_total / 2.0) * np.log(2.0 * np.pi * m_err**2)
 
     def _integrand_subprocess(self, arg):
         model, samples = arg
@@ -279,12 +288,12 @@ class sampler:
             print('Generating posterior samples')
             sys.stdout.flush()
         dim = len(self.ordered_params) # number of dimensions
+        ### dictionary mapping parameter names to ordered_params index
+        param_ind = dict(zip(self.ordered_params, range(dim)))
         if self.correlate_dims is None:
             ### assume separately-sampled dimensions
             gmm_dict = {(i,):None for i in range(dim)}
         else:
-            ### dictionary mapping parameter names to ordered_params index
-            param_ind = dict(zip(self.ordered_params, range(dim)))
             ### make a flattened version of correlate_dims
             correlated_params = [item for sublist in self.correlate_dims for item in sublist]
             ### add the correlated dimensions to the gmm_dict
@@ -293,10 +302,23 @@ class sampler:
             for p in self.ordered_params:
                 if p not in correlated_params:
                     gmm_dict[(param_ind[p],)] = None
+        if self.ncomp == 1:
+            ncomp = 1
+        else: # take care of multi-component GMMs
+            ### basically just copy gmm_dict (except map tuples to 1 instead of None)
+            ncomp = {}
+            for ind_tuple in gmm_dict:
+                ncomp[ind_tuple] = 1
+            for p in self.ncomp.keys():
+                ind = param_ind[p]
+                for ind_tuple in ncomp.keys():
+                    if ind in ind_tuple:
+                        ncomp[ind_tuple] = self.ncomp[p]
+                        break
         ### initialize and run the integrator
-        integrator = monte_carlo_integrator.integrator(dim, self.bounds, gmm_dict, self.ncomp,
+        integrator = monte_carlo_integrator.integrator(dim, self.bounds, gmm_dict, ncomp,
                         proc_count=None, L_cutoff=self.L_cutoff, use_lnL=True,
-                        user_func=sys.stdout.flush())
+                        user_func=sys.stdout.flush(), prior=self._prior)
         integrator.integrate(self._integrand, min_iter=self.min_iter, max_iter=self.max_iter, 
                 progress=self.v, epoch=self.epoch)
         ### make the array of samples

@@ -7,9 +7,9 @@ from .model import model_base
 class kilonova_3c(model_base):
     def __init__(self):
         name = "kilonova_3c"
-        param_names = ["log_mej_red",
-                       "log_mej_purple",
-                       "log_mej_blue",
+        param_names = ["mej_red",
+                       "mej_purple",
+                       "mej_blue",
                        "vej_red",
                        "vej_purple",
                        "vej_blue",
@@ -85,12 +85,11 @@ class kilonova_3c(model_base):
         self.T_photo = []
 
         ### for each component, compute photosphere radius and temperature
-        for log_mej, vej, Tc, kappa in zip(
-                [params["log_mej_red"], params["log_mej_purple"], params["log_mej_blue"]],
+        for mej, vej, Tc, kappa in zip(
+                [params["mej_red"], params["mej_purple"], params["mej_blue"]],
                 [params["vej_red"], params["vej_purple"], params["vej_blue"]],
                 [params["Tc_red"], params["Tc_purple"], params["Tc_blue"]],
                 [10.0, 3.0, 0.5]):
-            mej = 10.0**log_mej
             a = self.fa([mej, vej])[0]
             b = self.fb([mej, vej])[0]
             d = self.fd([mej, vej])[0]

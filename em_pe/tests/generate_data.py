@@ -31,6 +31,7 @@ parser.add_argument('--t0', type=float, default=0, help='Start time for event')
 parser.add_argument('--time-format', default='gps', help='Time format for t0 (gps or mjd)')
 parser.add_argument('--json', action='store_true', help='Export data in JSON format')
 parser.add_argument('--bns-params', action='store_true', help='Calculate EM parameters using BNS parameters')
+parser.add_argument('--sigma', type=float, default=0.0, help='Extra error estimate to be fit as a parameter')
 args = parser.parse_args()
 
 def convert_time(t0):
@@ -76,13 +77,13 @@ if args.orientation is not None:
 else:
     model = model_dict[args.m]()
 
-t_bounds = [args.tmin, args.tmax]
+t_bounds = [max(0.01, args.tmin), args.tmax]
 
 ### set model parameters
 model.set_params(params, t_bounds)
 
 ### generate times
-tdays = np.linspace(args.tmin, args.tmax, args.n)
+tdays = np.logspace(np.log10(args.tmin), np.log10(args.tmax), args.n)
 
 data_dict = {}
 
@@ -94,7 +95,7 @@ for band in model.bands:
         m += 5*(np.log10(dist*1e6) - 1)
     data = np.empty((4, args.n))
     data[0] = tdays + delta_t
-    data[2] = m + np.random.uniform(-1 * args.err, args.err, args.n) # generate errors
+    data[2] = m + np.random.normal(loc=0.0, scale=args.err, size=args.n) + np.random.normal(loc=0.0, scale=args.sigma, size=args.n)# generate errors
     data[3] = np.ones(args.n) * args.err
     data_dict[band] = data
 

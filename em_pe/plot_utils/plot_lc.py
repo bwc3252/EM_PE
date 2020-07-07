@@ -80,9 +80,10 @@ def _parse_command_line_args():
     parser.add_argument('--lc-file', action='append', help='Actual lightcurve data to plot (in same order as posterior sample files)')
     parser.add_argument('--b', action='append', help='Bands to plot (in same order as posterior sample files)')
     parser.add_argument('--fixed-param', action='append', nargs=2, help='Fixed parameters (i.e. parameters without posterior samples)')
+    parser.add_argument('--log-time', action='store_true', help='Use a log scale for time axis')
     return parser.parse_args()
 
-def generate_lc_plot(out, b, tmin, tmax, m=None, sample_file=None, lc_file=None, fixed_params=None):
+def generate_lc_plot(out, b, tmin, tmax, m=None, sample_file=None, lc_file=None, fixed_params=None, log_time=False):
     '''
     Generate a lightcurve plot
 
@@ -183,7 +184,8 @@ def generate_lc_plot(out, b, tmin, tmax, m=None, sample_file=None, lc_file=None,
             lc = lc[:,2]
             plt.errorbar(t, lc, yerr=err, fmt="none", capsize=2, color=color)
     plt.gca().invert_yaxis()
-    #plt.xscale('log')
+    if log_time:
+        plt.xscale('log')
     plt.ylabel('$m_{AB}$')
     plt.legend()
     plt.xlabel('Time (days)')
@@ -255,7 +257,8 @@ def main():
     if fixed_params is not None:
         for i in range(len(fixed_params)):
             fixed_params[i][1] = float(fixed_params[i][1])
-    generate_lc_plot(out, b, tmin, tmax, m=m, sample_file=sample_file, lc_file=lc_file, fixed_params=fixed_params)
+    log_time = args.log_time
+    generate_lc_plot(out, b, tmin, tmax, m=m, sample_file=sample_file, lc_file=lc_file, fixed_params=fixed_params, log_time=log_time)
 
 if __name__ == '__main__':
     main()
