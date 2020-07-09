@@ -1,5 +1,6 @@
 %\documentclass[aps,prb,twocolumn,groupedaddress,nofootinbib,floatfix]{revtex4}
 \documentclass{article}
+\usepackage{bm}
 \usepackage{mathtools}
 \usepackage{mathrsfs}
 \usepackage[parfill]{parskip}
@@ -72,20 +73,17 @@ The flux density at frequency $\nu$ is given in \cite{Metzger_2017}:
 where $D$ is the source distance.
 We use a fixed fiducial distance of $D = 10$ pc to calculate $F_\nu(t)$, then calculate AB magnitude with a distance modulus if necessary.
 
-For the single-component model $\kappa$ and $T_c$ are free parameters.
-For the two-component and three-component variations $\kappa$ takes a fixed value for each component and $T_c$ can either be fit to the data or fixed to any value specified by the user.
 To compute multi-component lightcurves we assume each component has a photosphere that evolves independently of the others.
 The total flux density is the sum of the flux densities of the individual components.
+The version of the model implemented in the code uses three components with fixed opacities (a blue component with $\kappa = 0.5$ cm$^2$ g$^{-1}$, a purple component with $\kappa = 3$, cm$^2$ g$^{-1}$ and a red component with $\kappa = 10$ cm$^2$ g$^{-1}$).
 
 \section{Parameter Estimation}
 
 \subsection{Likelihood Function}
 
-\editremark{The following likelihood function is just copied from \cite{Villar_2017}}
-
-For lightcurve magnitudes $x_i$, model values $m_i$ computed with parameters $\theta$, data uncertainties $\sigma_i$, and a scatter term $\sigma$, fit as a parameter, that accounts for additional uncertainty in the data or model, the log-likelihood is
+For lightcurve magnitudes $x_i$, model values $m_i(\bm{\theta})$ computed with a parameter vector $\bm{\theta}$, data uncertainties $\sigma_i$, and a scatter term $\sigma$, fit as a parameter, that accounts for additional uncertainty in the data and model, the log-likelihood is
 \begin{equation}
-    \ln \mathcal{L}(\theta) = -0.5 \sum_{i=1}^n \left [ \frac {(x_i - m_i)^2} {\sigma_i^2 + \sigma^2} - \ln(2 \pi \sigma_i^2) \right ] - \frac {n} {2} \ln(2 \pi \sigma^2)
+    \ln \mathcal{L}(\bm{\theta}) = -0.5 \sum_{i=1}^n \left [ \frac {(x_i - m_i(\bm{\theta}))^2} {\sigma_i^2 + \sigma^2} + \ln(2 \pi (\sigma_i^2 + \sigma^2)) \right ]
 \end{equation}
 where the sum is taken over every data point in every band used in the analysis.
 
