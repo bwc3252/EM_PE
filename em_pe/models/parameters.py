@@ -27,16 +27,34 @@ class EjectaMassRed(Parameter):
 class EjectaMassPurple(Parameter):
     def __init__(self):
         Parameter.__init__(self, "mej_purple", 0.001, 0.1)
+    
+    def prior(self, x):
+        """
+        Use a log-uniform prior
+        """
+        return loguniform.pdf(x, self.llim, self.rlim) # FIXME should I be setting the loc and scale for this?
 
 
 class EjectaMassBlue(Parameter):
     def __init__(self):
         Parameter.__init__(self, "mej_blue", 0.001, 0.1)
+    
+    def prior(self, x):
+        """
+        Use a log-uniform prior
+        """
+        return loguniform.pdf(x, self.llim, self.rlim) # FIXME should I be setting the loc and scale for this?
 
 
 class EjectaMassRed(Parameter):
     def __init__(self):
         Parameter.__init__(self, "mej_red", 0.001, 0.1)
+    
+    def prior(self, x):
+        """
+        Use a log-uniform prior
+        """
+        return loguniform.pdf(x, self.llim, self.rlim) # FIXME should I be setting the loc and scale for this?
 
 
 class EjectaVelocityRed(Parameter):
@@ -58,33 +76,33 @@ class TcRed(Parameter):
     def __init__(self):
         Parameter.__init__(self, "Tc_red", 3500.0, 4000.0)
 
-    #def prior(self, x):
-    #    """
-    #    Use a log-uniform prior
-    #    """
-    #    return loguniform.pdf(x, self.llim, self.rlim) # FIXME should I be setting the loc and scale for this?
+    def prior(self, x):
+        """
+        Use a log-uniform prior
+        """
+        return loguniform.pdf(x, self.llim, self.rlim) # FIXME should I be setting the loc and scale for this?
 
 
 class TcPurple(Parameter):
     def __init__(self):
         Parameter.__init__(self, "Tc_purple", 1000.0, 1500.0)
 
-    #def prior(self, x):
-    #    """
-    #    Use a log-uniform prior
-    #    """
-    #    return loguniform.pdf(x, self.llim, self.rlim) # FIXME should I be setting the loc and scale for this?
+    def prior(self, x):
+        """
+        Use a log-uniform prior
+        """
+        return loguniform.pdf(x, self.llim, self.rlim) # FIXME should I be setting the loc and scale for this?
 
 
 class TcBlue(Parameter):
     def __init__(self):
         Parameter.__init__(self, "Tc_blue", 400.0, 1000.0)
 
-    #def prior(self, x):
-    #    """
-    #    Use a log-uniform prior
-    #    """
-    #    return loguniform.pdf(x, self.llim, self.rlim) # FIXME should I be setting the loc and scale for this?
+    def prior(self, x):
+        """
+        Use a log-uniform prior
+        """
+        return loguniform.pdf(x, self.llim, self.rlim) # FIXME should I be setting the loc and scale for this?
 
 class Sigma(Parameter):
     def __init__(self):

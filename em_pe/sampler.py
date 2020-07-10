@@ -245,8 +245,8 @@ class sampler:
             m_err = temp_data[band][1]
             diff = x - m
             npts_total += diff.size
-            lnL += np.sum(diff**2 / (err**2 + m_err**2) - np.log(2.0 * np.pi * err**2))
-        return -0.5 * lnL - (npts_total / 2.0) * np.log(2.0 * np.pi * m_err**2)
+            lnL += np.sum(diff**2 / (err**2 + m_err**2) + np.log(2.0 * np.pi * (err**2 + m_err**2)))
+        return -0.5 * lnL
 
     def _integrand_subprocess(self, arg):
         model, samples = arg
