@@ -2,8 +2,7 @@
 
 Joint GW/EM parameter estimation.
 
-[Documentation](https://em-pe.readthedocs.io/en/latest/)
-(note that the documentation is outdated and does not reflect the current status of the code -- this will be fixed soon).
+More detailed documentation should be available soon.
 
 ## Installation
 

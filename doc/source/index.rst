@@ -13,8 +13,6 @@ EM PE Documentation
    sampler
    plot_utils
    parser
-   utils
-   low_level_utils
 
 Examples and Usage
 ------------------
