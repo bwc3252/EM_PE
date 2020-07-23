@@ -260,6 +260,8 @@ class sampler:
         return ret
 
     def _integrand(self, samples):
+        if self.v:
+            print("Iteration", self.iteration)
         if self.burn_in_length is not None and self.iteration < self.burn_in_length:
             beta = self.beta_start + (1.0 - self.beta_start) * (self.iteration / self.burn_in_length)
         else:
@@ -280,7 +282,8 @@ class sampler:
         ret[np.isnan(ret)] = -1 * np.inf
         self.iteration += 1
         ret *= beta
-        print("points with non-zero likelihood:", np.sum(np.exp(ret - np.max(ret)) > 0.0))
+        if self.v:
+            print("points with non-zero likelihood:", np.sum(np.exp(ret - np.max(ret)) > 0.0))
         return ret
 
     def _generate_samples(self):
