@@ -51,5 +51,5 @@ GW170817_kilonova_3c: directories
 	chmod u+x pe_runs/$@_$(shell date +%Y%m%d)/plot_lc.sh
 
 kilonova_3c_pp_plot: directories
-	python3 ${EM_PE_INSTALL_DIR}/scripts/pp_plot_helper.py --m kilonova_3c --directory pe_runs/ --name pp_plot --npts 25 --sigma 0.1 --sampler-args "--correlate-dims mej_red vej_red --correlate-dims mej_purple vej_purple --correlate-dims mej_blue vej_blue"
+	python3 ${EM_PE_INSTALL_DIR}/scripts/pp_plot_helper.py --m kilonova_3c --directory pe_runs/ --name pp_plot --npts 25 --sigma 0.1 --sampler-args "--estimate-dist --correlate-dims mej_red vej_red --correlate-dims mej_purple vej_purple --correlate-dims mej_blue vej_blue"
 	chmod u+x pe_runs/pp_plot/run.sh
