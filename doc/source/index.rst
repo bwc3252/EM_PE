@@ -13,8 +13,6 @@ EM PE Documentation
    sampler
    plot_utils
    parser
-   utils
-   low_level_utils
 
 Examples and Usage
 ------------------
@@ -23,21 +21,26 @@ Makefile Examples
 ^^^^^^^^^^^^^^^^^
 
 A Makefile is provided to generate bash scripts for testing and common PE tasks.
-For example, to do a PE run using GW170817 data and the ``woko2017`` model,
-run::
+For example, to generate fake data from the kilonova model and set up a PE run
+to recover the parameters, run::
 
-    $ make GW170817_woko2017_fixed_dist
+    $ make test_kilonova_3c
 
 To run the parameter estimation and plotting codes::
 
-    $ cd pe_runs/GW170817_woko2017_fixed_dist
-    $ sh sample.sh
-    $ sh plot_corner.sh
-    $ sh plot_lc.sh
+    $ cd pe_runs/test_kilonova_3c*/
+    $ ./sample.sh
+    $ ./plot_corner.sh
+    $ ./plot_lc.sh
+
+The default settings assume `sample.sh` is being run on a machine with a large
+number of CPU cores available, and as such will evaluate the likelihood in 8
+parallel processes. The code runs on smaller machines as well, but the `--nprocs`
+argument set in `sample.sh` should be set to something more appropriate.
 
 The corner plot for this example should look similar to this:
 
-.. image:: corner_r.png
+[example image coming soon]
 
 Using Log-Likelihood Function
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -48,8 +51,8 @@ internal log-likelihood function::
     from em_pe import sampler
 
     dat = "./"
-    m = "woko2017"
-    f = ["r.txt"]
+    m = "kilonova_3c"
+    f = ["g.txt", ...]
     out = "placeholder.txt"
 
     ### Initialize sampler
@@ -58,7 +61,7 @@ internal log-likelihood function::
     ### Log-likelihood function takes a dictionary mapping parameter
     ### names to values
 
-    params = {"mej":0.02, "vej":0.3, "dist":40.0}
+    params = {"mej_red":0.01, ...}
 
     ### Evaluate lnL
 
@@ -68,8 +71,6 @@ internal log-likelihood function::
 
     n = 100
 
-    params = {"mej":np.random.uniform(0.01, 0.04, n),
-              "vej":np.random.uniform(0.1, 0.3, n),
-              "dist":np.random.uniform(10.0, 80.0, n)}
+    params = {"mej_red":np.random.uniform(0.01, 0.04, n), ...}
 
     lnL = s.log_likelihood(params, vect=True)

@@ -2,13 +2,15 @@
 
 Joint GW/EM parameter estimation.
 
-[Documentation](https://em-pe.readthedocs.io/en/latest/)
-(note that the documentation is outdated and does not reflect the current status of the code -- this will be fixed soon).
+More detailed documentation should be available soon.
 
 ## Installation
 
 The integrator used for parameter estimation is implemented in RIFT.
 You can install it with pip: `$ pip3 install RIFT --user` or follow the instructions [here](https://github.com/oshaughn/research-projects-RIT/blob/master/INSTALL.md).
+
+Note: in its current form, the code expects a modified version of RIFT that's still in development.
+The standard installation of RIFT will most likely not currently work.
 
 Next, clone this repository:
 
