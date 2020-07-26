@@ -21,8 +21,8 @@ class Distance(Parameter):
 
 class EjectaMassRed(Parameter):
     def __init__(self):
-        #Parameter.__init__(self, "mej_red", 0.001, 0.1)
-        Parameter.__init__(self, "mej_red", 0.005, 0.015)
+        Parameter.__init__(self, "mej_red", 0.001, 0.1)
+        #Parameter.__init__(self, "mej_red", 0.005, 0.015)
     
     def prior(self, x):
         """
@@ -33,8 +33,8 @@ class EjectaMassRed(Parameter):
 
 class EjectaMassPurple(Parameter):
     def __init__(self):
-        #Parameter.__init__(self, "mej_purple", 0.001, 0.1)
-        Parameter.__init__(self, "mej_purple", 0.03, 0.052)
+        Parameter.__init__(self, "mej_purple", 0.001, 0.1)
+        #Parameter.__init__(self, "mej_purple", 0.03, 0.052)
     
     def prior(self, x):
         """
@@ -45,8 +45,8 @@ class EjectaMassPurple(Parameter):
 
 class EjectaMassBlue(Parameter):
     def __init__(self):
-        #Parameter.__init__(self, "mej_blue", 0.001, 0.1)
-        Parameter.__init__(self, "mej_blue", 0.015, 0.025)
+        Parameter.__init__(self, "mej_blue", 0.001, 0.1)
+        #Parameter.__init__(self, "mej_blue", 0.015, 0.025)
     
     def prior(self, x):
         """
@@ -57,19 +57,20 @@ class EjectaMassBlue(Parameter):
 
 class EjectaVelocityRed(Parameter):
     def __init__(self):
-        #Parameter.__init__(self, "vej_red", 0.1, 0.4)
-        Parameter.__init__(self, "vej_red", 0.05, 0.24)
+        Parameter.__init__(self, "vej_red", 0.1, 0.4)
+        #Parameter.__init__(self, "vej_red", 0.05, 0.24)
 
 
 class EjectaVelocityPurple(Parameter):
     def __init__(self):
-        #Parameter.__init__(self, "vej_purple", 0.1, 0.4)
-        Parameter.__init__(self, "vej_purple", 0.12, 0.18)
+        Parameter.__init__(self, "vej_purple", 0.1, 0.4)
+        #Parameter.__init__(self, "vej_purple", 0.12, 0.18)
 
 
 class EjectaVelocityBlue(Parameter):
     def __init__(self):
-        Parameter.__init__(self, "vej_blue", 0.22, 0.3)
+        Parameter.__init__(self, "vej_blue", 0.1, 0.4)
+        #Parameter.__init__(self, "vej_blue", 0.22, 0.3)
 
 
 class TcRed(Parameter):
