@@ -132,7 +132,9 @@ else:
 truths = []
 for param in model.param_names:
     truths.append(params[param])
+header = " ".join(model.param_names)
 if 'dist' in params:
     truths.append(params['dist'])
+    header += " dist"
 filename = args.out + 'test_truths.txt'
-np.savetxt(filename, truths)
+np.savetxt(filename, truths, header=header)

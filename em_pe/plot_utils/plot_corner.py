@@ -143,9 +143,12 @@ def generate_corner_plot(sample_files, out, params, truths=None, cutoff=0, frac=
     else:
         min_lnL = np.log(cutoff)
     if truths is not None:
-        truths = np.loadtxt(truths)
+        with open(truths) as f:
+            truths_header = f.readline().strip().split(' ')[1:]
+        truths_full = np.loadtxt(truths, skiprows=1)
+        truths_dict = {truths_header[i]:truths_full[i] for i in range(truths_full.size)}
     else:
-        truths = None
+        truths_dict = None
     fig_base = None
     i = 0
     total_samples = []
@@ -168,6 +171,11 @@ def generate_corner_plot(sample_files, out, params, truths=None, cutoff=0, frac=
         ### the parameter samples are in columns 4 and up, so to get their
         ### names look at the corresponding words in the header
         param_names = header[4:]
+        if truths_dict is not None:
+            truths = np.array([truths_dict[name] for name in param_names])
+            print(truths)
+        else:
+            truths = None
         index_dict = {}
         ### generate a dictionary that matches parameter names to column indices
         for index in range(4, len(header)):

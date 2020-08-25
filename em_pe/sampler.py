@@ -90,6 +90,7 @@ def _parse_command_line_args():
     parser.add_argument('--beta-start', type=float, default=1.0, help='Initial beta value: if burn-in is set, 0 < beta <= 1 is multiplied by lnL for every iteration of burn-in')
     parser.add_argument('--keep-npts', type=int, help='Store the n highest-likelihood samples')
     parser.add_argument('--nprocs', type=int, default=1, help='Number of parallel processes to use for likelihood evaluation')
+    parser.add_argument('--set-limit', action='append', nargs=3, help='Modify parameter limits (e.g. --set-limit mej_red 0.008 0.012)')
     return parser.parse_args()
 
 class sampler:
@@ -120,7 +121,7 @@ class sampler:
     def __init__(self, data_loc, m, files, out, v=True, L_cutoff=0, min_iter=20,
                  max_iter=20, ncomp=None, fixed_params=None,
                  estimate_dist=True, epoch=5, correlate_dims=None, burn_in_length=None,
-                 beta_start=1.0, keep_npts=None, nprocs=1):
+                 beta_start=1.0, keep_npts=None, nprocs=1, limits=None):
         ### parameters passed in from user or main()
         self.data_loc = data_loc
         self.m = m
@@ -140,6 +141,7 @@ class sampler:
         self.beta_start = beta_start
         self.keep_npts = keep_npts
         self.nprocs = nprocs
+        self.limits = limits if limits is not None else {}
         if ncomp is None:
             self.ncomp = 1
         else:
@@ -193,6 +195,9 @@ class sampler:
                 if param not in ordered_params and param not in self.fixed_params:
                     ordered_params.append(param)
                     params[param] = param_dict[param]()
+                    if param in self.limits.keys():
+                        llim, rlim = self.limits[param]
+                        params[param].update_limits(llim, rlim)
                     bounds.append([params[param].llim, params[param].rlim])
         t_bounds = [np.inf, -1 * np.inf] # tmin and tmax for each band
         for band in self.bands_used:
@@ -403,9 +408,13 @@ def main():
     beta_start = args.beta_start
     keep_npts = args.keep_npts
     nprocs = args.nprocs
+    if args.set_limit is not None:
+        limits = {name:(float(llim), float(rlim)) for (name, llim, rlim) in args.set_limit}
+    else:
+        limits = None
     s = sampler(data_loc, m, files, out, v, L_cutoff, min_iter, max_iter, ncomp, 
             fixed_params, estimate_dist, epoch, correlate_dims,
-            burn_in_length, beta_start, keep_npts, nprocs)
+            burn_in_length, beta_start, keep_npts, nprocs, limits)
     #        burn_in_length, burn_in_start, beta_start, keep_npts, nprocs)
     s.generate_samples()
 

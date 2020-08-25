@@ -28,7 +28,9 @@ params = m.param_names + ["dist"]
 
 fixed_params = {name:value for [name, value] in args.fixed_param} if args.fixed_param is not None else {}
 
-base_args = "--n 50 --err 0.2 --sigma " + args.sigma + " --time-format mjd --tmin 0.1 --tmax 30 --p sigma " + args.sigma + " "
+base_args = "--n 50 --err 0.2 --time-format mjd --tmin 0.1 --tmax 30 --p sigma "  + args.sigma + " "
+if args.sigma != "0.0":
+    base_args += "--sigma " + args.sigma + " "
 for p in fixed_params.keys():
     base_args += "--p " + p + " " + fixed_params[p] + " "
 
@@ -40,21 +42,25 @@ for p in params:
 commands = []
 
 for i in range(args.npts):
+    param_values = {}
     curr_dir = base_dir + str(i) + "/"
     if not os.path.exists(curr_dir):
         os.mkdir(curr_dir)
     command = "python3 ${EM_PE_INSTALL_DIR}/em_pe/tests/generate_data.py --m " + args.m + " --out " + str(i) + "/" + " " + base_args
     for p in variable_params.keys():
-        llim = variable_params[p].llim
-        rlim = variable_params[p].rlim
-        command += " --p " + p + " " + str(np.random.uniform(llim, rlim))
+        param_values[p] = variable_params[p].sample_from_prior(width=1.0)
+        command += " --p " + p + " " + str(param_values[p])
     commands.append(command)
     commands.append("python3 ${EM_PE_INSTALL_DIR}/em_pe/sampler.py --dat "
             + str(i) + "/" + " --m " + args.m + " -v --f g.txt --f r.txt --f "
-            + "i.txt --f z.txt --f y.txt --f J.txt --f H.txt --f K.txt --min 80"
-            + " --max 80 --out " + str(i) + "/" + "samples.txt"
-            + " --burn-in 10 --beta-start 0.01 --keep-npts 2000000 --nprocs 8 "
+            + "i.txt --f z.txt --f y.txt --f J.txt --f H.txt --f K.txt --min 40"
+            + " --max 40 --out " + str(i) + "/" + "samples.txt"
+            + " --burn-in 10 --beta-start 0.01 --keep-npts 100000 --nprocs 8 "
             + args.sampler_args)
+    for p in fixed_params.keys():
+        commands[-1] += " --fixed-param " + p + " " + str(fixed_params[p])
+    for p in variable_params.keys():
+        commands[-1] += " --set-limit " + p + " " + str(param_values[p] / 2.0) + " " + str(2.0 * param_values[p])
 
 with open(base_dir + "run.sh", "w") as f:
     f.write("\n".join(commands))
