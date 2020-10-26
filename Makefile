@@ -8,20 +8,13 @@ VEJ = 0.1
 MEJ_BLUE = 0.020
 MEJ_PURPLE = 0.050
 MEJ_RED = 0.010
-MEJ_POLAR = 0.015
-MEJ_EQ = 0.025
 VEJ_BLUE = 0.25
 VEJ_PURPLE = 0.15
 VEJ_RED = 0.15
-VEJ_POLAR = 0.25
-VEJ_EQ = 0.15
 TC_BLUE = 700.0
 TC_PURPLE = 1300.0
 TC_RED = 3700.0
-KAPPA_POLAR = 0.5
-KAPPA_EQ = 8.0
 SIGMA = 0.05
-THETA = 1.0
 DIST = 40.0
 M1 = 1.4
 M2 = 1.35
@@ -29,19 +22,8 @@ M2 = 1.35
 ### general injection parameters
 INJECTION_PARAMS = --n 100 --err 0.1 --sigma ${SIGMA} --time-format mjd --tmin ${TMIN} --tmax ${TMAX} --p dist ${DIST}
 EJECTA_PARAMS = --p mej ${MEJ} --p vej ${VEJ}
-EJECTA_PARAMS_2C = --p mej_polar ${MEJ_POLAR} --p mej_eq ${MEJ_EQ} --p vej_polar ${VEJ_POLAR} --p vej_eq ${VEJ_EQ} --p kappa_polar ${KAPPA_POLAR} --p kappa_eq ${KAPPA_EQ} --p theta ${THETA} --p sigma ${SIGMA}
 EJECTA_PARAMS_3C = --p mej_red ${MEJ_RED} --p mej_purple ${MEJ_PURPLE} --p mej_blue ${MEJ_BLUE} --p vej_red ${VEJ_RED} --p vej_purple ${VEJ_PURPLE} --p vej_blue ${VEJ_BLUE} --p Tc_red ${TC_RED} --p Tc_purple ${TC_PURPLE} --p Tc_blue ${TC_BLUE} --p sigma ${SIGMA}
 BNS_PARAMS = --p m1 ${M1} --p m2 ${M2}
-
-test_kilonova_2c: directories
-	mkdir -p pe_runs/$@_$(shell date +%Y%m%d)/
-	python3 em_pe/tests/generate_data.py --m kilonova_2c --out pe_runs/$@_$(shell date +%Y%m%d)/ ${INJECTION_PARAMS} ${EJECTA_PARAMS_2C}
-	echo "time python3 ${EM_PE_INSTALL_DIR}/em_pe/sampler.py --dat ./ --m kilonova_2c -v --f g.txt --f r.txt --f i.txt --f z.txt --f y.txt --f J.txt --f H.txt --f K.txt --min 40 --max 40 --out samples.txt --fixed-param dist 40.0 --correlate-dims mej_polar vej_polar mej_eq vej_eq --burn-in 10 --beta-start 0.01 --keep-npts 1000000 --nprocs 8 --set-limit mej_polar 0.01 0.02 --set-limit mej_eq 0.02 0.03 --fixed-param kappa_polar 0.5 --fixed-param kappa_eq 8.0" > pe_runs/$@_$(shell date +%Y%m%d)/sample.sh
-	echo "python3 ${EM_PE_INSTALL_DIR}/em_pe/plot_utils/plot_corner.py --posterior-samples samples.txt --truth-file test_truths.txt --out corner.png --p mej_polar --p mej_eq --p vej_polar --p vej_eq --p theta --p sigma" > pe_runs/$@_$(shell date +%Y%m%d)/plot_corner.sh
-	echo "python3 ${EM_PE_INSTALL_DIR}/em_pe/plot_utils/plot_lc.py --log-time --posterior-samples samples.txt --out lc.png --m kilonova_2c --tmin ${TMIN} --tmax ${TMAX} --lc-file g.txt --b g --lc-file r.txt --b r --lc-file i.txt --b i --lc-file z.txt --b z --lc-file y.txt --b y --lc-file J.txt --b J --lc-file H.txt --b H --lc-file K.txt --b K --fixed-param dist 40.0 --fixed-param kappa_polar 0.5 --fixed-param kappa_eq 8.0" > pe_runs/$@_$(shell date +%Y%m%d)/plot_lc.sh
-	chmod u+x pe_runs/$@_$(shell date +%Y%m%d)/sample.sh
-	chmod u+x pe_runs/$@_$(shell date +%Y%m%d)/plot_corner.sh
-	chmod u+x pe_runs/$@_$(shell date +%Y%m%d)/plot_lc.sh
 
 test_kilonova_3c: directories
 	mkdir -p pe_runs/$@_$(shell date +%Y%m%d)/
