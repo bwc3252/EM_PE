@@ -148,17 +148,27 @@ def generate_lc_plot(out, b, tmin, tmax, m=None, sample_file=None, lc_file=None,
             for [name, val] in fixed_params:
                 best_params[name] = val
         for band in b:
-            lc_array = np.empty((num_samples, n_pts))
             model.set_params(best_params, [tmin, tmax])
             best_lc = model.evaluate(t, band)[0] + 5.0 * (np.log10(best_params['dist'] * 1.0e6) - 1.0)
-            for row in range(num_samples):
-                params = dict(zip(param_names, param_array[row]))
+            if model.vectorized:
+                params = dict(zip(param_names, [param_array[:,i] for i in range(len(param_names))]))
                 if fixed_params is not None:
                     for [name, val] in fixed_params:
-                        params[name] = val
+                        params[name] = np.ones(num_samples) * val
                 model.set_params(params, [tmin, tmax])
-                dist = params['dist']
-                lc_array[row] = model.evaluate(t, band)[0] + 5.0 * (np.log10(dist * 1.0e6) - 1.0)
+                lc_array = model.evaluate(t, band)[0]
+                for i in range(num_samples):
+                    lc_array[i] += 5.0 * (np.log10(params["dist"][i] * 1.0e6) - 1.0)
+            else:
+                lc_array = np.empty((num_samples, n_pts))
+                for row in range(num_samples):
+                    params = dict(zip(param_names, param_array[row]))
+                    if fixed_params is not None:
+                        for [name, val] in fixed_params:
+                            params[name] = val
+                    model.set_params(params, [tmin, tmax])
+                    dist = params['dist']
+                    lc_array[row] = model.evaluate(t, band)[0] + 5.0 * (np.log10(dist * 1.0e6) - 1.0)
             if band in colors:
                 color = colors[band]
             else:

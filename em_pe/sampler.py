@@ -225,23 +225,40 @@ class sampler:
             ret *= self.params[p].prior(x)
         return ret.reshape((n, 1))
 
-    def _evaluate_lnL(self, params, model):
+    def _evaluate_lnL(self, params, model, vectorized=False):
         temp_data = {} # used to hold model data and squared model error
         for band in self.bands_used:
             temp_data[band] = [None, None]
         ### evaluate each model for the params, in the required bands
         model.set_params(params, self.t_bounds)
         for band in model.bands:
-            if band in self.bands_used:
-                t = self.data[band][:,0]
-                m, m_err = model.evaluate(t, band)
-                temp_data[band][0] = m
-                temp_data[band][1] = m_err
-                if 'dist' in params:
-                    dist = params['dist']
+            if band not in self.bands_used:
+                continue
+            t = self.data[band][:,0]
+            m, m_err = model.evaluate(t, band)
+            temp_data[band][0] = m
+            temp_data[band][1] = m_err
+            if 'dist' in params:
+                dist = params['dist']
+                if vectorized:
+                    for i in range(dist.size):
+                        temp_data[band][0][i] += 5.0 * (np.log10(dist[i] * 1.0e6) - 1.0)
+                else:
                     temp_data[band][0] += 5.0 * (np.log10(dist * 1.0e6) - 1.0)
+
+        if vectorized:
+            for band in self.bands_used:
+                x = self.data[band][:,2]
+                err = self.data[band][:,3]
+                m = temp_data[band][0]
+                m_err = temp_data[band][1]
+                lnL = np.empty(m.shape[0])
+                for i in range(m.shape[0]):
+                    diff = x - m[i]
+                    lnL[i] += np.sum(diff**2 / (err**2 + m_err[i]**2) + np.log(2.0 * np.pi * (err**2 + m_err[i]**2)))
+            return -0.5 * lnL
+
         lnL = 0
-        npts_total = 0
         ### calculate lnL
         for band in self.bands_used:
             x = self.data[band][:,2]
@@ -249,12 +266,22 @@ class sampler:
             m = temp_data[band][0]
             m_err = temp_data[band][1]
             diff = x - m
-            npts_total += diff.size
             lnL += np.sum(diff**2 / (err**2 + m_err**2) + np.log(2.0 * np.pi * (err**2 + m_err**2)))
         return -0.5 * lnL
 
     def _integrand_subprocess(self, arg):
         model, samples = arg
+
+        ### if the model is vectorized, use that
+        if model.vectorized:
+            params = {}
+            for i, p in enumerate(self.ordered_params):
+                params[p] = samples[:,i]
+            for p in self.fixed_params:
+                params[p] = self.fixed_params[p] * np.ones(samples.shape[0])
+            return self._evaluate_lnL(params, model, vectorized=True)
+
+        ### otherwise do it in a loop
         ret = np.empty(samples.shape[0])
         for i in range(samples.shape[0]):
             row = samples[i]

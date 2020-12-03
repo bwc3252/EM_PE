@@ -27,6 +27,7 @@ class model_base:
         self.bands = bands
         self.params = None
         self.t_bounds = None
+        self.vectorized = False # child classes should set this to True if vectorized evaluations are allowed
 
     def set_params(self, params, t_bounds):
         '''

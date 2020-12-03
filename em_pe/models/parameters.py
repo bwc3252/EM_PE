@@ -56,6 +56,16 @@ class EjectaMassBlue(LogUniformPriorParameter):
         LogUniformPriorParameter.__init__(self, "mej_blue", 0.001, 0.1)
 
 
+class DynamicalEjectaMass(LogUniformPriorParameter):
+    def __init__(self):
+        LogUniformPriorParameter.__init__(self, "mej_dyn", 0.001, 0.1)
+
+
+class WindEjectaMass(LogUniformPriorParameter):
+    def __init__(self):
+        LogUniformPriorParameter.__init__(self, "mej_wind", 0.001, 0.1)
+
+
 class EjectaVelocityRed(UniformPriorParameter):
     def __init__(self):
         UniformPriorParameter.__init__(self, "vej_red", 0.1, 0.4)
@@ -64,6 +74,16 @@ class EjectaVelocityRed(UniformPriorParameter):
 class EjectaVelocityPurple(UniformPriorParameter):
     def __init__(self):
         UniformPriorParameter.__init__(self, "vej_purple", 0.1, 0.4)
+
+
+class DynamicalEjectaVelocity(UniformPriorParameter):
+    def __init__(self):
+        UniformPriorParameter.__init__(self, "vej_dyn", 0.05, 0.3)
+
+
+class WindEjectaVelocity(UniformPriorParameter):
+    def __init__(self):
+        UniformPriorParameter.__init__(self, "vej_wind", 0.05, 0.3)
 
 
 class EjectaVelocityBlue(UniformPriorParameter):
