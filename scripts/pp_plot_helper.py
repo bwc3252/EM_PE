@@ -28,7 +28,7 @@ params = m.param_names + ["dist"]
 
 fixed_params = {name:value for [name, value] in args.fixed_param} if args.fixed_param is not None else {}
 
-base_args = "--n 100 --err 0.2 --time-format mjd --tmin 0.1 --tmax 30 --p sigma "  + args.sigma + " "
+base_args = "--n 50 --err 0.2 --time-format mjd --tmin 0.1 --tmax 30 --p sigma "  + args.sigma + " "
 if args.sigma != "0.0":
     base_args += "--sigma " + args.sigma + " "
 for p in fixed_params.keys():

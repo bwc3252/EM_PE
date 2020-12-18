@@ -44,7 +44,7 @@ test_kilonova_3c: directories
 test_kn_interp: directories
 	mkdir -p pe_runs/$@_$(shell date +%Y%m%d)/
 	python3 em_pe/tests/generate_data.py --m kn_interp --out pe_runs/$@_$(shell date +%Y%m%d)/ ${INJECTION_PARAMS_INTERP} ${EJECTA_PARAMS_INTERP}
-	echo "time python3 -u ${EM_PE_INSTALL_DIR}/em_pe/sampler.py --dat ./ --m kn_interp -v --f g.txt --f r.txt --f i.txt --f z.txt --f y.txt --f J.txt --f H.txt --f K.txt --min 40 --max 40 --out samples.txt --fixed-param dist 40.0 --burn-in 10 --beta-start 0.01 --keep-npts 1000000" > pe_runs/$@_$(shell date +%Y%m%d)/sample.sh
+	echo "time python3 -u ${EM_PE_INSTALL_DIR}/em_pe/sampler.py --dat ./ --m kn_interp -v --f g.txt --f r.txt --f i.txt --f z.txt --f y.txt --f J.txt --f H.txt --f K.txt --min 40 --max 40 --out samples.txt --fixed-param dist 40.0 --burn-in 10 --beta-start 0.005 --keep-npts 1000000 --set-limit mej_dyn 0.01 0.03 --set-limit mej_wind 0.015 0.035 --correlate-dims mej_dyn vej_dyn --correlate-dims mej_wind vej_wind" > pe_runs/$@_$(shell date +%Y%m%d)/sample.sh
 	echo "python3 ${EM_PE_INSTALL_DIR}/em_pe/plot_utils/plot_corner.py --posterior-samples samples.txt --truth-file test_truths.txt --out corner.png --p mej_dyn --p vej_dyn --p mej_wind --p vej_wind" > pe_runs/$@_$(shell date +%Y%m%d)/plot_corner.sh
 	echo "python3 ${EM_PE_INSTALL_DIR}/em_pe/plot_utils/plot_lc.py --log-time --posterior-samples samples.txt --out lc.png --m kn_interp --tmin ${TMIN} --tmax 6.7 --lc-file g.txt --b g --lc-file r.txt --b r --lc-file i.txt --b i --lc-file z.txt --b z --lc-file y.txt --b y --lc-file J.txt --b J --lc-file H.txt --b H --lc-file K.txt --b K --fixed-param dist 40.0" > pe_runs/$@_$(shell date +%Y%m%d)/plot_lc.sh
 	chmod u+x pe_runs/$@_$(shell date +%Y%m%d)/sample.sh
@@ -76,9 +76,25 @@ GW170817_kn_interp: directories
 	chmod u+x pe_runs/$@_$(shell date +%Y%m%d)/plot_corner.sh
 	chmod u+x pe_runs/$@_$(shell date +%Y%m%d)/plot_lc.sh
 
+kilonova_pp_plot: directories
+	python3 ${EM_PE_INSTALL_DIR}/scripts/pp_plot_helper.py --m kilonova --directory pe_runs/ --name pp_plot_$(shell date +%Y%m%d) --npts 100 --sigma 0.1 --sampler-args "--correlate-dims mej vej" --fixed-param dist ${DIST} --fixed-param kappa 1.0
+	echo "python3 ${EM_PE_INSTALL_DIR}/em_pe/plot_utils/pp_plot.py --m kilonova --name \"\" --directory ./" > pe_runs/pp_plot_$(shell date +%Y%m%d)/plot.sh
+	chmod u+x pe_runs/pp_plot_$(shell date +%Y%m%d)/run.sh
+	chmod u+x pe_runs/pp_plot_$(shell date +%Y%m%d)/plot.sh
+
 kilonova_3c_pp_plot: directories
 	chmod u+x pe_runs/pp_plot/run.sh
 	python3 ${EM_PE_INSTALL_DIR}/scripts/pp_plot_helper.py --m kilonova_3c --directory pe_runs/ --name pp_plot_$(shell date +%Y%m%d) --npts 100 --sigma 0.1 --sampler-args "--correlate-dims mej_red vej_red --correlate-dims mej_purple vej_purple --correlate-dims mej_blue vej_blue" --fixed-param dist ${DIST} --fixed-param Tc_red ${TC_RED} --fixed-param Tc_purple ${TC_PURPLE} --fixed-param Tc_blue ${TC_BLUE}
 	echo "python3 ${EM_PE_INSTALL_DIR}/em_pe/plot_utils/pp_plot.py --m kilonova_3c --name \"\" --directory ./" > pe_runs/pp_plot_$(shell date +%Y%m%d)/plot.sh
 	chmod u+x pe_runs/pp_plot_$(shell date +%Y%m%d)/run.sh
 	chmod u+x pe_runs/pp_plot_$(shell date +%Y%m%d)/plot.sh
+
+simulation_injection: directories
+	mkdir -p pe_runs/$@_$(shell date +%Y%m%d)/
+	python3 ${EM_PE_INSTALL_DIR}/scripts/setup_simulation_injection.py --input-sim ~/interpolator/kn_sims/Run_TP_dyn_all_lanth_wind2_all_md0.01_vd0.3_mw0.01_vw0.3_mags_2019-12-26.dat --tmin 0.1 --tmax 6.7 --n 30 --err 0.15 --out pe_runs/$@_$(shell date +%Y%m%d)/ --angular-bin 5 --dist 40.0
+	echo "time python3 -u ${EM_PE_INSTALL_DIR}/em_pe/sampler.py --dat ./ --m kn_interp -v --f g.txt --f r.txt --f i.txt --f z.txt --f y.txt --f J.txt --f H.txt --f K.txt --min 40 --max 40 --out samples.txt --fixed-param dist 40.0 --burn-in 10 --beta-start 0.005 --keep-npts 1000000" > pe_runs/$@_$(shell date +%Y%m%d)/sample.sh
+	echo "python3 ${EM_PE_INSTALL_DIR}/em_pe/plot_utils/plot_corner.py --posterior-samples samples.txt --out corner.png --p mej_dyn --p mej_wind --p vej_dyn --p vej_wind" > pe_runs/$@_$(shell date +%Y%m%d)/plot_corner.sh
+	echo "python3 ${EM_PE_INSTALL_DIR}/em_pe/plot_utils/plot_lc.py --log-time --posterior-samples samples.txt --out lc.png --m kn_interp --tmin ${TMIN} --tmax 6.7 --lc-file g.txt --b g --lc-file r.txt --b r --lc-file i.txt --b i --lc-file z.txt --b z --lc-file y.txt --b y --lc-file J.txt --b J --lc-file H.txt --b H --lc-file K.txt --b K --fixed-param dist 40.0" > pe_runs/$@_$(shell date +%Y%m%d)/plot_lc.sh
+	chmod u+x pe_runs/$@_$(shell date +%Y%m%d)/sample.sh
+	chmod u+x pe_runs/$@_$(shell date +%Y%m%d)/plot_corner.sh
+	chmod u+x pe_runs/$@_$(shell date +%Y%m%d)/plot_lc.sh

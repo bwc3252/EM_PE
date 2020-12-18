@@ -13,7 +13,12 @@ parser = argparse.ArgumentParser(description="Script to generate PP plot")
 parser.add_argument("--m", help="Model to use")
 parser.add_argument("--directory", help="PP plot run directory")
 parser.add_argument("--name", help="Name")
+parser.add_argument("--exclude-param", action="append", help="parameter to exclude from plot")
+parser.add_argument("--exclude-dir", action="append", help="Exclude a run by directory name")
 args = parser.parse_args()
+
+exclude_params = args.exclude_param if args.exclude_param is not None else []
+exclude_dir = args.exclude_dir if args.exclude_dir is not None else []
 
 eff_samp_cutoff = 10.0
 
@@ -33,6 +38,7 @@ tex_dict = {'mej':'$m_{ej}$',
             'mej_red':'$m_{ej}$ [red]',
             'mej_purple':'$m_{ej}$ [purple]',
             'mej_blue':'$m_{ej}$ [blue]',
+            'vej':'$v_{ej}$',
             'vej_red':'$v_{ej}$ [red]',
             'vej_purple':'$v_{ej}$ [purple]',
             'vej_blue':'$v_{ej}$ [blue]',
@@ -40,6 +46,7 @@ tex_dict = {'mej':'$m_{ej}$',
             'Tc_purple':'Tc [purple]',
             'Tc_blue':'Tc [blue]',
             'dist':'Distance',
+            'kappa':'$\kappa$',
             'sigma':'$\\sigma$'
 }
 
@@ -62,7 +69,7 @@ dir_list = []
 
 for d in os.listdir(base_dir):
     curr_dir = base_dir + d + "/"
-    if not os.path.isdir(curr_dir) or "samples.txt" not in os.listdir(curr_dir):
+    if not os.path.isdir(curr_dir) or "samples.txt" not in os.listdir(curr_dir) or curr_dir in exclude_dir or d in exclude_dir:
         continue
     print("reading samples from", curr_dir)
     s = np.loadtxt(curr_dir + "samples.txt")
@@ -85,6 +92,7 @@ for d in os.listdir(base_dir):
     weights /= np.sum(weights)
     for i in range(3, len(header)):
         p = header[i]
+        if p in exclude_params: continue
         if p not in params_used:
             cache[p] = {"CDF":[], "true":[], "ML":[]}
             params_used.add(p)
@@ -106,18 +114,22 @@ out_dict = {
 plt.figure(figsize=(8, 8))
 
 markers = {
+        "mej":"x",
         "mej_red":"x",
         "mej_purple":"x",
         "mej_blue":"x",
+        "vej":"o",
         "vej_red":"o",
         "vej_purple":"o",
         "vej_blue":"o",
         "sigma":"+"
 }
 colors = {
+        "mej":"red",
         "mej_red":"red",
         "mej_purple":"purple",
         "mej_blue":"blue",
+        "vej":"blue",
         "vej_red":"red",
         "vej_purple":"purple",
         "vej_blue":"blue",
@@ -125,6 +137,7 @@ colors = {
 }
 
 for p in params_used:
+    if p in exclude_params: continue
     cdf = np.array(cache[p]["CDF"])
     ind = np.argsort(cdf[mask])
     j = 0.0
@@ -149,7 +162,7 @@ for p in params_used:
 
 xvals = np.linspace(0.0, 1.0, 100)
 plt.plot(xvals, xvals, "--", color="black")
-pvals_lims = binomial_credible_interval_default(xvals, npts_valid, nParams=len(params_used))
+pvals_lims = binomial_credible_interval_default(xvals, npts_valid, nParams=(len(params_used) + len(exclude_params)))
 plt.plot(xvals, pvals_lims[:,0], color='k', ls=':')
 plt.plot(xvals, pvals_lims[:,1], color='k', ls=':')
 

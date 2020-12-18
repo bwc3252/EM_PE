@@ -41,6 +41,11 @@ class Distance(UniformPriorParameter):
         UniformPriorParameter.__init__(self, "dist", 10.0, 100.0)
 
 
+class EjectaMass(LogUniformPriorParameter):
+    def __init__(self):
+        LogUniformPriorParameter.__init__(self, "mej", 0.001, 0.1)
+
+
 class EjectaMassRed(LogUniformPriorParameter):
     def __init__(self):
         LogUniformPriorParameter.__init__(self, "mej_red", 0.001, 0.1)
@@ -64,6 +69,11 @@ class DynamicalEjectaMass(LogUniformPriorParameter):
 class WindEjectaMass(LogUniformPriorParameter):
     def __init__(self):
         LogUniformPriorParameter.__init__(self, "mej_wind", 0.001, 0.1)
+
+
+class EjectaVelocity(UniformPriorParameter):
+    def __init__(self):
+        UniformPriorParameter.__init__(self, "vej", 0.1, 0.4)
 
 
 class EjectaVelocityRed(UniformPriorParameter):
@@ -104,6 +114,11 @@ class TcPurple(LogUniformPriorParameter):
 class TcBlue(LogUniformPriorParameter):
     def __init__(self):
         LogUniformPriorParameter.__init__(self, "Tc_blue", 400.0, 1000.0)
+
+
+class Kappa(LogUniformPriorParameter):
+    def __init__(self):
+        LogUniformPriorParameter.__init__(self, "kappa", 0.1, 10.0)
 
 class Sigma(UniformPriorParameter):
     def __init__(self):
