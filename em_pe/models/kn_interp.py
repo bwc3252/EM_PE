@@ -1,6 +1,7 @@
 import numpy as np
 from scipy.interpolate import interp1d
 from joblib import load
+import os
 
 from .model import model_base
 
@@ -11,8 +12,11 @@ class kn_interp(model_base):
         bands = ["g", "r", "i", "z", "y", "J", "H", "K"]
         model_base.__init__(self, name, param_names, bands)
         self.vectorized = True
-
-        full_times = np.loadtxt("/home/benjamin.champion/interpolator/times.dat")
+        
+        interp_loc = os.environ["INTERP_LOC"]
+        if interp_loc[-1] != "/":
+            interp_loc += "/"
+        full_times = np.loadtxt(interp_loc + "times.dat")
 
         ind_use = np.arange(191) % 4 == 0 # use every 4th interpolator
     
@@ -33,7 +37,7 @@ class kn_interp(model_base):
             # FIXME
             ## me: don't hardcode paths like this, it's just dumb
             ## also me: *hardcodes paths*
-            self.interpolators.append(load("/home/benjamin.champion/interpolator/saved_models/time_" + suffix + ".joblib"))
+            self.interpolators.append(load(interp_loc + "saved_models/time_" + suffix + ".joblib"))
         
         self.lmbda_dict = { # dictionary of wavelengths corresponding to bands
                 "u":354.3,
