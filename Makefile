@@ -3,8 +3,8 @@ directories:
 
 TMIN = 0.5
 TMAX = 20.0
-MEJ = 0.01
-VEJ = 0.1
+MEJ = 0.02
+VEJ = 0.2
 MEJ_BLUE = 0.020
 MEJ_PURPLE = 0.050
 MEJ_RED = 0.010
@@ -25,11 +25,21 @@ M2 = 1.35
 
 ### general injection parameters
 INJECTION_PARAMS = --n 50 --err 0.1 --sigma ${SIGMA} --time-format mjd --tmin ${TMIN} --tmax ${TMAX} --p dist ${DIST}
-EJECTA_PARAMS = --p mej ${MEJ} --p vej ${VEJ}
+EJECTA_PARAMS = --p mej ${MEJ} --p vej ${VEJ} --p kappa 1.0
 EJECTA_PARAMS_3C = --p mej_red ${MEJ_RED} --p mej_purple ${MEJ_PURPLE} --p mej_blue ${MEJ_BLUE} --p vej_red ${VEJ_RED} --p vej_purple ${VEJ_PURPLE} --p vej_blue ${VEJ_BLUE} --p Tc_red ${TC_RED} --p Tc_purple ${TC_PURPLE} --p Tc_blue ${TC_BLUE} --p sigma ${SIGMA}
 EJECTA_PARAMS_INTERP = --p mej_dyn ${MEJ_DYN} --p vej_dyn ${VEJ_DYN} --p mej_wind ${MEJ_WIND} --p vej_wind ${VEJ_WIND}
 INJECTION_PARAMS_INTERP = --n 25 --err 0.25 --time-format mjd --tmin ${TMIN} --tmax 6.7 --p dist ${DIST}
 BNS_PARAMS = --p m1 ${M1} --p m2 ${M2}
+
+test_kilonova: directories
+	mkdir -p pe_runs/$@_$(shell date +%Y%m%d)/
+	python3 em_pe/tests/generate_data.py --m kilonova --out pe_runs/$@_$(shell date +%Y%m%d)/ ${INJECTION_PARAMS} ${EJECTA_PARAMS}
+	echo "time python3 ${EM_PE_INSTALL_DIR}/em_pe/sampler.py --dat ./ --m kilonova -v --f g.txt --f r.txt --f i.txt --f z.txt --f y.txt --f J.txt --f H.txt --f K.txt --min 40 --max 40 --out samples.txt --fixed-param dist 40.0 --correlate-dims mej vej --burn-in 10 --beta-start 0.01 --keep-npts 2000000 --nprocs 4" > pe_runs/$@_$(shell date +%Y%m%d)/sample.sh
+	echo "python3 ${EM_PE_INSTALL_DIR}/em_pe/plot_utils/plot_corner.py --posterior-samples samples.txt --truth-file test_truths.txt --out corner.png --p mej --p vej --p kappa --p sigma" > pe_runs/$@_$(shell date +%Y%m%d)/plot_corner.sh
+	echo "python3 ${EM_PE_INSTALL_DIR}/em_pe/plot_utils/plot_lc.py --log-time --posterior-samples samples.txt --out lc.png --m kilonova --tmin ${TMIN} --tmax ${TMAX} --lc-file g.txt --b g --lc-file r.txt --b r --lc-file i.txt --b i --lc-file z.txt --b z --lc-file y.txt --b y --lc-file J.txt --b J --lc-file H.txt --b H --lc-file K.txt --b K --fixed-param dist 40.0" > pe_runs/$@_$(shell date +%Y%m%d)/plot_lc.sh
+	chmod u+x pe_runs/$@_$(shell date +%Y%m%d)/sample.sh
+	chmod u+x pe_runs/$@_$(shell date +%Y%m%d)/plot_corner.sh
+	chmod u+x pe_runs/$@_$(shell date +%Y%m%d)/plot_lc.sh
 
 test_kilonova_3c: directories
 	mkdir -p pe_runs/$@_$(shell date +%Y%m%d)/

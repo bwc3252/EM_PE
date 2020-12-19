@@ -1,48 +1,4 @@
 # -*- coding: utf-8 -*-
-'''
-Parse JSON
-----------
-Parse Open Astronomy Catalog (OAC) JSON files and save requested data.
-
-CLI Usage
-^^^^^^^^^
-Example::
-
-    $ python parse_json.py --f [JSON file] --b [band] --out [output dir]
-
-To see full command line parameter documentation::
-
-    $ python parse_json.py -h
-    usage: parse_json.py [-h] [--t0 T0] [--f F] [--b B] [--out OUT]
-                         [--maxpts MAXPTS] [--tmax TMAX]
-                         [--time_format TIME_FORMAT]
-
-    Parse Open Astronomy Catalog (OAC) JSON files
-
-    optional arguments:
-      -h, --help            show this help message and exit
-      --t0 T0               Initial time (t=0 for event)
-      --f F                 Filename for JSON file
-      --b B                 Data bands to store
-      --out OUT             Directory to save data to
-      --maxpts MAXPTS       Maximum number of points to keep for each band
-      --tmax TMAX           Upper bound for time points to keep
-      --time_format TIME_FORMAT
-                            Time format (MJD or GPS)
-
-Python API
-^^^^^^^^^^
-Example::
-
-    from em_pe.parser import parse_json
-
-    t0 = 1187008882.43
-    f = 'GW170817.json'
-    b = ['H', 'J']
-    out = './'
-
-    parse_json(t0, f, b, out)
-'''
 
 from __future__ import print_function
 import numpy as np
