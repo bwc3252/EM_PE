@@ -15,7 +15,7 @@ To use the interpolated kilonova model, you'll need to set an environment variab
 For example:
 
 ```bash
-$ export INTERP_LOC="~/interpolator/"
+$ export INTERP_LOC=~/interpolator/
 ```
 
 Then, switch to the top-level directory, and install:
