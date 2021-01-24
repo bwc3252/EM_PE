@@ -35,6 +35,7 @@ def _parse_command_line_args():
     parser.add_argument('--correlate-dims', action='append', nargs='+', help='Parameters to group together')
     parser.add_argument('--burn-in', type=int, help='Number or iterations to use as burn-in')
     parser.add_argument('--beta-start', type=float, default=1.0, help='Initial beta value: if burn-in is set, 0 < beta <= 1 is multiplied by lnL for every iteration of burn-in')
+    parser.add_argument('--beta-end', type=float, default=1.0, help='')
     parser.add_argument('--keep-npts', type=int, help='Store the n highest-likelihood samples')
     parser.add_argument('--nprocs', type=int, default=1, help='Number of parallel processes to use for likelihood evaluation')
     parser.add_argument('--set-limit', action='append', nargs=3, help='Modify parameter limits (e.g. --set-limit mej_red 0.008 0.012)')
@@ -68,7 +69,7 @@ class sampler:
     def __init__(self, data_loc, m, files, out, v=True, L_cutoff=0, min_iter=20,
                  max_iter=20, ncomp=None, fixed_params=None,
                  estimate_dist=True, epoch=5, correlate_dims=None, burn_in_length=None,
-                 beta_start=1.0, keep_npts=None, nprocs=1, limits=None):
+                 beta_start=1.0, beta_end=1.0, keep_npts=None, nprocs=1, limits=None):
         ### parameters passed in from user or main()
         self.data_loc = data_loc
         self.m = m
@@ -86,6 +87,7 @@ class sampler:
         #self.burn_in_start = burn_in_start
         #self.burn_in_npts = burn_in_start
         self.beta_start = beta_start
+        self.beta_end = beta_end
         self.keep_npts = keep_npts
         self.nprocs = nprocs
         self.limits = limits if limits is not None else {}
@@ -109,6 +111,8 @@ class sampler:
         self.t_bounds = None
         self.iteration = 0
         self.iteration_size = 0
+
+        self.cumulative_lnL = np.array([])
 
         ### initialization things
         self._read_data()
@@ -242,9 +246,10 @@ class sampler:
         if self.v:
             print("Iteration", self.iteration)
         if self.burn_in_length is not None and self.iteration < self.burn_in_length:
-            beta = self.beta_start + (1.0 - self.beta_start) * (self.iteration / self.burn_in_length)
+            beta = np.exp((1.0 - self.iteration / (self.burn_in_length + 1.0)) * np.log(self.beta_start)
+                    + self.iteration * np.log(self.beta_end) / (self.burn_in_length + 1.0)) # evenly-spaced on log scale
         else:
-            beta = 1.0
+            beta = self.beta_end
         n, _ = samples.shape
         self.iteration_size = n
         if self.nprocs == 1:
@@ -260,6 +265,7 @@ class sampler:
         #print(np.min(ret), np.max(ret))
         ret[np.isnan(ret)] = -1 * np.inf
         self.iteration += 1
+        self.cumulative_lnL = np.append(self.cumulative_lnL, ret)
         ret *= beta
         if self.v:
             print("points with non-zero likelihood:", np.sum(np.exp(ret - np.max(ret)) > 0.0))
@@ -304,12 +310,13 @@ class sampler:
         integrator.integrate(self._integrand, min_iter=self.min_iter, max_iter=self.max_iter, 
                 progress=self.v, epoch=self.epoch)
         ### make the array of samples
-        samples = integrator.cumulative_values
+        #samples = integrator.cumulative_values
+        samples = self.cumulative_lnL.reshape((self.cumulative_lnL.size, 1))
         samples = np.append(samples, integrator.cumulative_p, axis=1)
         samples = np.append(samples, integrator.cumulative_p_s, axis=1)
         samples = np.append(samples, integrator.cumulative_samples, axis=1)
-        if self.burn_in_length is not None:
-            samples = samples[self.burn_in_length * self.iteration_size:]
+        #if self.burn_in_length is not None:
+        #    samples = samples[self.burn_in_length * self.iteration_size:]
         if self.keep_npts is not None and self.keep_npts < samples.shape[0]:
             ind_sorted = np.argsort(samples[:,0])
             samples = samples[ind_sorted[samples.shape[0] - self.keep_npts:]]
@@ -380,6 +387,7 @@ def main():
     #    burn_in_start = None
     burn_in_length = args.burn_in
     beta_start = args.beta_start
+    beta_end = args.beta_end
     keep_npts = args.keep_npts
     nprocs = args.nprocs
     if args.set_limit is not None:
@@ -388,7 +396,7 @@ def main():
         limits = None
     s = sampler(data_loc, m, files, out, v, L_cutoff, min_iter, max_iter, ncomp, 
             fixed_params, estimate_dist, epoch, correlate_dims,
-            burn_in_length, beta_start, keep_npts, nprocs, limits)
+            burn_in_length, beta_start, beta_end, keep_npts, nprocs, limits)
     #        burn_in_length, burn_in_start, beta_start, keep_npts, nprocs)
     s.generate_samples()
 

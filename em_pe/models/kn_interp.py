@@ -34,9 +34,6 @@ class kn_interp(model_base):
             if not ind_use[i]:
                 continue
             print("loading interpolator", suffix)
-            # FIXME
-            ## me: don't hardcode paths like this, it's just dumb
-            ## also me: *hardcodes paths*
             self.interpolators.append(load(interp_loc + "saved_models/time_" + suffix + ".joblib"))
         
         self.lmbda_dict = { # dictionary of wavelengths corresponding to bands

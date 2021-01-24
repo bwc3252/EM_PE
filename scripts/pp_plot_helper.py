@@ -46,7 +46,7 @@ for i in range(args.npts):
     curr_dir = base_dir + str(i) + "/"
     if not os.path.exists(curr_dir):
         os.mkdir(curr_dir)
-    command = "python3 ${EM_PE_INSTALL_DIR}/em_pe/tests/generate_data.py --m " + args.m + " --out " + str(i) + "/" + " " + base_args
+    command = "python3 ${EM_PE_INSTALL_DIR}/scripts/generate_data.py --m " + args.m + " --out " + str(i) + "/" + " " + base_args
     for p in variable_params.keys():
         param_values[p] = variable_params[p].sample_from_prior(width=1.0)
         command += " --p " + p + " " + str(param_values[p])

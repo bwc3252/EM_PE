@@ -71,22 +71,28 @@ def generate_corner_plot(sample_files, out, params, truths=None, cutoff=0, frac=
                 #'log_mej_red':'$\\log(m_{ej} / M_\\odot)$ (red)',
                 'mej1':'$m_{ej1}$ $(M_\\odot)$',
                 'mej2':'$m_{ej2}$ $(M_\\odot)$',
-                'vej':'$v_{ej}$ $(v/c)$',
+                'vej':'$v_{ej} / c$',
                 'vej1':'$v_{ej1}$ $(v/c)$',
                 'vej2':'$v_{ej2}$ $(v/c)$',
                 'mej_red':'$m_{ej}$ [red] $(M_\\odot)$',
                 'mej_purple':'$m_{ej}$ [purple] $(M_\\odot)$',
                 'mej_blue':'$m_{ej}$ [blue] $(M_\\odot)$',
+                'mej_dyn':'$m_{ej}$ [dyn] $(M_\\odot)$',
+                'mej_wind':'$m_{ej}$ [wind] $(M_\\odot)$',
                 'vej_red':'$v_{ej} / c$ [red]',
                 'vej_purple':'$v_{ej} / c$ [purple]',
                 'vej_blue':'$v_{ej} / c$ [blue]',
+                'vej_dyn':'$v_{ej} / c$ [dyn]',
+                'vej_wind':'$v_{ej} / c$ [wind]',
                 'Tc_red':'Tc [red]',
                 'Tc_purple':'Tc [purple]',
                 'Tc_blue':'Tc [blue]',
                 'm1':'$m_1$ $(M_\\odot)$',
                 'm2':'$m_2$ $(M_\\odot)$',
                 'dist':'Distance (Mpc)',
-                'sigma':'$\\sigma$ (mag)'
+                'sigma':'$\\sigma$ (mag)',
+                'kappa':'$\kappa$ (cm$^2$ g$^{-1}$)',
+                'theta':'$\\theta$ (deg)'
                }
     if cutoff <= 0:
         min_lnL = -1 * np.inf
@@ -122,8 +128,7 @@ def generate_corner_plot(sample_files, out, params, truths=None, cutoff=0, frac=
         ### names look at the corresponding words in the header
         param_names = header[4:]
         if truths_dict is not None:
-            truths = np.array([truths_dict[name] for name in param_names])
-            print(truths)
+            truths = np.array([truths_dict[name] for name in params])
         else:
             truths = None
         index_dict = {}
@@ -155,10 +160,11 @@ def generate_corner_plot(sample_files, out, params, truths=None, cutoff=0, frac=
         ### throw out points with weight less than minimum weight
         mask2 = weights > min_weight
         print(np.sum(mask2), 'samples with weight >', min_weight)
-        print('Median weight:', np.median(weights))
+        print('Median weight of full sample set:', np.median(weights))
         weights = weights[mask2]
         x = x[mask]
         x = x[mask2]
+        print('Median weight of masked sample set:', np.median(weights))
         color = color_list[i % len(color_list)]
         for i in range(len(params)):
             if params[i] == 'log_mej_red':

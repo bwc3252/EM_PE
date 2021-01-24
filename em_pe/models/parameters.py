@@ -123,3 +123,7 @@ class Kappa(LogUniformPriorParameter):
 class Sigma(UniformPriorParameter):
     def __init__(self):
         UniformPriorParameter.__init__(self, "sigma", 0.0, 0.5)
+
+class Theta(UniformPriorParameter):
+    def __init__(self):
+        UniformPriorParameter.__init__(self, "theta", 0.0, 90.0)
