@@ -7,6 +7,8 @@ import sys
 import json
 from astropy.time import Time
 
+predefined_bands = ["g", "r", "i", "z", "y", "J", "H", "K"]
+
 def _parse_command_line_args():
     '''
     Parses and returns the command line arguments.
@@ -20,9 +22,11 @@ def _parse_command_line_args():
     parser.add_argument('--tmax', type=float, default=np.inf, help='Upper bound for time points to keep')
     parser.add_argument('--time-format', type=str, default='gps', help='Time format (MJD or GPS)')
     parser.add_argument('--telescopes', action='append', nargs='+', help='Telescopes to use (defaults to all)')
+    for b in predefined_bands:
+        parser.add_argument('--tmax-' + b, type=float, help="Upper bound for time in " + b + " band")
     return parser.parse_args()
 
-def _read_data(t0, file, bands, out, maxpts, tmax, telescopes):
+def _read_data(t0, file, bands, out, maxpts, tmax, telescopes, args):
     if telescopes is not None:
         telescopes = set(telescopes)
     name = file.split('/')[-1] # get rid of path except for filename
@@ -38,11 +42,16 @@ def _read_data(t0, file, bands, out, maxpts, tmax, telescopes):
         if 'band' in entry:
             band = entry['band']
             ### check that it's a band we want and that it has an error magnitude
-            if band in bands and 'e_magnitude' in entry and 'telescope' in entry and (telescopes is None or entry['telescope'] in telescopes):
+            if (band in bands and 'e_magnitude' in entry and 'telescope' in entry and 'source' in entry
+                and (telescopes is None or entry['telescope'] in telescopes)
+                and 'realization' not in entry):
                 ### [time, time error, magnitude, magnitude error]
                 to_append = np.array([[entry['time']], [0], [entry['magnitude']], [entry['e_magnitude']]]).astype(np.float)
                 to_append[0] -= t0
-                if to_append[0] < tmax:
+                tmax_here = tmax
+                if "tmax_" + band in args.keys() and args["tmax_" + band] is not None:
+                    tmax_here = min(tmax, args["tmax_" + band])
+                if to_append[0] < tmax_here:
                     data_dict[band] = np.append(data_dict[band], to_append, axis=1)
     for band in data_dict:
         data = data_dict[band]
@@ -67,7 +76,7 @@ def _convert_time(t0):
     t = Time(t0, format='gps')
     return t.mjd
 
-def parse_json(t0, file, bands, out, maxpts=np.inf, tmax=np.inf, gps_time=False, telescopes=None):
+def parse_json(t0, file, bands, out, maxpts=np.inf, tmax=np.inf, gps_time=False, telescopes=None, args={}):
     '''
     Parse JSON file.
 
@@ -89,12 +98,12 @@ def parse_json(t0, file, bands, out, maxpts=np.inf, tmax=np.inf, gps_time=False,
     '''
     if gps_time:
         t0 = _convert_time(t0)
-    data_dict = _read_data(t0, file, bands, out, maxpts, tmax, telescopes)
+    data_dict = _read_data(t0, file, bands, out, maxpts, tmax, telescopes, args)
     _save_data(out, data_dict)
 
 def main():
     args = _parse_command_line_args()
-    parse_json(args.t0, args.f, args.b, args.out, args.maxpts, args.tmax, (args.time_format == 'gps'), args.telescopes)
+    parse_json(args.t0, args.f, args.b, args.out, args.maxpts, args.tmax, (args.time_format == 'gps'), args.telescopes, vars(args))
 
 if __name__ == '__main__':
     main()
