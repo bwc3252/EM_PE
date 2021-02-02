@@ -156,6 +156,7 @@ def generate_corner_plot(sample_files, out, params, truths=None, cutoff=0, frac=
         L = np.exp(lnL)
         ### calculate weights
         weights = L * p / p_s
+        print("eff samp:", np.sum(weights) / np.max(weights))
         weights /= np.sum(weights)
         ### throw out points with weight less than minimum weight
         mask2 = weights > min_weight

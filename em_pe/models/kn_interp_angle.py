@@ -93,10 +93,9 @@ class kn_interp_angle(model_base):
         mags_err_interp = np.empty((self.params_array.shape[0], self.t_interp.size))
         
         for i in range(self.t_interp.size):
+            print("evaluating time step {} of {}".format(i + 1, self.t_interp.size))
             ### 0-30 angular bin
-            print("loading theta=0 interpolator, index {}".format(i))
             interpolator_0 = load(self.interpolators[0][i])
-            print("loading theta=30 interpolator, index {}".format(i))
             interpolator_30 = load(self.interpolators[30][i])
             if self.ind_0_30.size > 0:
                 mags_0, mags_err_0 = interpolator_0.GP.evaluate(self.params_array[self.ind_0_30])
@@ -111,7 +110,6 @@ class kn_interp_angle(model_base):
                 mags_err_interp[:,i][self.ind_0_30] = ((30.0 - self.theta[self.ind_0_30]) * mags_err_0 + (self.theta[self.ind_0_30] - 0.0) * mags_err_30) / (30.0)
             
             ### 30-60 angular bin
-            print("loading theta=60 interpolator, index {}".format(i))
             interpolator_60 = load(self.interpolators[60][i])
             if self.ind_30_60.size > 0:
                 mags_30, mags_err_30 = interpolator_30.GP.evaluate(self.params_array[self.ind_30_60])
@@ -126,7 +124,6 @@ class kn_interp_angle(model_base):
                 mags_err_interp[:,i][self.ind_30_60] = ((60.0 - self.theta[self.ind_30_60]) * mags_err_30 + (self.theta[self.ind_30_60] - 30.0) * mags_err_60) / (30.0)
 
             ### 60-75 angular bin
-            print("loading theta=75 interpolator, index {}".format(i))
             interpolator_75 = load(self.interpolators[75][i])
             if self.ind_60_75.size > 0:
                 mags_60, mags_err_60 = interpolator_60.GP.evaluate(self.params_array[self.ind_60_75])
@@ -141,7 +138,6 @@ class kn_interp_angle(model_base):
                 mags_err_interp[:,i][self.ind_60_75] = ((75.0 - self.theta[self.ind_60_75]) * mags_err_60 + (self.theta[self.ind_60_75] - 60.0) * mags_err_75) / (15.0)
 
             ### 75-90 angular bin
-            print("loading theta=90 interpolator, index {}".format(i))
             interpolator_90 = load(self.interpolators[90][i])
             if self.ind_75_90.size > 0:
                 mags_75, mags_err_75 = interpolator_75.GP.evaluate(self.params_array[self.ind_75_90])

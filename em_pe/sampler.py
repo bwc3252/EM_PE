@@ -102,6 +102,7 @@ class sampler:
                 self.fixed_params[name] = float(value)
 
         ###variables to store
+        self.integrator = None
         self.data = None
         self.bands_used = None
         self.models = []
@@ -220,6 +221,16 @@ class sampler:
             lnL += np.sum(diff**2 / (err**2 + m_err**2) + np.log(2.0 * np.pi * (err**2 + m_err**2)))
         return -0.5 * lnL
 
+    def _get_current_samples(self):
+        samples = self.cumulative_lnL.reshape((self.cumulative_lnL.size, 1))
+        samples = np.append(samples, self.integrator.cumulative_p, axis=1)
+        samples = np.append(samples, self.integrator.cumulative_p_s, axis=1)
+        samples = np.append(samples, self.integrator.cumulative_samples, axis=1)
+        if self.keep_npts is not None and self.keep_npts < samples.shape[0]:
+            ind_sorted = np.argsort(samples[:,0])
+            samples = samples[ind_sorted[samples.shape[0] - self.keep_npts:]]
+        return samples
+
     def _integrand_subprocess(self, arg):
         model, samples = arg
 
@@ -245,6 +256,12 @@ class sampler:
     def _integrand(self, samples):
         if self.v:
             print("Iteration", self.iteration)
+        #if self.iteration > 0:
+        #    header = 'lnL p p_s ' + ' '.join(self.ordered_params)
+        #    if self.v:
+        #        print("saving intermediate samples...")
+        #    fname = self.out.split(".")[0] + "_intermediate." + "".join(self.out.split(".")[1:])
+        #    np.savetxt(fname, self._get_current_samples(), header=header)
         if self.burn_in_length is not None and self.iteration < self.burn_in_length:
             beta = np.exp((1.0 - self.iteration / (self.burn_in_length + 1.0)) * np.log(self.beta_start)
                     + self.iteration * np.log(self.beta_end) / (self.burn_in_length + 1.0)) # evenly-spaced on log scale
@@ -304,25 +321,15 @@ class sampler:
                         ncomp[ind_tuple] = self.ncomp[p]
                         break
         ### initialize and run the integrator
-        integrator = monte_carlo_integrator.integrator(dim, self.bounds, gmm_dict, ncomp,
+        self.integrator = monte_carlo_integrator.integrator(dim, self.bounds, gmm_dict, ncomp,
                         proc_count=None, L_cutoff=self.L_cutoff, use_lnL=True,
                         user_func=sys.stdout.flush(), prior=self._prior)
-        integrator.integrate(self._integrand, min_iter=self.min_iter, max_iter=self.max_iter, 
+        self.integrator.integrate(self._integrand, min_iter=self.min_iter, max_iter=self.max_iter, 
                 progress=self.v, epoch=self.epoch)
         ### make the array of samples
-        #samples = integrator.cumulative_values
-        samples = self.cumulative_lnL.reshape((self.cumulative_lnL.size, 1))
-        samples = np.append(samples, integrator.cumulative_p, axis=1)
-        samples = np.append(samples, integrator.cumulative_p_s, axis=1)
-        samples = np.append(samples, integrator.cumulative_samples, axis=1)
-        #if self.burn_in_length is not None:
-        #    samples = samples[self.burn_in_length * self.iteration_size:]
-        if self.keep_npts is not None and self.keep_npts < samples.shape[0]:
-            ind_sorted = np.argsort(samples[:,0])
-            samples = samples[ind_sorted[samples.shape[0] - self.keep_npts:]]
         if self.v:
-            print('Integral result:', integrator.integral)
-        return samples
+            print('Integral result:', self.integrator.integral)
+        return self._get_current_samples()
 
     def generate_samples(self):
         '''
