@@ -16,18 +16,19 @@ class kn_interp_angle(model_base):
         interp_loc = os.environ["INTERP_LOC"]
         if interp_loc[-1] != "/":
             interp_loc += "/"
-        full_times = np.loadtxt(interp_loc + "times.dat")
+        #full_times = np.loadtxt(interp_loc + "times.dat")
         self.angles = [0, 30, 60, 75, 90]
 
-        ind_use = np.arange(191) % 8 == 0 # use every 8th interpolator
+        #ind_use = np.arange(191) % 1 == 0 # use every interpolator
     
         interpolator_suffixes = ["%03d" % i for i in range(191)]
 
         # force it to always use first and last interpolators
-        ind_use[0] = True
-        ind_use[-1] = True
+        #ind_use[0] = True
+        #ind_use[-1] = True
 
-        self.t_interp = full_times[ind_use]
+        #self.t_interp = full_times[ind_use]
+        self.t_interp_full = np.loadtxt(interp_loc + "times.dat")
 
         self.interpolators = {angle:[] for angle in self.angles}
 
@@ -40,8 +41,8 @@ class kn_interp_angle(model_base):
         
         ### rather than preload all the interpolators, just store their string names and load them on the fly
         for i, suffix in enumerate(interpolator_suffixes):
-            if not ind_use[i]:
-                continue
+            #if not ind_use[i]:
+            #    continue
             for angle in self.angles:
                 self.interpolators[angle].append(interp_loc + "saved_models_angle/ang" + str(angle) + "_time_" + suffix + ".joblib")
         
@@ -85,15 +86,31 @@ class kn_interp_angle(model_base):
 
 
     def evaluate(self, tvec_days, band):
+        print(band + " band:")
         mags_out = np.empty((self.params_array.shape[0], tvec_days.size))
         mags_err_out = np.empty((self.params_array.shape[0], tvec_days.size))
         self.params_array[:,4] = self.lmbda_dict[band]
 
-        mags_interp = np.empty((self.params_array.shape[0], self.t_interp.size))
-        mags_err_interp = np.empty((self.params_array.shape[0], self.t_interp.size))
+        ### find out which interpolators we actually need to use
+        ind_use = [False] * 191
+        t_interp = []
+        for t in tvec_days:
+            for i in range(190):
+                if self.t_interp_full[i] <= t < self.t_interp_full[i + 1]:
+                    if not ind_use[i]:
+                        ind_use[i] = True
+                        t_interp.append(self.t_interp_full[i])
+                    if not ind_use[i + 1]:
+                        ind_use[i + 1] = True
+                        t_interp.append(self.t_interp_full[i + 1])
+
+        t_interp = np.array(t_interp)
+        mags_interp = np.empty((self.params_array.shape[0], t_interp.size))
+        mags_err_interp = np.empty((self.params_array.shape[0], t_interp.size))
         
-        for i in range(self.t_interp.size):
-            print("evaluating time step {} of {}".format(i + 1, self.t_interp.size))
+        for i in range(t_interp.size):
+            if i == 0 or (i + 1) % 5 == 0:
+                print("  evaluating time step {} of {}".format(i + 1, t_interp.size))
             ### 0-30 angular bin
             interpolator_0 = load(self.interpolators[0][i])
             interpolator_30 = load(self.interpolators[30][i])
@@ -152,8 +169,8 @@ class kn_interp_angle(model_base):
                 mags_err_interp[:,i][self.ind_75_90] = ((90.0 - self.theta[self.ind_75_90]) * mags_err_75 + (self.theta[self.ind_75_90] - 75.0) * mags_err_90) / (15.0)
 
         for i in range(self.params_array.shape[0]):
-            mags_interpolator = interp1d(self.t_interp, mags_interp[i], fill_value="extrapolate")
-            mags_err_interpolator = interp1d(self.t_interp, mags_err_interp[i], fill_value="extrapolate")
+            mags_interpolator = interp1d(t_interp, mags_interp[i], fill_value="extrapolate")
+            mags_err_interpolator = interp1d(t_interp, mags_err_interp[i], fill_value="extrapolate")
             mags_out[i] = mags_interpolator(tvec_days)
             mags_err_out[i] = mags_err_interpolator(tvec_days)
         

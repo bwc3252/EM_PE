@@ -5,7 +5,7 @@ import argparse
 import sys
 
 parser = argparse.ArgumentParser(description='Combine multiple posterior sample files into a single file.')
-parser.add_argument('--input-file', action='append', help='Input posterior sample file (can provide multiple instances)')
+parser.add_argument('--input-file', nargs="*", help='Input posterior sample file (can provide multiple instances)')
 parser.add_argument('--output-fname', default='samples-combined.txt', help='Filename for output')
 parser.add_argument('--keep-npts', type=int, help='Store the n highest-likelihood samples')
 args = parser.parse_args()

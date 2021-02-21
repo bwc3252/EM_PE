@@ -256,12 +256,12 @@ class sampler:
     def _integrand(self, samples):
         if self.v:
             print("Iteration", self.iteration)
-        #if self.iteration > 0:
-        #    header = 'lnL p p_s ' + ' '.join(self.ordered_params)
-        #    if self.v:
-        #        print("saving intermediate samples...")
-        #    fname = self.out.split(".")[0] + "_intermediate." + "".join(self.out.split(".")[1:])
-        #    np.savetxt(fname, self._get_current_samples(), header=header)
+        if self.iteration > 0:
+            header = 'lnL p p_s ' + ' '.join(self.ordered_params)
+            if self.v:
+                print("saving intermediate samples...")
+            fname = self.out.split(".")[0] + "_intermediate" + str(self.iteration) + "." + "".join(self.out.split(".")[1:])
+            np.savetxt(fname, self._get_current_samples()[-self.iteration_size:], header=header)
         if self.burn_in_length is not None and self.iteration < self.burn_in_length:
             beta = np.exp((1.0 - self.iteration / (self.burn_in_length + 1.0)) * np.log(self.beta_start)
                     + self.iteration * np.log(self.beta_end) / (self.burn_in_length + 1.0)) # evenly-spaced on log scale
@@ -286,6 +286,7 @@ class sampler:
         ret *= beta
         if self.v:
             print("points with non-zero likelihood:", np.sum(np.exp(ret - np.max(ret)) > 0.0))
+        ret[np.isnan(ret)] = -np.inf
         return ret
 
     def _generate_samples(self):

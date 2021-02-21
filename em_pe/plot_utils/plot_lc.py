@@ -87,7 +87,7 @@ def generate_lc_plot(out, b, tmin, tmax, m=None, sample_file=None, lc_file=None,
             upper = _quantile(values, 0.95, weights)
             ### randomly sample some points in this range
             param_array[:,col - 3] = np.random.uniform(lower, upper, num_samples)
-        n_pts = 200
+        n_pts = 25
         t = np.logspace(np.log10(tmin), np.log10(tmax), n_pts)
         param_names = header[3:]
         best_params = dict(zip(param_names, best_params))
