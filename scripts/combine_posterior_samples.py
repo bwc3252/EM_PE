@@ -8,6 +8,8 @@ parser = argparse.ArgumentParser(description='Combine multiple posterior sample 
 parser.add_argument('--input-file', nargs="*", help='Input posterior sample file (can provide multiple instances)')
 parser.add_argument('--output-fname', default='samples-combined.txt', help='Filename for output')
 parser.add_argument('--keep-npts', type=int, help='Store the n highest-likelihood samples')
+parser.add_argument('--tempering-exp', default=1.0, type=float, help="Exponent for likelihoods")
+parser.add_argument('--max-lnL', default=np.inf, type=float, help="Maximum log-likelihood")
 args = parser.parse_args()
 
 if args.input_file is None:
@@ -24,6 +26,9 @@ out = np.concatenate(out, axis=0)
 with open(args.input_file[0], "r") as f:
     header = f.readline()[2:] # read the header, remove the "# " at the beginning
     header = header[:-1] # remove the '\n' at the end
+
+out = out[out[:,0] < args.max_lnL]
+out[:,0] *= args.tempering_exp
 
 if args.keep_npts is not None:
     ind_sorted = np.argsort(out[:,0])

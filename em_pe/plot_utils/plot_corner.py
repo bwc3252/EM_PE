@@ -28,10 +28,11 @@ def _parse_command_line_args():
     parser.add_argument('--cl', action='append', type=float, help='Adds a confidence level. Set to "default" for default contours')
     parser.add_argument('--combine', action='store_true', help='Generate a plot using ALL sample files specified')
     parser.add_argument('--min-weight', type=float, default=0.0, help='Minimum weight to keep')
+    parser.add_argument('--log-mass', action='store_true', help="Plot log10 of masses")
     return parser.parse_args()
 
 def generate_corner_plot(sample_files, out, params, truths=None, cutoff=0, frac=1.0, leg=None,
-                  cl='default', title=None, combine=False, min_weight=0):
+                  cl='default', title=None, combine=False, min_weight=0, log_mass=False):
     '''
     Generates a corner plot for the specified posterior samples and parameters.
 
@@ -78,6 +79,8 @@ def generate_corner_plot(sample_files, out, params, truths=None, cutoff=0, frac=
                 'mej_purple':'$m_{ej}$ [purple] $(M_\\odot)$',
                 'mej_blue':'$m_{ej}$ [blue] $(M_\\odot)$',
                 'mej_dyn':'$m_{ej}$ [dyn] $(M_\\odot)$',
+                'log_mej_dyn':'log$_{10}( m_{ej} / M_\\odot)$ [dyn]',
+                'log_mej_wind':'log$_{10}( m_{ej} / M_\\odot)$ [wind]',
                 'mej_wind':'$m_{ej}$ [wind] $(M_\\odot)$',
                 'vej_red':'$v_{ej} / c$ [red]',
                 'vej_purple':'$v_{ej} / c$ [purple]',
@@ -135,6 +138,17 @@ def generate_corner_plot(sample_files, out, params, truths=None, cutoff=0, frac=
         ### generate a dictionary that matches parameter names to column indices
         for index in range(4, len(header)):
             index_dict[header[index]] = index - 1
+        if log_mass:
+            for index, name in enumerate(params):
+                if name == "mej_dyn":
+                    index_dict["log_mej_dyn"] = index_dict["mej_dyn"]
+                    samples[:,index_dict["log_mej_dyn"]] = np.log10(samples[:,index_dict["log_mej_dyn"]])
+                    params[index] = "log_mej_dyn"
+                if name == "mej_wind":
+                    index_dict["log_mej_wind"] = index_dict["mej_wind"]
+                    samples[:,index_dict["log_mej_wind"]] = np.log10(samples[:,index_dict["log_mej_wind"]])
+                    params[index] = "log_mej_wind"
+
         lnL = samples[:,0]
         p = samples[:,1]
         p_s = samples[:,2]
@@ -226,5 +240,6 @@ if __name__ == '__main__':
     title = args.title
     combine = args.combine
     min_weight = args.min_weight
+    log_mass = args.log_mass
     generate_corner_plot(sample_files, out, params, truths, cutoff, frac, leg, cl,
-                  title, combine, min_weight)
+                  title, combine, min_weight, log_mass)

@@ -98,7 +98,7 @@ GW170817_kn_interp: directories
 
 GW170817_kn_interp_angle: directories
 	mkdir -p pe_runs/$@_$(shell date +%Y%m%d)/
-	python3 ${EM_PE_INSTALL_DIR}/em_pe/parser/parse_json.py --t0 ${GW170817_START} --tmax 6.7 --f ${EM_PE_INSTALL_DIR}/Data/GW170817.json --b g --b r --b i --b z --b y --b J --b H --b K --out pe_runs/$@_$(shell date +%Y%m%d)/ --tmax-g 3.0 --tmax-r 3.0 --tmax-i 3.0
+	python3 ${EM_PE_INSTALL_DIR}/em_pe/parser/parse_json.py --t0 ${GW170817_START} --tmax 6.7 --f ${EM_PE_INSTALL_DIR}/Data/GW170817.json --b g --b r --b i --b z --b y --b J --b H --b K --out pe_runs/$@_$(shell date +%Y%m%d)/
 	echo "#!/bin/sh" > pe_runs/$@_$(shell date +%Y%m%d)/sample.sh
 	echo "time python3 -u ${EM_PE_INSTALL_DIR}/em_pe/sampler.py --dat ./ --m kn_interp_angle -v --f g.txt --f r.txt --f i.txt --f z.txt --f y.txt --f J.txt --f H.txt --f K.txt --min 8 --max 8 --out samples.txt --fixed-param dist 40.0 --fixed-param theta 30.0 --burn-in 5 --beta-start 0.005 --beta-end 0.1 --keep-npts 1000000" >> pe_runs/$@_$(shell date +%Y%m%d)/sample.sh
 	echo "python3 ${EM_PE_INSTALL_DIR}/em_pe/plot_utils/plot_corner.py --posterior-samples samples-combined.txt --out corner.png --p mej_dyn --p mej_wind --p vej_dyn --p vej_wind" > pe_runs/$@_$(shell date +%Y%m%d)/plot_corner.sh

@@ -97,37 +97,41 @@ def generate_lc_plot(out, b, tmin, tmax, m=None, sample_file=None, lc_file=None,
         for band in b:
             model.set_params(best_params, [tmin, tmax])
             best_lc = model.evaluate(t, band)[0] + 5.0 * (np.log10(best_params['dist'] * 1.0e6) - 1.0)
-            if model.vectorized:
-                params = dict(zip(param_names, [param_array[:,i] for i in range(len(param_names))]))
-                if fixed_params is not None:
-                    for [name, val] in fixed_params:
-                        params[name] = np.ones(num_samples) * val
-                model.set_params(params, [tmin, tmax])
-                lc_array = model.evaluate(t, band)[0]
-                for i in range(num_samples):
-                    lc_array[i] += 5.0 * (np.log10(params["dist"][i] * 1.0e6) - 1.0)
-            else:
-                lc_array = np.empty((num_samples, n_pts))
-                for row in range(num_samples):
-                    params = dict(zip(param_names, param_array[row]))
-                    if fixed_params is not None:
-                        for [name, val] in fixed_params:
-                            params[name] = val
-                    model.set_params(params, [tmin, tmax])
-                    dist = params['dist']
-                    lc_array[row] = model.evaluate(t, band)[0] + 5.0 * (np.log10(dist * 1.0e6) - 1.0)
             if band in colors:
                 color = colors[band]
             else:
                 print("No matching color for band", band)
                 color=None
-            min_lc = np.amin(lc_array, axis=0)
-            max_lc = np.amax(lc_array, axis=0)
-            #plt.plot(t, min_lc, color=color, label=band)
-            #plt.plot(t, max_lc, color=color)
             plt.plot(t, best_lc, color=color, label=band)
-            plt.fill_between(t, min_lc, max_lc, color=color, alpha=0.1)
+            plot_ranges = False
+            if plot_ranges:
+                if model.vectorized:
+                    params = dict(zip(param_names, [param_array[:,i] for i in range(len(param_names))]))
+                    if fixed_params is not None:
+                        for [name, val] in fixed_params:
+                            params[name] = np.ones(num_samples) * val
+                    model.set_params(params, [tmin, tmax])
+                    lc_array = model.evaluate(t, band)[0]
+                    for i in range(num_samples):
+                        lc_array[i] += 5.0 * (np.log10(params["dist"][i] * 1.0e6) - 1.0)
+                else:
+                    lc_array = np.empty((num_samples, n_pts))
+                    for row in range(num_samples):
+                        params = dict(zip(param_names, param_array[row]))
+                        if fixed_params is not None:
+                            for [name, val] in fixed_params:
+                                params[name] = val
+                        model.set_params(params, [tmin, tmax])
+                        dist = params['dist']
+                        lc_array[row] = model.evaluate(t, band)[0] + 5.0 * (np.log10(dist * 1.0e6) - 1.0)
+                min_lc = np.amin(lc_array, axis=0)
+                max_lc = np.amax(lc_array, axis=0)
+                #plt.plot(t, min_lc, color=color, label=band)
+                #plt.plot(t, max_lc, color=color)
+                plt.fill_between(t, min_lc, max_lc, color=color, alpha=0.1)
     if lc_file is not None:
+        minval = np.inf
+        maxval = -np.inf
         for fname in lc_file:
             band = fname.split(".")[0]
             if band in colors:
@@ -139,8 +143,16 @@ def generate_lc_plot(out, b, tmin, tmax, m=None, sample_file=None, lc_file=None,
             t = lc[:,0]
             err = lc[:,3]
             lc = lc[:,2]
+            minval = min(minval, np.min(lc))
+            maxval = max(maxval, np.max(lc))
             plt.errorbar(t, lc, yerr=err, fmt="none", capsize=2, color=color)
-    plt.gca().invert_yaxis()
+        maxval += 2.0
+        minval -= 2.0
+        plt.ylim(minval, maxval)
+    if lc_file is not None:
+        plt.ylim(maxval, minval)
+    else:
+        plt.gca().invert_yaxis()
     if log_time:
         plt.xscale('log')
     plt.ylabel('$m_{AB}$')

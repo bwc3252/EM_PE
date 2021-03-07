@@ -204,7 +204,7 @@ class sampler:
                 err = self.data[band][:,3]
                 m = temp_data[band][0]
                 m_err = temp_data[band][1]
-                lnL = np.empty(m.shape[0])
+                lnL = np.zeros(m.shape[0])
                 for i in range(m.shape[0]):
                     diff = x - m[i]
                     lnL[i] += np.sum(diff**2 / (err**2 + m_err[i]**2) + np.log(2.0 * np.pi * (err**2 + m_err[i]**2)))
@@ -222,7 +222,7 @@ class sampler:
         return -0.5 * lnL
 
     def _get_current_samples(self):
-        samples = self.cumulative_lnL.reshape((self.cumulative_lnL.size, 1))
+        samples = np.copy(self.cumulative_lnL).reshape((self.cumulative_lnL.size, 1))
         samples = np.append(samples, self.integrator.cumulative_p, axis=1)
         samples = np.append(samples, self.integrator.cumulative_p_s, axis=1)
         samples = np.append(samples, self.integrator.cumulative_samples, axis=1)
@@ -286,7 +286,6 @@ class sampler:
         ret *= beta
         if self.v:
             print("points with non-zero likelihood:", np.sum(np.exp(ret - np.max(ret)) > 0.0))
-        ret[np.isnan(ret)] = -np.inf
         return ret
 
     def _generate_samples(self):
@@ -402,9 +401,9 @@ def main():
         limits = {name:(float(llim), float(rlim)) for (name, llim, rlim) in args.set_limit}
     else:
         limits = None
-    s = sampler(data_loc, m, files, out, v, L_cutoff, min_iter, max_iter, ncomp, 
-            fixed_params, estimate_dist, epoch, correlate_dims,
-            burn_in_length, beta_start, beta_end, keep_npts, nprocs, limits)
+    s = sampler(data_loc, m, files, out, v=v, L_cutoff=L_cutoff, min_iter=min_iter, max_iter=max_iter, ncomp=ncomp, 
+            fixed_params=fixed_params, estimate_dist=estimate_dist, epoch=epoch, correlate_dims=correlate_dims,
+            burn_in_length=burn_in_length, beta_start=beta_start, beta_end=beta_end, keep_npts=keep_npts, nprocs=nprocs, limits=limits)
     #        burn_in_length, burn_in_start, beta_start, keep_npts, nprocs)
     s.generate_samples()
 
