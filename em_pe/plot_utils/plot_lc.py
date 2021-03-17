@@ -78,32 +78,33 @@ def generate_lc_plot(out, b, tmin, tmax, m=None, sample_file=None, lc_file=None,
         weights = L * p / p_s
         _, c = samples.shape
         num_samples = 100
-        param_array = np.empty((num_samples, c - 3))
-        for col in range(3, c):
-            p = header[col]
-            values = samples[:,col]
-            ### get intervals of parameters
-            lower = _quantile(values, 0.05, weights)
-            upper = _quantile(values, 0.95, weights)
-            ### randomly sample some points in this range
-            param_array[:,col - 3] = np.random.uniform(lower, upper, num_samples)
+        random_param_ind = np.random.choice(np.arange(weights.size), p=(weights / np.sum(weights)), size=num_samples)
+        param_array = samples[:,3:][random_param_ind]
+        #for col in range(3, c):
+        #    p = header[col]
+        #    values = samples[:,col]
+        #    ### get intervals of parameters
+        #    lower = _quantile(values, 0.05, weights)
+        #    upper = _quantile(values, 0.95, weights)
+        #    ### randomly sample some points in this range
+        #    param_array[:,col - 3] = np.random.uniform(lower, upper, num_samples)
         n_pts = 25
         t = np.logspace(np.log10(tmin), np.log10(tmax), n_pts)
         param_names = header[3:]
-        best_params = dict(zip(param_names, best_params))
-        if fixed_params is not None:
-            for [name, val] in fixed_params:
-                best_params[name] = val
+        param_array[0] = best_params
+        #best_params = dict(zip(param_names, best_params))
+        #if fixed_params is not None:
+        #    for [name, val] in fixed_params:
+        #        best_params[name] = val
         for band in b:
-            model.set_params(best_params, [tmin, tmax])
-            best_lc = model.evaluate(t, band)[0] + 5.0 * (np.log10(best_params['dist'] * 1.0e6) - 1.0)
+            #model.set_params(best_params, [tmin, tmax])
+            #best_lc = model.evaluate(t, band)[0] + 5.0 * (np.log10(best_params['dist'] * 1.0e6) - 1.0)
             if band in colors:
                 color = colors[band]
             else:
                 print("No matching color for band", band)
                 color=None
-            plt.plot(t, best_lc, color=color, label=band)
-            plot_ranges = False
+            plot_ranges = True
             if plot_ranges:
                 if model.vectorized:
                     params = dict(zip(param_names, [param_array[:,i] for i in range(len(param_names))]))
@@ -111,11 +112,12 @@ def generate_lc_plot(out, b, tmin, tmax, m=None, sample_file=None, lc_file=None,
                         for [name, val] in fixed_params:
                             params[name] = np.ones(num_samples) * val
                     model.set_params(params, [tmin, tmax])
-                    lc_array = model.evaluate(t, band)[0]
+                    lc_array, lc_err_array = model.evaluate(t, band)
                     for i in range(num_samples):
                         lc_array[i] += 5.0 * (np.log10(params["dist"][i] * 1.0e6) - 1.0)
                 else:
                     lc_array = np.empty((num_samples, n_pts))
+                    lc_err_array = np.empty((num_samples, npts))
                     for row in range(num_samples):
                         params = dict(zip(param_names, param_array[row]))
                         if fixed_params is not None:
@@ -123,11 +125,14 @@ def generate_lc_plot(out, b, tmin, tmax, m=None, sample_file=None, lc_file=None,
                                 params[name] = val
                         model.set_params(params, [tmin, tmax])
                         dist = params['dist']
-                        lc_array[row] = model.evaluate(t, band)[0] + 5.0 * (np.log10(dist * 1.0e6) - 1.0)
+                        lc_array[row], lc_err_arry[row] = model.evaluate(t, band)
+                        lc_array[row] += 5.0 * (np.log10(dist * 1.0e6) - 1.0)
                 min_lc = np.amin(lc_array, axis=0)
                 max_lc = np.amax(lc_array, axis=0)
+                best_lc = lc_array[0]
                 #plt.plot(t, min_lc, color=color, label=band)
                 #plt.plot(t, max_lc, color=color)
+                plt.plot(t, best_lc, color=color, label=band)
                 plt.fill_between(t, min_lc, max_lc, color=color, alpha=0.1)
     if lc_file is not None:
         minval = np.inf

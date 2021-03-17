@@ -47,7 +47,6 @@ class kn_interp_angle(model_base):
                 self.interpolators[angle].append(interp_loc + "saved_models_angle/ang" + str(angle) + "_time_" + suffix + ".joblib")
         
         self.lmbda_dict = { # dictionary of wavelengths corresponding to bands
-                "u":354.3,
                 "g":477.56,
                 "r":612.95,
                 "i":748.46,
@@ -182,3 +181,4 @@ class kn_interp_angle(model_base):
             # if the model is being used in non-vectorized form, return 1d arrays
             return mags_out.flatten(), mags_err_out.flatten()
         return mags_out, mags_err_out
+

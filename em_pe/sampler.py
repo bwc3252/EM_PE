@@ -39,6 +39,8 @@ def _parse_command_line_args():
     parser.add_argument('--keep-npts', type=int, help='Store the n highest-likelihood samples')
     parser.add_argument('--nprocs', type=int, default=1, help='Number of parallel processes to use for likelihood evaluation')
     parser.add_argument('--set-limit', action='append', nargs=3, help='Modify parameter limits (e.g. --set-limit mej_red 0.008 0.012)')
+    parser.add_argument('--ignore-model-error', action='store_true', help='Fix model error to 0 (i.e. ignore it)')
+    parser.add_argument('--gaussian-prior-theta', nargs=2, type=float, help='Mean and std. dev. for Gaussian prior (overrides default uniform prior for angle')
     return parser.parse_args()
 
 class sampler:
@@ -69,7 +71,7 @@ class sampler:
     def __init__(self, data_loc, m, files, out, v=True, L_cutoff=0, min_iter=20,
                  max_iter=20, ncomp=None, fixed_params=None,
                  estimate_dist=True, epoch=5, correlate_dims=None, burn_in_length=None,
-                 beta_start=1.0, beta_end=1.0, keep_npts=None, nprocs=1, limits=None):
+                 beta_start=1.0, beta_end=1.0, keep_npts=None, nprocs=1, limits=None, ignore_m_err=False, gaussian_prior_theta=None):
         ### parameters passed in from user or main()
         self.data_loc = data_loc
         self.m = m
@@ -90,6 +92,8 @@ class sampler:
         self.beta_end = beta_end
         self.keep_npts = keep_npts
         self.nprocs = nprocs
+        self.ignore_m_err = ignore_m_err
+        self.gaussian_prior_theta = gaussian_prior_theta
         self.limits = limits if limits is not None else {}
         if ncomp is None:
             self.ncomp = 1
@@ -174,7 +178,11 @@ class sampler:
         ### evaluate the prior for each parameter
         for p in self.ordered_params:
             x = sample_array[:,index_dict[p]]
-            ret *= self.params[p].prior(x)
+            if self.gaussian_prior_theta is not None and p == "theta":
+                from scipy.stats import norm
+                ret *= norm.pdf(x, loc=self.gaussian_prior_theta[0], scale=self.gaussian_prior_theta[1])
+            else:
+                ret *= self.params[p].prior(x)
         return ret.reshape((n, 1))
 
     def _evaluate_lnL(self, params, model, vectorized=False):
@@ -204,6 +212,8 @@ class sampler:
                 err = self.data[band][:,3]
                 m = temp_data[band][0]
                 m_err = temp_data[band][1]
+                if self.ignore_m_err:
+                    m_err *= 0.0
                 lnL = np.zeros(m.shape[0])
                 for i in range(m.shape[0]):
                     diff = x - m[i]
@@ -217,6 +227,8 @@ class sampler:
             err = self.data[band][:,3]
             m = temp_data[band][0]
             m_err = temp_data[band][1]
+            if self.ignore_m_err:
+                m_err *= 0.0
             diff = x - m
             lnL += np.sum(diff**2 / (err**2 + m_err**2) + np.log(2.0 * np.pi * (err**2 + m_err**2)))
         return -0.5 * lnL
@@ -403,7 +415,7 @@ def main():
         limits = None
     s = sampler(data_loc, m, files, out, v=v, L_cutoff=L_cutoff, min_iter=min_iter, max_iter=max_iter, ncomp=ncomp, 
             fixed_params=fixed_params, estimate_dist=estimate_dist, epoch=epoch, correlate_dims=correlate_dims,
-            burn_in_length=burn_in_length, beta_start=beta_start, beta_end=beta_end, keep_npts=keep_npts, nprocs=nprocs, limits=limits)
+            burn_in_length=burn_in_length, beta_start=beta_start, beta_end=beta_end, keep_npts=keep_npts, nprocs=nprocs, limits=limits, ignore_m_err=args.ignore_model_error, gaussian_prior_theta=args.gaussian_prior_theta)
     #        burn_in_length, burn_in_start, beta_start, keep_npts, nprocs)
     s.generate_samples()
 

@@ -106,6 +106,10 @@ def generate_corner_plot(sample_files, out, params, truths=None, cutoff=0, frac=
             truths_header = f.readline().strip().split(' ')[1:]
         truths_full = np.loadtxt(truths, skiprows=1)
         truths_dict = {truths_header[i]:truths_full[i] for i in range(truths_full.size)}
+        if log_mass:
+            for name in truths_dict.keys():
+                if name[:3] == "mej":
+                    truths_dict[name] = np.log10(truths_dict[name])
     else:
         truths_dict = None
     fig_base = None

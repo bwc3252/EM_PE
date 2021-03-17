@@ -1,5 +1,5 @@
 import numpy as np
-from scipy.stats import loguniform
+from scipy.stats import loguniform, norm
 
 class Parameter:
     def __init__(self, name, llim, rlim):
@@ -35,6 +35,17 @@ class LogUniformPriorParameter(Parameter):
         ret = loguniform.rvs(*loguniform.interval(width, self.llim, self.rlim), size=size)
         return ret if size != 1 else ret[0]
 
+class GaussianPriorParameter(Parameter):
+    def __init__(self, name, llim, rlim, mean, std):
+        self.mean = mean
+        self.std = std
+        Parameter.__init__(self, name, llim, rlim)
+
+    def prior(self, x):
+        return norm.pdf(x, loc=self.mean, scale=self.std)
+
+    def sample_from_prior(self, size=1, width=1.0):
+        raise NotImplementedError("Need to implement Gaussian prior sampling")
 
 class Distance(UniformPriorParameter):
     def __init__(self):
@@ -123,6 +134,10 @@ class Kappa(LogUniformPriorParameter):
 class Sigma(UniformPriorParameter):
     def __init__(self):
         UniformPriorParameter.__init__(self, "sigma", 0.0, 0.5)
+
+#class Theta(UniformPriorParameter):
+#    def __init__(self):
+#        UniformPriorParameter.__init__(self, "theta", 0.0, 90.0)
 
 class Theta(UniformPriorParameter):
     def __init__(self):
