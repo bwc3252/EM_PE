@@ -29,10 +29,12 @@ def _parse_command_line_args():
     parser.add_argument('--combine', action='store_true', help='Generate a plot using ALL sample files specified')
     parser.add_argument('--min-weight', type=float, default=0.0, help='Minimum weight to keep')
     parser.add_argument('--log-mass', action='store_true', help="Plot log10 of masses")
+    parser.add_argument('--simulation-points', help='File with simulation parameters')
+    parser.add_argument('--simulation-lnL', help='File with simulation log likelihoods')
     return parser.parse_args()
 
 def generate_corner_plot(sample_files, out, params, truths=None, cutoff=0, frac=1.0, leg=None,
-                  cl='default', title=None, combine=False, min_weight=0, log_mass=False):
+                  cl='default', title=None, combine=False, min_weight=0, log_mass=False, sim_points=None, sim_lnL=None):
     '''
     Generates a corner plot for the specified posterior samples and parameters.
 
@@ -79,14 +81,14 @@ def generate_corner_plot(sample_files, out, params, truths=None, cutoff=0, frac=
                 'mej_purple':'$m_{ej}$ [purple] $(M_\\odot)$',
                 'mej_blue':'$m_{ej}$ [blue] $(M_\\odot)$',
                 'mej_dyn':'$m_{ej}$ [dyn] $(M_\\odot)$',
-                'log_mej_dyn':'log$_{10}( m_{ej} / M_\\odot)$ [dyn]',
-                'log_mej_wind':'log$_{10}( m_{ej} / M_\\odot)$ [wind]',
+                'log_mej_dyn':'log$_{10}( M_{D} / M_\\odot)$',
+                'log_mej_wind':'log$_{10}( M_{W} / M_\\odot)$',
                 'mej_wind':'$m_{ej}$ [wind] $(M_\\odot)$',
                 'vej_red':'$v_{ej} / c$ [red]',
                 'vej_purple':'$v_{ej} / c$ [purple]',
                 'vej_blue':'$v_{ej} / c$ [blue]',
-                'vej_dyn':'$v_{ej} / c$ [dyn]',
-                'vej_wind':'$v_{ej} / c$ [wind]',
+                'vej_dyn':'$v_{D} / c$',
+                'vej_wind':'$v_{W} / c$',
                 'Tc_red':'Tc [red]',
                 'Tc_purple':'Tc [purple]',
                 'Tc_blue':'Tc [blue]',
@@ -129,6 +131,7 @@ def generate_corner_plot(sample_files, out, params, truths=None, cutoff=0, frac=
         if leg is not None:
             leg.append('combined')
     for ind in range(len(total_samples)):
+        params_copy = params.copy()
         samples = total_samples[ind]
         header = headers[ind]
         ### the parameter samples are in columns 4 and up, so to get their
@@ -142,6 +145,7 @@ def generate_corner_plot(sample_files, out, params, truths=None, cutoff=0, frac=
         ### generate a dictionary that matches parameter names to column indices
         for index in range(4, len(header)):
             index_dict[header[index]] = index - 1
+
         if log_mass:
             for index, name in enumerate(params):
                 if name == "mej_dyn":
@@ -184,17 +188,18 @@ def generate_corner_plot(sample_files, out, params, truths=None, cutoff=0, frac=
         x = x[mask]
         x = x[mask2]
         print('Median weight of masked sample set:', np.median(weights))
-        color = color_list[i % len(color_list)]
-        for i in range(len(params)):
-            if params[i] == 'log_mej_red':
-                params[i] = 'mej_red'
-                x[:,i] = 10.0**x[:,i]
-            elif params[i] == 'log_mej_purple':
-                params[i] = 'mej_purple'
-                x[:,i] = 10.0**x[:,i]
-            elif params[i] == 'log_mej_blue':
-                params[i] = 'mej_blue'
-                x[:,i] = 10.0**x[:,i]
+        color = color_list[i]
+        print(color)
+        for ii in range(len(params)):
+            if params[ii] == 'log_mej_red':
+                params[ii] = 'mej_red'
+                x[:,ii] = 10.0**x[:,ii]
+            elif params[ii] == 'log_mej_purple':
+                params[ii] = 'mej_purple'
+                x[:,ii] = 10.0**x[:,ii]
+            elif params[ii] == 'log_mej_blue':
+                params[ii] = 'mej_blue'
+                x[:,ii] = 10.0**x[:,ii]
 
         labels = []
         for param in params:
@@ -211,8 +216,31 @@ def generate_corner_plot(sample_files, out, params, truths=None, cutoff=0, frac=
         ### make the corner plot
         fig_base = corner.corner(x, weights=weights, levels=args.cl, fig=fig_base, labels=labels, truths=truths,
                                  color=color, plot_datapoints=False, plot_density=plot_density,
-                                 contours=True, smooth1d=0.1, smooth=0.1)
+                                 contours=True, smooth1d=0.1, smooth=0.1, label_kwargs={"fontsize":16})
         i += 1
+        params = params_copy
+    if sim_points is not None:
+        import RIFT.misc.our_corner as our_corner
+        with open(sim_points) as f:
+            header = f.readline().strip().split(" ")[1:]
+        sim_points = np.loadtxt(sim_points)
+        sim_lnL = np.loadtxt(sim_lnL)
+        ind = np.argsort(sim_lnL)[-50:]
+        sim_points = sim_points[ind]
+        sim_lnL = sim_lnL[ind]
+        vals = (sim_lnL - np.min(sim_lnL)) / (np.max(sim_lnL) - np.min(sim_lnL))
+        x = np.empty((vals.size, len(params)))
+        for i, name in enumerate(params):
+            if log_mass and name[:3] == "log":
+                x[:,i] = np.log10(sim_points[:,header.index(name[4:])])
+            else:
+                x[:,i] = sim_points[:,header.index(name)]
+            if name == "theta":
+                mask = x[:,i] > 90.0
+                x[:,i][mask] = 180.0 - x[:,i][mask]
+        cm = plt.cm.get_cmap('rainbow')
+        cmap_values = cm(vals)
+        fig_base = our_corner.corner(x, plot_datapoints=True, plot_density=False, no_fill_contours=True, plot_contours=False, contours=False, levels=None, fig=fig_base, data_kwargs={'color':cmap_values})
     if title is not None:
         plt.title(title)
     if leg is not None:
@@ -220,7 +248,7 @@ def generate_corner_plot(sample_files, out, params, truths=None, cutoff=0, frac=
         xcoord = 0 #len(params) - 1
         ycoord = len(params)
         ### generate the legend
-        lgd = plt.legend(leg, bbox_to_anchor=(xcoord, ycoord), loc='upper left')
+        lgd = plt.legend(leg, bbox_to_anchor=(xcoord, ycoord), loc='upper left', prop={"size":16})
         #lgd = plt.legend(leg, loc="center left")
         ### fix the colors in the legend -- for some reason, if truth values are provided,
         ### every entry in the legend will have the same color
@@ -245,5 +273,7 @@ if __name__ == '__main__':
     combine = args.combine
     min_weight = args.min_weight
     log_mass = args.log_mass
+    sim_points = args.simulation_points
+    sim_lnL = args.simulation_lnL
     generate_corner_plot(sample_files, out, params, truths, cutoff, frac, leg, cl,
-                  title, combine, min_weight, log_mass)
+                  title, combine, min_weight, log_mass, sim_points, sim_lnL)

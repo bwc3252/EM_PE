@@ -59,6 +59,7 @@ def generate_lc_plot(out, b, tmin, tmax, m=None, sample_file=None, lc_file=None,
         raise RuntimeError("No samples supplied for model evaluation.")
     ### colors to use for each band
     colors = {"K":"darkred", "H":"red", "J":"orange", "y":"gold", "z":"greenyellow", "i":"green", "r":"lime", "g":"cyan", "u":"blue"}
+    offsets = {"K":0, "H":1, "J":2, "y":3, "z":4, "i":5, "r":6, "g":7}
     plt.figure(figsize=(12, 8))
     if m is not None:
         model = model_dict[m]()
@@ -68,7 +69,7 @@ def generate_lc_plot(out, b, tmin, tmax, m=None, sample_file=None, lc_file=None,
         samples = np.loadtxt(sample_file)
         header = header[1:]
         lnL = samples[:,0]
-        best_params = samples[np.argmax(lnL)][3:]
+        #best_params = samples[np.argmax(lnL)][3:]
         p = samples[:,1]
         p_s = samples[:,2]
         ### shift all the lnL values up so that we don't have rounding issues
@@ -76,6 +77,7 @@ def generate_lc_plot(out, b, tmin, tmax, m=None, sample_file=None, lc_file=None,
         L = np.exp(lnL)
         ### calculate weights
         weights = L * p / p_s
+        best_params = np.array([_quantile(samples[:,i], [0.5], weights=(weights / np.sum(weights)))[0] for i in range(3, len(header))])
         _, c = samples.shape
         num_samples = 100
         random_param_ind = np.random.choice(np.arange(weights.size), p=(weights / np.sum(weights)), size=num_samples)
@@ -127,12 +129,15 @@ def generate_lc_plot(out, b, tmin, tmax, m=None, sample_file=None, lc_file=None,
                         dist = params['dist']
                         lc_array[row], lc_err_arry[row] = model.evaluate(t, band)
                         lc_array[row] += 5.0 * (np.log10(dist * 1.0e6) - 1.0)
-                min_lc = np.amin(lc_array, axis=0)
-                max_lc = np.amax(lc_array, axis=0)
+                lc_array += offsets[band]
+                #min_lc = np.amin(lc_array, axis=0)
+                #max_lc = np.amax(lc_array, axis=0)
                 best_lc = lc_array[0]
                 #plt.plot(t, min_lc, color=color, label=band)
                 #plt.plot(t, max_lc, color=color)
-                plt.plot(t, best_lc, color=color, label=band)
+                plt.plot(t, best_lc, color=color, label=band + " + " + str(offsets[band]))
+                min_lc = np.quantile(lc_array, 0.05, axis=0)
+                max_lc = np.quantile(lc_array, 0.95, axis=0)
                 plt.fill_between(t, min_lc, max_lc, color=color, alpha=0.1)
     if lc_file is not None:
         minval = np.inf
@@ -147,7 +152,7 @@ def generate_lc_plot(out, b, tmin, tmax, m=None, sample_file=None, lc_file=None,
             lc = np.loadtxt(fname)
             t = lc[:,0]
             err = lc[:,3]
-            lc = lc[:,2]
+            lc = lc[:,2] + offsets[band]
             minval = min(minval, np.min(lc))
             maxval = max(maxval, np.max(lc))
             plt.errorbar(t, lc, yerr=err, fmt="none", capsize=2, color=color)
@@ -160,9 +165,14 @@ def generate_lc_plot(out, b, tmin, tmax, m=None, sample_file=None, lc_file=None,
         plt.gca().invert_yaxis()
     if log_time:
         plt.xscale('log')
-    plt.ylabel('$m_{AB}$')
-    plt.legend()
-    plt.xlabel('Time (days)')
+    ticks = [x for x in [0.125, 0.5, 1, 2, 4, 8, 16, 32] if x <= tmax]
+    labels = [str(x) for x in ticks]
+    plt.gca().set_xticks(ticks)
+    plt.gca().set_xticklabels(labels)
+    plt.gca().tick_params(labelsize=16)
+    plt.ylabel('$m_{AB}$', fontsize=16)
+    plt.legend(prop={"size":16})
+    plt.xlabel('Time (days)', fontsize=16)
     plt.tight_layout()
     plt.savefig(out)
 
