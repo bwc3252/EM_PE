@@ -5,7 +5,7 @@ multiprocess==0.70.6.1
 scipy==1.2.1
 corner==2.0.1
 matplotlib==2.0.2
-numpy==1.16.2
+numpy==1.22.0
 progressbar2==3.42.0
 pyDOE==0.3.8
 scikit_learn==0.20.0
