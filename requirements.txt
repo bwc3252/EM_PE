@@ -1,6 +1,6 @@
 astropy==2.0.12
 lalsuite==6.53
-setuptools==39.0.1
+setuptools==65.5.1
 multiprocess==0.70.6.1
 scipy==1.2.1
 corner==2.0.1
